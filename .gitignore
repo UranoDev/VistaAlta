@@ -1,0 +1,30 @@
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+paletas.js
+
+# Excluir todos los archivos y directorios que inicien con .
+.*
+!.gitignore
+
+# En .claude, solo permitir log.md
+# Permitir el directorio .claude
+!.claude/
+
+# Ignorar todo dentro de .claude
+.claude/*
+
+# Excepto log.md
+!.claude/log.md

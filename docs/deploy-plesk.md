@@ -19,7 +19,8 @@ para comentar.
 | --- | --- | --- |
 | DNS | `vistaaltatx.com` y `www` con registro A a la IP del VPS | `nslookup vistaaltatx.com` |
 | PHP | 8.3 o superior (`composer.json` pide `^8.3`; en local corre 8.4) | Plesk → Domains → PHP Settings |
-| Extensiones PHP | `pdo_sqlite`, `sqlite3`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `curl`, `fileinfo`, `zip` | `php -m` por SSH |
+| MariaDB | 10.5.29 — Laravel 13 pide 10.3 o superior | `mysql --version` por SSH |
+| Extensiones PHP | `pdo_mysql`, `mysqli`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `curl`, `fileinfo`, `zip` | `php -m` por SSH |
 | Acceso SSH | Habilitado para el usuario de la suscripción | Plesk → Web Hosting Access → *Access to the server over SSH* → `/bin/bash` |
 | Twilio | SID, Auth Token y número emisor | Consola de Twilio |
 
@@ -31,8 +32,10 @@ puede comentar.
 ## 1. Línea base en git *(en tu máquina, una sola vez)*
 
 El repo no tiene historial todavía. Antes del primer `git add`, confirma que la
-base local está ignorada — guarda Comentarios con el teléfono de quien los
-escribió, y el historial de git no se depura después:
+base local está ignorada. En producción los Comentarios viven en MariaDB, pero
+**en tu máquina el desarrollo sigue en SQLite** (`.env` trae
+`DB_CONNECTION=sqlite`), y ese archivo acumula los teléfonos que hayas usado
+probando el OTP. El historial de git no se depura después:
 
 ```bash
 git check-ignore -v database/database.sqlite   # debe imprimir la regla del .gitignore
@@ -61,7 +64,7 @@ Después, el repo remoto. Dos caminos:
   empujas directo. Sirve si prefieres no meter un tercero.
 
 ```bash
-git remote add origin https://github.com/uranodev/VistaAlta.git
+git remote add origin https://github.com/UranoDev/VistaAlta.git
 ```
 
 HTTPS y no SSH a propósito: Git Credential Manager viene con Git para Windows y
@@ -214,8 +217,8 @@ git push; if ($?) { git push origin 2026.07.29 }
 
    Este es *el* paso que se equivoca. La aplicación se copia en `httpdocs/` y el
    docroot apunta a `httpdocs/public`, no a `httpdocs`. Si queda en `httpdocs`,
-   quedan expuestos `.env`, `database/database.sqlite` y todo `storage/` a
-   cualquiera que adivine la URL.
+   quedan expuestos `.env` —con la contraseña de MariaDB y las credenciales de
+   Twilio— y todo `storage/`, incluidos los logs, a cualquiera que adivine la URL.
 3. **PHP Settings:** versión 8.3+, modo **FPM application served by nginx**.
 
 ---
@@ -223,7 +226,7 @@ git push; if ($?) { git push origin 2026.07.29 }
 ## 4. El código en el servidor
 
 Con la extensión **Git** de Plesk: *Add Repository* →
-`https://github.com/uranodev/VistaAlta.git` → carpeta de destino `/httpdocs` →
+`https://github.com/UranoDev/VistaAlta.git` → carpeta de destino `/httpdocs` →
 rama `master`. Plesk guarda las credenciales del repo en la suscripción, así que
 es el camino menos áspero para un repo privado.
 
@@ -231,7 +234,7 @@ O a mano, desde una sesión SSH en el servidor:
 
 ```bash
 cd ~/httpdocs
-git clone https://github.com/uranodev/VistaAlta.git .
+git clone https://github.com/UranoDev/VistaAlta.git .
 ```
 
 Ojo con esta variante si el repo es privado: en el VPS **no hay** Git Credential
@@ -239,7 +242,7 @@ Manager, así que ese `clone` se queda esperando usuario y contraseña, y GitHub
 no acepta contraseñas de cuenta. Hay que darle un token:
 
 ```bash
-git clone https://<usuario>:<token>@github.com/uranodev/VistaAlta.git .
+git clone https://<usuario>:<token>@github.com/UranoDev/VistaAlta.git .
 ```
 
 Un *fine-grained token* con permiso de solo lectura sobre este repo alcanza. Queda
@@ -288,6 +291,13 @@ LOG_LEVEL=error
 SESSION_DOMAIN=vistaaltatx.com
 SESSION_SECURE_COOKIE=true
 
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=vistaalta
+DB_USERNAME=vistaalta
+DB_PASSWORD=...
+
 OTP_CHANNEL=twilio
 TWILIO_SID=...
 TWILIO_AUTH_TOKEN=...
@@ -304,6 +314,16 @@ Los tres que más caro cuestan si se olvidan:
   `/sistema-visual` (`routes/web.php` la envuelve en `! app()->isProduction()`).
 - **`OTP_CHANNEL=twilio`** — en `log` el código de verificación se escribe al
   archivo de log en vez de mandarse por SMS, y ningún Colono puede comentar.
+- **`APP_KEY`** — la llave de la aplicación.
+- **`DB_CONNECTION=mysql`** — el valor por omisión de `config/database.php` es
+  `sqlite`, así que si esta línea falta, Laravel busca un archivo
+  `database/database.sqlite` que en este servidor no existe, y el sitio truena
+  con *database file does not exist* en vez de decir algo sobre MariaDB.
+
+**No pongas `DB_COLLATION`.** El valor que trae `config/database.php` es
+`utf8mb4_unicode_ci`, que MariaDB 10.5 sí tiene. La tentación es copiar el
+`utf8mb4_0900_ai_ci` de algún ejemplo de MySQL 8: esa collation **no existe en
+MariaDB** y toda migración falla con *Unknown collation*.
 
 Luego la llave de la aplicación:
 
@@ -315,15 +335,41 @@ php artisan key:generate
 
 ## 6. Base de datos
 
-SQLite, un archivo. Hay que crearlo — no viaja por git:
+MariaDB 10.5.29. La base y su usuario se crean en Plesk, no por línea de comandos:
+
+1. **Databases → Add Database**
+   - *Database name:* `vistaalta`
+   - *Related site:* `vistaaltatx.com`
+2. En la misma pantalla, **Add Database User**
+   - *User name:* `vistaalta`
+   - Contraseña generada por Plesk — cópiala al `.env`
+   - *Access control:* **Allow local connections only**
+
+Ese último punto importa: la aplicación y la base viven en el mismo VPS, así que
+la base no tiene por qué escuchar en la red. Con conexiones locales nada más, el
+puerto 3306 deja de ser superficie de ataque.
+
+Plesk crea la base en `utf8mb4` por omisión, que es lo que la aplicación espera.
+Si quieres confirmarlo antes de migrar:
 
 ```bash
-touch database/database.sqlite
+mysql -u vistaalta -p -e "SHOW CREATE DATABASE vistaalta\G"
+```
+
+Luego las tablas:
+
+```bash
 php artisan migrate --force
 ```
 
 `--force` es obligatorio: en producción Laravel pide confirmación interactiva y
 la va a rechazar en un script.
+
+Si `migrate` responde *Access denied* o *Unknown database*, el problema está en
+el `.env` y no en la base — revisa que `DB_DATABASE` y `DB_USERNAME` traigan el
+nombre **completo** que Plesk asignó. Plesk suele prefijar ambos con el nombre de
+la suscripción, así que lo que ves en el panel puede no ser `vistaalta` sino algo
+como `vistaaltatx_vistaalta`. Cópialos del panel, no los escribas de memoria.
 
 ### Contenido inicial
 
@@ -341,11 +387,15 @@ actualizar**. Cuando el sitio ya esté al aire, las Actividades nuevas se captur
 desde `/admin`, no aquí.
 
 ### La cuenta del panel
+Proceso interactivo
 
 ```bash
 php artisan make:filament-user
 ```
-
+Opcionalmente:
+```bash
+php artisan make:filament-user --name="Nombre" --email=persona@ejemplo.com --password=...
+```
 Una por integrante de la Mesa Directiva. No hay registro abierto ni recuperación
 de contraseña por correo (el sitio no manda correo): si alguien la olvida, se
 reasigna por SSH con `php artisan tinker`.
@@ -354,15 +404,15 @@ reasigna por SSH con `php artisan tinker`.
 
 ## 7. Permisos
 
-El usuario de PHP-FPM tiene que poder escribir en tres lugares:
+El usuario de PHP-FPM tiene que poder escribir en dos lugares:
 
 ```bash
-chmod -R 775 storage bootstrap/cache database
+chmod -R 775 storage bootstrap/cache
 ```
 
-`database/` como **directorio**, no solo el archivo: SQLite crea ahí sus archivos
-`-wal` y `-shm` durante la escritura, y sin permiso en la carpeta las escrituras
-fallan aunque el `.sqlite` sea escribible.
+Nada más. `database/` **no** va en esa lista: con MariaDB esa carpeta solo guarda
+migraciones y seeders, que PHP únicamente lee. Si vienes de la versión SQLite de
+este runbook, quítale el permiso de escritura — dárselo de gratis no aporta nada.
 
 ---
 
@@ -429,21 +479,47 @@ php artisan migrate --force
 php artisan optimize             # limpia y rehace config/route/view cache
 ```
 
-**Nunca** corras `git clean -fdx` en el servidor: se lleva `.env` y
-`database/database.sqlite`, que son justamente lo que no está en git.
+**Nunca** corras `git clean -fdx` en el servidor: se lleva `.env`, `public/build`
+y el `.node-version`, que son justamente lo que no está en git.
+
+Con MariaDB esto pica menos que con SQLite: la base ya no vive dentro del árbol de
+trabajo, así que un `git clean` descuidado te tira la configuración y los assets
+—molesto, reconstruible— pero ya no los Comentarios de los Colonos.
 
 ---
 
 ## 12. Respaldos
 
-La base es un solo archivo, así que respaldar es copiarlo. Programa en Plesk
-(**Backup Manager → Scheduled Backups**) un respaldo diario de la suscripción, que
-se lleva `httpdocs/` completo e incluye `database/database.sqlite` y `.env`.
+Programa en Plesk (**Backup Manager → Scheduled Backups**) un respaldo diario de
+la suscripción. Con MariaDB eso ya no es opcional ni cosmético: el respaldo de la
+suscripción es lo que se lleva **las bases de datos además de `httpdocs/`**, y la
+base ya no está dentro del árbol de archivos. Si alguien configura el respaldo
+para llevarse solo los archivos, respalda todo menos lo único irreemplazable.
 
-Vale la pena antes de cada despliegue:
+Vale la pena un volcado antes de cada despliegue:
 
 ```bash
-cp database/database.sqlite ~/respaldos/database-$(date +%F-%H%M).sqlite
+mkdir -p ~/respaldos
+mysqldump --single-transaction --default-character-set=utf8mb4 \
+  -u vistaalta -p vistaalta > ~/respaldos/vistaalta-$(date +%F-%H%M).sql
 ```
 
-Los Comentarios y sus teléfonos solo existen ahí. No hay segunda copia.
+`--single-transaction` deja el volcado consistente sin bloquear las tablas, así
+que se puede correr con el sitio arriba. Fíjate que `-p` va **sin la contraseña
+pegada**: así `mysqldump` la pide por teclado en vez de dejarla en el historial de
+bash y a la vista de cualquier `ps`. Para automatizarlo, la contraseña va en un
+`~/.my.cnf` con permisos `600`, nunca en la línea de comandos:
+
+```ini
+[mysqldump]
+user=vistaalta
+password=...
+```
+
+Restaurar:
+
+```bash
+mysql -u vistaalta -p vistaalta < ~/respaldos/vistaalta-2026-07-29-1430.sql
+```
+
+Los Comentarios y sus teléfonos solo existen en esa base. No hay segunda copia.

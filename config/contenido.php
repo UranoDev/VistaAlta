@@ -83,7 +83,7 @@ return [
 
         '¿Por qué hacerlo ahora?' => 'Porque las tres cosas que hoy sostiene la palabra de quien esté en la Mesa Directiva pasarían a sostenerse solas: la cuenta del fraccionamiento a nombre del fraccionamiento y no de un colono; los acuerdos con proveedores firmados por la Asociación; y la cuota exigible por la vía legal a quien decide no pagarla. Mientras la figura no exista, cada una de las tres depende de un favor personal y de que la persona que lo hace siga ahí.',
 
-        '¿Quiénes formarían parte?' => 'Los propietarios de una unidad dentro de Vista Alta. La ley los llama «asociados»; en los hechos son los mismos colonos que hoy asisten a la Asamblea. Nadie queda fuera por no haber ido a una reunión, y formar parte no obliga a ocupar ningún cargo.',
+        '¿Quiénes formarían parte?' => 'Los propietarios de un lote o terreno dentro del Fraccionamiento Vista Alta. La ley los llama «asociados»; en los hechos son los mismos colonos que hoy asisten a las Asambleas. Nadie queda fuera por no haber ido a una reunión, y formar parte no obliga a ocupar ningún cargo.',
 
         '¿Cómo se constituye?' => 'Se redactan los estatutos —las reglas con las que la Asociación se gobierna—, se protocolizan ante notario público y se inscriben en el Registro Público de la Propiedad; después se tramita el RFC ante el SAT. Los estatutos se presentan a la Asamblea antes de ir con el notario: la propuesta es que no se firme nada que la Asamblea no haya leído.',
 

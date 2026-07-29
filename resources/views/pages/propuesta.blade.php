@@ -15,21 +15,19 @@
                     Formalizar el fraccionamiento como Asociación Civil
                 </h1>
                 <p class="mt-4 text-grafito/85">
-                    Vista Alta funciona. Lo que no existe es Vista Alta ante la ley: la cuenta donde caen las cuotas
-                    está a nombre de un colono, los acuerdos con proveedores se sostienen de palabra y la cuota se
-                    paga porque cada quien decide pagarla.
+                    El Fraccionamiento sigue funcionando. Lo que no existe es Vista Alta ante la ley: no tenemos una cuenta donde puedan depositar las cuotas.
                 </p>
                 <p class="mt-4 text-grafito/85">
-                    Esto es lo que la Mesa Directiva somete a consideración de la Asamblea: constituir la Asociación
+                    Esto es lo que la Mesa Directiva propone: constituir la Asociación
                     Civil que le dé al fraccionamiento un nombre propio con el cual abrir una cuenta, firmar y
-                    responder.
+                    responder. <br>Tener personalidad jurídica ante el Municipio, por ejemplo.
                 </p>
                 <p class="mt-4 text-sm text-grafito/75">
                     Es el único asunto del periodo. Las
                     <a href="{{ route('actividades') }}" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Actividades</a>
                     y el
                     <a href="{{ route('reporte-financiero') }}" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Reporte financiero</a>
-                    están aquí para respaldarlo.
+                    están aquí para las revisen.
                 </p>
             </div>
 
@@ -60,14 +58,14 @@
         @php
             $cambios = [
                 [
-                    'titulo' => 'El dinero deja de estar a nombre de alguien',
-                    'texto' => 'Hoy la cuenta donde caen las cuotas está a nombre de un colono, con su RFC y bajo su
-                                responsabilidad personal. Con la Asociación constituida la cuenta es del
-                                fraccionamiento: quien entra y sale de la Mesa Directiva cambia, la cuenta se queda.',
+                    'titulo' => 'Podremos tener una cuenta bancaria.',
+                    'texto' => 'Hoy no tenemos cuenta donde caigan las cuotas, tenemos que manejar soloefectivo, lo que complica el control y seguimiento.
+                                Con la Asociación constituida la cuenta es del
+                                fraccionamiento: sin importar quien entra y sale de la Mesa Directiva, la cuenta (y el dinero) se queda.',
                 ],
                 [
                     'titulo' => 'Los acuerdos se pueden firmar',
-                    'texto' => 'Vigilancia, jardinería, mantenimiento del acceso. Hoy se acuerdan de palabra o los
+                    'texto' => 'Vigilancia, jardinería, mantenimiento, reparaciones. Hoy se acuerdan de palabra o los
                                 firma un particular que pone su nombre. Una Asociación Civil contrata, exige lo
                                 pactado y tiene con qué reclamar cuando un proveedor no cumple.',
                 ],
@@ -75,12 +73,12 @@
                     'titulo' => 'La cuota se vuelve exigible',
                     'texto' => 'Hoy quien no paga simplemente no paga, y lo que deja de aportar lo terminan cubriendo
                                 los vecinos que sí pagaron. No se trata de demandar a nadie: se trata de que dejar de
-                                pagar tenga una consecuencia posible en vez de salir gratis.',
+                                pagar tenga una consecuencia posible en vez de vivir de gratis.',
                 ],
                 [
                     'titulo' => 'Rendir cuentas deja de ser un gesto de buena voluntad',
                     'texto' => 'Una Asociación Civil está obligada por sus estatutos a llevar cuentas y a presentarlas
-                                ante su Asamblea. Lo que hoy hacemos porque nos parece lo correcto —esta página, entre
+                                ante su Asamblea y ante los Colonos. Lo que hoy hacemos porque nos parece lo correcto —esta página, entre
                                 otras cosas— quedaría como obligación de quien ocupe la Mesa Directiva después.',
                 ],
             ];
@@ -116,7 +114,7 @@
                 'La Mesa Directiva no gana poder.' => 'Sigue rindiendo cuentas ante los Colonos y dura lo que la
                                                        Asamblea decida. Los estatutos la sujetan más de lo que hoy la
                                                        sujeta la costumbre.',
-                'El fraccionamiento no se le entrega a nadie de fuera.' => 'Los asociados son los propietarios de Vista
+                'El fraccionamiento no se le entrega a nadie de fuera.' => 'De entrada, los asociados son los propietarios de Vista
                                                                             Alta. No entra una empresa, ni un
                                                                             administrador externo, ni el municipio.',
             ];
@@ -145,9 +143,8 @@
 
     <x-recibo.seccion id="comentarios" rotulo="Tu voz" titulo="Preguntas y comentarios de los colonos">
         <p class="text-grafito/85">
-            La Asamblea es donde esto se decide, pero no tiene por qué ser el único lugar donde se pregunte. Si algo
-            de la Propuesta no te cuadra, escríbelo aquí: la Mesa Directiva lo lee antes de la reunión y así llega
-            contestado en vez de improvisado.
+            La Asamblea es donde muchas cosas se deciden, pero no tiene por qué ser el único lugar donde se pregunte. Si algo
+            de la Propuesta no te cuadra, escríbelo aquí: la Mesa Directiva lo lee y lo conteesta antes de tomar alguna acción.
         </p>
 
         <div class="mt-8">

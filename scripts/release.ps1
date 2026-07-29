@@ -108,4 +108,8 @@ if ($LASTEXITCODE -ne 0) { Write-Error "git tag $effVersion fallo (ya existe?)."
 
 $short = git rev-parse --short HEAD
 Write-Host "Listo: version $effVersion taggeada en $short." -ForegroundColor Green
-Write-Host "Publicar (si hay remoto): git push && git push origin $effVersion" -ForegroundColor DarkGray
+# Dos renglones y no `git push && ...`: en Windows PowerShell 5.1 el `&&` no es
+# un separador valido y el comando truena antes de ejecutar nada.
+Write-Host "Publicar (si hay remoto):" -ForegroundColor DarkGray
+Write-Host "  git push" -ForegroundColor DarkGray
+Write-Host "  git push origin $effVersion" -ForegroundColor DarkGray

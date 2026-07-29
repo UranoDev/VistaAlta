@@ -40,11 +40,18 @@ git check-ignore -v database/database.sqlite   # debe imprimir la regla del .git
 
 Si no imprime nada, **detente** y arregla `.gitignore` primero.
 
-```bash
-git add -A
-git status                      # revisa que no aparezca ningún .sqlite ni .env
-git commit -m "Línea base del sitio"
+Revisa qué entraría al commit **antes** de hacerlo:
+
+```powershell
+git add -An | Select-String -Pattern '\.env|\.sqlite|\.key|/vendor/|node_modules'
 ```
+
+Debe salir únicamente `.env.example` (la plantilla, sin valores) y los
+`storage/framework/*/.gitignore` de Laravel, que son los marcadores que recrean
+esas carpetas en un clon nuevo. Cualquier otra cosa en esa lista es un problema.
+
+No commitees a mano: el primer commit lo hace `release.ps1` junto con el
+CHANGELOG y la etiqueta — es la sección siguiente.
 
 Después, el repo remoto. Dos caminos:
 
@@ -54,16 +61,153 @@ Después, el repo remoto. Dos caminos:
   empujas directo. Sirve si prefieres no meter un tercero.
 
 ```bash
-git remote add origin git@github.com:<cuenta>/urge.git
+git remote add origin https://github.com/uranodev/VistaAlta.git
+```
+
+HTTPS y no SSH a propósito: Git Credential Manager viene con Git para Windows y
+ya es el `credential.helper` de esta máquina, así que el primer `push` se
+autentica solo —o abre el navegador una vez— sin que haya que generar ni
+registrar una llave. En un clon nuevo en Windows, esto funciona sin preparativos.
+
+El primer push necesita `-u` porque la rama local todavía no tiene upstream:
+
+```powershell
 git push -u origin master
 ```
 
-Para cortar versión usa `scripts/release.ps1`, que regenera el CHANGELOG, commitea
-y etiqueta en un solo paso.
+---
+
+## 2. Cortar la versión: CHANGELOG.md y etiqueta
+
+El changelog **no se escribe a mano**: se genera desde los issues resueltos de
+YouTrack (proyecto `URVA` en `https://uranodev.youtrack.cloud`, declarado en
+`.youtrack-project.ps1`). Todo desde PowerShell, en la raíz del repo.
+
+### El camino corto: un solo comando
+
+```powershell
+./scripts/release.ps1
+```
+
+Eso hace cuatro cosas en orden, y el orden es el punto: refresca el caché de
+issues desde YouTrack → regenera `CHANGELOG.md` → `git add -A` → `git commit` →
+`git tag`. El changelog se genera **antes** del commit, así que viaja *dentro*
+del commit de release en vez de quedar como un commit «docs» aparte.
+
+La versión es CalVer y sale de la fecha de hoy (`2026.07.29`). Si ya existe una
+etiqueta con ese nombre —segundo corte el mismo día— la sube a `.1`, `.2`, y usa
+ese mismo valor para el encabezado del CHANGELOG y para la etiqueta.
+
+Banderas útiles:
+
+```powershell
+./scripts/release.ps1 -DryRun                              # regenera el CHANGELOG y NO toca git
+./scripts/release.ps1 -NoRefresh                           # reusa el caché actual, sin pegarle a YouTrack
+./scripts/release.ps1 -Version 2026.08.01 -Message "..."   # versión y mensaje explícitos
+```
+
+Corre `-DryRun` primero. Deja el `CHANGELOG.md` regenerado para que lo revises
+sin haber commiteado ni etiquetado nada.
+
+Un detalle que engaña: **`-DryRun` también se salta el refresh** —lo anuncia con
+`(dry-run) & scripts/refresh-issues-resolved.ps1`— así que lo que ves sale del
+caché, no de YouTrack. Si cerraste issues después de la última generación, no
+aparecen en esa vista previa. Para revisar lo que de verdad va a salir:
+
+```powershell
+./scripts/refresh-issues-resolved.ps1
+./scripts/release.ps1 -DryRun -NoRefresh
+```
+
+### Los dos pasos por separado
+
+Si quieres control fino, o si `release.ps1` falla a medias:
+
+```powershell
+./scripts/refresh-issues-resolved.ps1       # 1. YouTrack -> issues-resolved.json
+./scripts/changelog.ps1 -Mode TagWindow     # 2. issues-resolved.json -> CHANGELOG.md
+```
+
+Para revisar antes de sobreescribir el caché o el changelog reales:
+
+```powershell
+./scripts/refresh-issues-resolved.ps1 -OutputFile issues-resolved.preview.json
+./scripts/changelog.ps1 -Mode TagWindow -OutputFile CHANGELOG.preview.md
+```
+
+### Qué hace `-Mode TagWindow` y por qué es el que usamos
+
+`changelog.ps1` tiene tres modos. `TagWindow` **ignora por completo el texto de
+los mensajes de commit**: agrupa los issues por la etiqueta de versión en cuyo
+rango cayó su fecha de resolución. Cada encabezado es el nombre de una etiqueta,
+y lo resuelto después de la última etiqueta va bajo `## [Unreleased]`.
+
+De ahí sale el truco de `-AsVersion`, que `release.ps1` usa: renderiza ese bucket
+final con el número de versión que estás a punto de crear en vez de
+`[Unreleased]`, y así el CHANGELOG puede quedar completo *antes* de que la
+etiqueta exista.
+
+Consecuencia práctica: **los mensajes de commit no alimentan el changelog**. Lo
+que aparece publicado es el `Summary` de cada issue en YouTrack. Si un renglón se
+lee mal, se corrige en YouTrack y se vuelve a generar — no editando el markdown,
+que se sobreescribe en el siguiente corte.
+
+Los tipos `Bug`, `Exception` y `Performance Problem` caen bajo *Fix / Bugs*;
+todo lo demás —`Task`, `Feature`, `Usability Problem`, `Cosmetics`— cae bajo
+*Features*. Los `Epic` se excluyen: el detalle lo cargan sus subtareas.
+
+### Credenciales
+
+La cascada la resuelve `scripts/youtrack-credentials.ps1`, de lo más específico a
+lo más general:
+
+1. `.ralph/youtrack.config.ps1` — override local, gitignoreado
+2. `.youtrack-project.ps1` — **commiteado**, solo URL y proyecto, nunca el token
+3. `$HOME\.youtrack.config.ps1` — el token, una vez por máquina
+4. `YOUTRACK_BASE_URL` / `YOUTRACK_TOKEN` / `YOUTRACK_PROJECT` — entorno, para CI
+
+En esta máquina el token está en `C:\Users\Urano\.youtrack.config.ps1`, así que
+los scripts corren sin argumentos. En un clon nuevo, ese archivo es lo único que
+hay que crear.
+
+`issues-resolved.json` **está gitignoreado**: es caché local, no parte del repo.
+No es por secretos —el archivo solo trae `Id`, `ResolvedAt`, `Type` y `Summary`,
+sin autores ni teléfonos— sino para no versionar un archivo derivado que se
+regenera con un comando.
+
+La consecuencia es concreta: **YouTrack es la única fuente del changelog**. En un
+clon recién hecho el caché no existe, así que `changelog.ps1` no tiene de dónde
+leer y hay que refrescar primero:
+
+```powershell
+./scripts/refresh-issues-resolved.ps1     # obligatorio en un clon nuevo
+./scripts/changelog.ps1 -Mode TagWindow
+```
+
+Por lo mismo, `-NoRefresh` sirve solo en una máquina que ya generó el caché al
+menos una vez, y un CI que corte versiones necesita el token de YouTrack en el
+entorno — no le basta con el repo.
+
+### Publicar
+
+```powershell
+git push -u origin master     # -u solo la primera vez, para amarrar el upstream
+git push origin 2026.07.29
+```
+
+La etiqueta se empuja aparte: `git push` solo no se lleva las etiquetas.
+
+Nada de `&&` entre los dos: esta máquina corre **Windows PowerShell 5.1**, donde
+`&&` no es un separador válido y truena con `InvalidEndOfLine` antes de ejecutar
+nada. Si los quieres condicionados en un solo renglón:
+
+```powershell
+git push; if ($?) { git push origin 2026.07.29 }
+```
 
 ---
 
-## 2. El dominio en Plesk
+## 3. El dominio en Plesk
 
 1. **Domains → Add Domain →** `vistaaltatx.com`.
 2. **Hosting Settings → Document root:** `/httpdocs/public`.
@@ -76,17 +220,32 @@ y etiqueta en un solo paso.
 
 ---
 
-## 3. El código en el servidor
+## 4. El código en el servidor
 
-Con la extensión **Git** de Plesk: *Add Repository* → tu remoto → carpeta de
-destino `/httpdocs` → rama `master`.
+Con la extensión **Git** de Plesk: *Add Repository* →
+`https://github.com/uranodev/VistaAlta.git` → carpeta de destino `/httpdocs` →
+rama `master`. Plesk guarda las credenciales del repo en la suscripción, así que
+es el camino menos áspero para un repo privado.
 
-O por SSH:
+O a mano, desde una sesión SSH en el servidor:
 
 ```bash
 cd ~/httpdocs
-git clone git@github.com:<cuenta>/urge.git .
+git clone https://github.com/uranodev/VistaAlta.git .
 ```
+
+Ojo con esta variante si el repo es privado: en el VPS **no hay** Git Credential
+Manager, así que ese `clone` se queda esperando usuario y contraseña, y GitHub ya
+no acepta contraseñas de cuenta. Hay que darle un token:
+
+```bash
+git clone https://<usuario>:<token>@github.com/uranodev/VistaAlta.git .
+```
+
+Un *fine-grained token* con permiso de solo lectura sobre este repo alcanza. Queda
+escrito en `.git/config` en claro, que es la razón de preferir la extensión de
+Plesk o —si el repo se queda privado y hay muchos despliegues— una **deploy key**
+SSH de solo lectura generada en el propio servidor.
 
 ### Dependencias PHP
 
@@ -115,7 +274,7 @@ sin estilos.
 
 ---
 
-## 4. `.env` de producción
+## 5. `.env` de producción
 
 `.env` no se versiona. Cópialo de `.env.example` y ajusta:
 
@@ -154,7 +313,7 @@ php artisan key:generate
 
 ---
 
-## 5. Base de datos
+## 6. Base de datos
 
 SQLite, un archivo. Hay que crearlo — no viaja por git:
 
@@ -193,7 +352,7 @@ reasigna por SSH con `php artisan tinker`.
 
 ---
 
-## 6. Permisos
+## 7. Permisos
 
 El usuario de PHP-FPM tiene que poder escribir en tres lugares:
 
@@ -207,7 +366,7 @@ fallan aunque el `.sqlite` sea escribible.
 
 ---
 
-## 7. Cachés de producción
+## 8. Cachés de producción
 
 ```bash
 php artisan config:cache
@@ -221,7 +380,7 @@ cambio posterior a `.env` exige volver a correr `config:cache` o no surte efecto
 
 ---
 
-## 8. TLS
+## 9. TLS
 
 Plesk → **SSL/TLS Certificates → Install a free basic certificate** (Let's
 Encrypt), incluyendo `www`. Después, en *Hosting Settings*, activa la redirección
@@ -232,7 +391,7 @@ HTTPS: hazlo después de que el certificado esté emitido, no antes.
 
 ---
 
-## 9. Verificación
+## 10. Verificación
 
 | Qué | Esperado |
 | --- | --- |
@@ -249,7 +408,17 @@ docroot bien puesto y regalar las credenciales de Twilio.
 
 ---
 
-## 10. Despliegues posteriores
+## 11. Despliegues posteriores
+
+En tu máquina, corta la versión (sección 2) y publícala:
+
+```powershell
+./scripts/release.ps1
+git push
+git push origin <version>
+```
+
+En el servidor:
 
 ```bash
 cd ~/httpdocs
@@ -265,7 +434,7 @@ php artisan optimize             # limpia y rehace config/route/view cache
 
 ---
 
-## 11. Respaldos
+## 12. Respaldos
 
 La base es un solo archivo, así que respaldar es copiarlo. Programa en Plesk
 (**Backup Manager → Scheduled Backups**) un respaldo diario de la suscripción, que

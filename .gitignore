@@ -45,3 +45,4 @@ Thumbs.db
 
 # Config local de YouTrack: puede contener un token permanente.
 /.ralph
+issues-resolved.json

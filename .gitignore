@@ -1,0 +1,47 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.env.staging
+.env.example
+.phpactor.json
+.phpunit.result.cache
+/.codex
+/.cursor/
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+
+# La base local. Nunca se versiona: guarda Comentarios con el teléfono del
+# Colono que los escribió, y el historial de git no se puede depurar después.
+# El contenido que sí debe viajar al servidor va en el seeder.
+/database/*.sqlite
+/database/*.sqlite-shm
+/database/*.sqlite-wal
+
+/auth.json
+/node_modules
+/public/build
+/public/fonts-manifest.dev.json
+/public/hot
+/public/storage
+
+# Assets del panel de Filament. Los republica `filament:upgrade`, que ya corre
+# en el `post-autoload-dump` de composer, así que versionarlos solo genera
+# conflictos con cada actualización del paquete.
+/public/css/filament
+/public/js/filament
+/public/fonts/filament
+/storage/*.key
+/storage/pail
+/vendor
+_ide_helper.php
+Homestead.json
+Homestead.yaml
+Thumbs.db
+
+# Config local de YouTrack: puede contener un token permanente.
+/.ralph

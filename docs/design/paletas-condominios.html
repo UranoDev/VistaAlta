@@ -1,0 +1,711 @@
+<title>Condominios — Paletas y tipografía</title>
+<style>
+  :root {
+    --bg: #FBFAF8;
+    --ink: #1C1B1A;
+    --muted: #6B6862;
+    --line: #E4E1DA;
+    --accent: #3C4A5C;
+    --card-bg: #FFFFFF;
+    --card-line: #E7E4DC;
+
+    --font-serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    --font-sans: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --font-mono: "SF Mono", Consolas, "IBM Plex Mono", monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121212;
+      --ink: #EDEBE7;
+      --muted: #9C9892;
+      --line: #2A2A28;
+      --accent: #8FA6BE;
+      --card-bg: #1A1A19;
+      --card-line: #2E2C29;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121212;
+    --ink: #EDEBE7;
+    --muted: #9C9892;
+    --line: #2A2A28;
+    --accent: #8FA6BE;
+    --card-bg: #1A1A19;
+    --card-line: #2E2C29;
+  }
+  :root[data-theme="light"] {
+    --bg: #FBFAF8;
+    --ink: #1C1B1A;
+    --muted: #6B6862;
+    --line: #E4E1DA;
+    --accent: #3C4A5C;
+    --card-bg: #FFFFFF;
+    --card-line: #E7E4DC;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .doc {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 3.5rem 1.5rem 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    font-weight: 600;
+    margin: 0 0 0.6rem;
+  }
+
+  .doc-head { max-width: 62ch; }
+  .doc-head h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem);
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+  .doc-head .lede {
+    font-size: 1.0625rem;
+    color: var(--ink);
+    opacity: 0.85;
+    margin: 0;
+  }
+
+  .doc-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+    border-top: 1px solid var(--line);
+    padding-top: 2.5rem;
+  }
+  .section-head { max-width: 62ch; }
+  .section-head h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.375rem, 1.2rem + 1vw, 1.75rem);
+    margin: 0 0 0.75rem;
+    text-wrap: balance;
+  }
+  .section-head p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  /* --- proposal card shell --- */
+  .proposal {
+    background: var(--card-bg);
+    border: 1px solid var(--card-line);
+    border-radius: 6px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+  .proposal-head { max-width: 58ch; }
+  .proposal-eyebrow {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 0 0 0.35rem;
+  }
+  .proposal-head h3 {
+    font-family: var(--font-serif);
+    font-size: 1.3125rem;
+    margin: 0 0 0.5rem;
+  }
+  .proposal-head p {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+
+  .proposal-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 780px) {
+    .proposal-body { grid-template-columns: 1fr; }
+  }
+
+  .proposal-specs { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .swatch-row { display: flex; flex-wrap: wrap; gap: 0.85rem; }
+  .swatch { display: flex; flex-direction: column; gap: 0.3rem; width: 84px; }
+  .swatch-fill {
+    display: block;
+    width: 100%;
+    height: 52px;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  .swatch-label { font-size: 0.6875rem; font-weight: 600; color: var(--ink); line-height: 1.25; }
+  .swatch-hex {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  .type-specimen { display: flex; flex-direction: column; gap: 0.4rem; }
+  .specimen-display { margin: 0; text-wrap: balance; }
+  .specimen-body { margin: 0.35rem 0 0; max-width: 42ch; font-size: 0.9375rem; }
+  .specimen-meta {
+    margin: 0 0 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--muted);
+    letter-spacing: 0.01em;
+  }
+
+  .proposal-mock { display: flex; align-items: stretch; }
+  .mock { width: 100%; }
+
+  button { font: inherit; cursor: pointer; border: none; }
+  button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ============ FRONT 1 — Muro y Luz ============ */
+  .mock--muro .mock-surface {
+    background: #16233E;
+    padding: 2.1rem 1.9rem;
+    border-radius: 2px;
+  }
+  .mock--muro .mock-eyebrow {
+    margin: 0 0 0.6rem;
+    color: #C98A2B;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+  .mock--muro .mock-headline {
+    margin: 0 0 0.75rem;
+    color: #F4EEE4;
+    font-family: "Futura", "Century Gothic", "Avenir Next", sans-serif;
+    font-size: 1.7rem;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+  .mock--muro .mock-sub {
+    margin: 0 0 1.4rem;
+    color: #F4EEE4;
+    opacity: 0.82;
+    font-size: 0.9375rem;
+    max-width: 34ch;
+  }
+  .mock--muro .mock-cta {
+    background: #B3134F;
+    color: #F4EEE4;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    transition: opacity 0.15s ease;
+  }
+  .mock--muro .mock-cta:hover { opacity: 0.88; }
+
+  /* ============ FRONT 2 — Recibo ============ */
+  .mock--recibo .ticket {
+    background: #EEEDE4;
+    color: #2A2A28;
+    padding: 1.6rem 1.5rem 1.4rem;
+    position: relative;
+    font-family: var(--font-mono);
+  }
+  .mock--recibo .ticket::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background-image: radial-gradient(circle, #EEEDE4 1.4px, transparent 1.4px), radial-gradient(circle, #cfcdc2 1.4px, transparent 1.4px);
+    background-size: 10px 10px, 10px 10px;
+    background-position: 0 -3px, 5px -3px;
+  }
+  .mock--recibo .ticket-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0.45rem 0;
+    border-bottom: 1px dashed #cfcdc2;
+    font-size: 0.8125rem;
+  }
+  .mock--recibo .ticket-row span { font-weight: 700; }
+  .mock--recibo .ticket-title {
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    color: #1E4D3B;
+    border-bottom: none;
+    padding-top: 0.6rem;
+  }
+  .mock--recibo .ticket-total {
+    border-bottom: none;
+    font-size: 0.9375rem;
+    padding-top: 0.7rem;
+  }
+  .mock--recibo .ticket-stamp {
+    display: inline-block;
+    margin: 1rem 0 0;
+    padding: 0.3rem 0.75rem;
+    border: 2px solid #1E4D3B;
+    color: #1E4D3B;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transform: rotate(-3deg);
+  }
+
+  /* ============ FRONT 3 — Reja y Patio ============ */
+  .mock--reja .plan-card {
+    background: #F4F2EC;
+    border: 2px solid #24282E;
+    border-radius: 44px 44px 6px 6px;
+    padding: 2.2rem 1.75rem 1.75rem;
+    text-align: center;
+  }
+  .mock--reja .plan-eyebrow {
+    margin: 0 0 0.4rem;
+    color: #B5592F;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .mock--reja .plan-price {
+    margin: 0 0 1.1rem;
+    font-family: Rockwell, "Roboto Slab", Georgia, serif;
+    font-size: 2.1rem;
+    color: #2F5D53;
+    font-variant-numeric: tabular-nums;
+  }
+  .mock--reja .plan-price span {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    color: #24282E;
+    font-weight: 400;
+  }
+  .mock--reja .plan-list {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .mock--reja .plan-list li {
+    font-size: 0.875rem;
+    color: #24282E;
+    padding-left: 1.15rem;
+    position: relative;
+  }
+  .mock--reja .plan-list li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0.4em;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #D9A441;
+  }
+  .mock--reja .plan-cta {
+    background: #2F5D53;
+    color: #F4F2EC;
+    padding: 0.7rem 1.75rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.875rem;
+  }
+
+  /* ============ DASHBOARD A — Torre de Control ============ */
+  .mock--torre .dash-surface {
+    background: #F1F3F5;
+    border: 1px solid #d7dce1;
+    border-radius: 4px;
+    padding: 1.5rem;
+  }
+  .mock--torre .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .mock--torre .stat-tile {
+    background: #ffffff;
+    border: 1px solid #d7dce1;
+    border-radius: 4px;
+    padding: 0.75rem 0.85rem;
+  }
+  .mock--torre .stat-label {
+    margin: 0 0 0.3rem;
+    font-size: 0.6875rem;
+    color: #5b6b78;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .mock--torre .stat-value {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.0625rem;
+    color: #1B232C;
+    font-variant-numeric: tabular-nums;
+  }
+  .mock--torre .table-wrap { overflow-x: auto; }
+  .mock--torre table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+  .mock--torre th {
+    text-align: left;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #5b6b78;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid #d7dce1;
+  }
+  .mock--torre td {
+    padding: 0.55rem 0.6rem;
+    border-bottom: 1px solid #e4e8eb;
+    color: #1B232C;
+  }
+  .mock--torre td:nth-child(3) { font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+  .mock--torre .chip {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+  .mock--torre .chip--pagada { background: #DEEFE6; color: #2E7D5B; }
+  .mock--torre .chip--atrasada { background: #F6DEDA; color: #B3392C; }
+  .mock--torre .chip--futura { background: #E6DEF0; color: #6A4C93; }
+  .mock--torre .chip--pendiente { background: #F5E6CC; color: #B8791A; }
+
+  /* ============ DASHBOARD B — Mesa de Trabajo ============ */
+  .mock--mesa .unit-card {
+    background: #ECE5D6;
+    border: 1px solid #ddd3bd;
+    border-radius: 10px;
+    padding: 1.5rem 1.6rem;
+  }
+  .mock--mesa .unit-eyebrow {
+    margin: 0 0 0.15rem;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a7550;
+    font-weight: 700;
+  }
+  .mock--mesa .unit-name {
+    margin: 0 0 1.1rem;
+    font-family: Rockwell, Georgia, serif;
+    font-size: 1.25rem;
+    color: #2B231C;
+  }
+  .mock--mesa .unit-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.3rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid #ddd3bd;
+  }
+  .mock--mesa .unit-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: #2B231C;
+  }
+  .mock--mesa .unit-row strong { font-variant-numeric: tabular-nums; }
+  .mock--mesa .chip {
+    display: inline-block;
+    padding: 0.2rem 0.55rem;
+    border-radius: 10px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+  }
+  .mock--mesa .chip--pagada { background: #DCEBDD; color: #3F7D4A; }
+  .mock--mesa .unit-cta {
+    background: #A66A1E;
+    color: #FBF6EC;
+    padding: 0.65rem 1.1rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    width: 100%;
+  }
+
+  .doc-foot {
+    border-top: 1px solid var(--line);
+    padding-top: 1.75rem;
+    max-width: 62ch;
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+  .doc-foot p { margin: 0; }
+</style>
+
+<main class="doc">
+
+  <header class="doc-head">
+    <p class="eyebrow">Propuesta de identidad visual</p>
+    <h1>Paletas y tipografía — Condominios</h1>
+    <p class="lede">Tres direcciones para el sitio y el portal del residente, dos para el panel administrativo. Cada una con su propia paleta, su pareja tipográfica y una aplicación real tomada del producto — no la misma pantalla recoloreada tres veces.</p>
+  </header>
+
+  <section class="doc-section" id="front">
+    <div class="section-head">
+      <p class="eyebrow">01 — Front</p>
+      <h2>Sitio y portal del residente</h2>
+      <p>Tiene que convencer a un administrador profesional de agendar una demo, y transmitirle que el dinero de su condominio está en buenas manos.</p>
+    </div>
+
+    <!-- PROPUESTA 1 -->
+    <article class="proposal">
+      <div class="proposal-head">
+        <p class="proposal-eyebrow">Propuesta 1</p>
+        <h3>Muro y Luz</h3>
+        <p>Le debe su confianza a la arquitectura mexicana moderna: paredes de color pleno, luz dura, sombra profunda. Para un administrador que ya gestiona dinero real, no un dashboard genérico más.</p>
+      </div>
+      <div class="proposal-body">
+        <div class="proposal-specs">
+          <div class="swatch-row">
+            <div class="swatch"><span class="swatch-fill" style="background:#B3134F"></span><span class="swatch-label">Rosa Mexicano</span><span class="swatch-hex">#B3134F</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#16233E"></span><span class="swatch-label">Añil Profundo</span><span class="swatch-hex">#16233E</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#C98A2B"></span><span class="swatch-label">Ocre Solar</span><span class="swatch-hex">#C98A2B</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#F4EEE4"></span><span class="swatch-label">Cal</span><span class="swatch-hex">#F4EEE4</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#2B1F1A"></span><span class="swatch-label">Sombra Cálida</span><span class="swatch-hex">#2B1F1A</span></div>
+          </div>
+          <div class="type-specimen">
+            <p class="specimen-display" style="font-family:'Futura','Century Gothic','Avenir Next',sans-serif; font-size:1.6rem; font-weight:700; color:#16233E;">Cobra a tiempo.</p>
+            <p class="specimen-meta">Display · pila del sistema: Futura / Century Gothic / Avenir Next — referencia de producción: Futura PT</p>
+            <p class="specimen-body" style="font-family:Charter,'Iowan Old Style',Georgia,serif;">Pagos por SPEI, OXXO y tarjeta. Recordatorios por WhatsApp. Factura CFDI automática.</p>
+            <p class="specimen-meta">Texto · pila del sistema: Charter / Iowan Old Style / Georgia — referencia: Untitled Serif</p>
+          </div>
+        </div>
+        <div class="proposal-mock">
+          <div class="mock mock--muro">
+            <div class="mock-surface">
+              <p class="mock-eyebrow">Condominios · Los Robles</p>
+              <p class="mock-headline">Cobra a tiempo,<br>sin perseguir a nadie.</p>
+              <p class="mock-sub">Pagos por SPEI, OXXO y tarjeta. Recordatorios por WhatsApp. Factura CFDI automática.</p>
+              <button class="mock-cta" type="button">Agendar una demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- PROPUESTA 2 -->
+    <article class="proposal">
+      <div class="proposal-head">
+        <p class="proposal-eyebrow">Propuesta 2</p>
+        <h3>Recibo</h3>
+        <p>Nace del objeto que ya usa el residente: el comprobante de pago. Tinta de folio, números tabulares, papel térmico — la marca es la prueba de que cobraron bien.</p>
+      </div>
+      <div class="proposal-body">
+        <div class="proposal-specs">
+          <div class="swatch-row">
+            <div class="swatch"><span class="swatch-fill" style="background:#1E4D3B"></span><span class="swatch-label">Tinta Verde</span><span class="swatch-hex">#1E4D3B</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#A22E2E"></span><span class="swatch-label">Rojo Sello</span><span class="swatch-hex">#A22E2E</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#EEEDE4"></span><span class="swatch-label">Papel Térmico</span><span class="swatch-hex">#EEEDE4</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#2A2A28"></span><span class="swatch-label">Grafito</span><span class="swatch-hex">#2A2A28</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#BFE0CE"></span><span class="swatch-label">Menta Pálida</span><span class="swatch-hex">#BFE0CE</span></div>
+          </div>
+          <div class="type-specimen">
+            <p class="specimen-display" style="font-family:var(--font-mono); font-size:1.4rem; font-weight:700; color:#1E4D3B;">$1,350.00</p>
+            <p class="specimen-meta">Display / cifras · pila: SF Mono / Consolas / IBM Plex Mono — referencia: IBM Plex Mono</p>
+            <p class="specimen-body" style="font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;">Folio 000482 — cuota de julio pagada con OXXO. Recibo enviado por WhatsApp.</p>
+            <p class="specimen-meta">Texto · pila: Segoe UI / Roboto / Arial — referencia: IBM Plex Sans</p>
+          </div>
+        </div>
+        <div class="proposal-mock">
+          <div class="mock mock--recibo">
+            <div class="ticket">
+              <p class="ticket-row ticket-title">Recibo de pago</p>
+              <p class="ticket-row">Folio <span>000482</span></p>
+              <p class="ticket-row">Unidad <span>14B</span></p>
+              <p class="ticket-row">Concepto <span>Cuota julio</span></p>
+              <p class="ticket-row ticket-total">Total <span>$1,350.00</span></p>
+              <span class="ticket-stamp">Pagado · OXXO</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- PROPUESTA 3 -->
+    <article class="proposal">
+      <div class="proposal-head">
+        <p class="proposal-eyebrow">Propuesta 3</p>
+        <h3>Reja y Patio</h3>
+        <p>Toma prestado el vocabulario del propio fraccionamiento: cantera, herrería, patio compartido. Habla del lugar donde vive la gente, no solo del software.</p>
+      </div>
+      <div class="proposal-body">
+        <div class="proposal-specs">
+          <div class="swatch-row">
+            <div class="swatch"><span class="swatch-fill" style="background:#2F5D53"></span><span class="swatch-label">Verde Cantera</span><span class="swatch-hex">#2F5D53</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#B5592F"></span><span class="swatch-label">Terracota Muro</span><span class="swatch-hex">#B5592F</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#24282E"></span><span class="swatch-label">Herrería</span><span class="swatch-hex">#24282E</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#E7E4DA"></span><span class="swatch-label">Piedra Hueso</span><span class="swatch-hex">#E7E4DA</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#D9A441"></span><span class="swatch-label">Amarillo Talavera</span><span class="swatch-hex">#D9A441</span></div>
+          </div>
+          <div class="type-specimen">
+            <p class="specimen-display" style="font-family:Rockwell,'Roboto Slab',Georgia,serif; font-size:1.5rem; font-weight:700; color:#2F5D53;">Tu condominio, en orden.</p>
+            <p class="specimen-meta">Display · pila: Rockwell / Roboto Slab / Georgia — referencia: Superclarendon</p>
+            <p class="specimen-body" style="font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;">Un plan por unidad, transparente para todo el patio.</p>
+            <p class="specimen-meta">Texto · pila: Segoe UI / Helvetica Neue / Arial — referencia: Work Sans</p>
+          </div>
+        </div>
+        <div class="proposal-mock">
+          <div class="mock mock--reja">
+            <div class="plan-card">
+              <p class="plan-eyebrow">Plan Básico</p>
+              <p class="plan-price">$12<span> / unidad / mes</span></p>
+              <ul class="plan-list">
+                <li>Cobranza y recordatorios</li>
+                <li>Pagos SPEI, OXXO y tarjeta</li>
+                <li>Estado de cuenta por unidad</li>
+              </ul>
+              <button class="plan-cta" type="button">Empezar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="doc-section" id="dashboard">
+    <div class="section-head">
+      <p class="eyebrow">02 — Dashboard</p>
+      <h2>Panel administrativo</h2>
+      <p>Se usa a diario, con dinero real. Los cuatro estados de cobro del reporte de ingresos — del mes, atrasada, futura, moratorio — tienen que leerse de un vistazo.</p>
+    </div>
+
+    <!-- DASHBOARD A -->
+    <article class="proposal proposal--dash">
+      <div class="proposal-head">
+        <p class="proposal-eyebrow">Propuesta A</p>
+        <h3>Torre de Control</h3>
+        <p>Un panel de control financiero: gris pizarra, un solo azul de mando, y cuatro estados semánticos que son literalmente los cuatro tipos de cobro del reporte de ingresos.</p>
+      </div>
+      <div class="proposal-body">
+        <div class="proposal-specs">
+          <div class="swatch-row">
+            <div class="swatch"><span class="swatch-fill" style="background:#2F4FA3"></span><span class="swatch-label">Índigo Señal</span><span class="swatch-hex">#2F4FA3</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#F1F3F5"></span><span class="swatch-label">Base Pizarra</span><span class="swatch-hex">#F1F3F5</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#1B232C"></span><span class="swatch-label">Tinta Pizarra</span><span class="swatch-hex">#1B232C</span></div>
+          </div>
+          <p class="specimen-meta" style="margin-top:-0.5rem;">Estados semánticos (independientes del acento):</p>
+          <div class="swatch-row">
+            <div class="swatch"><span class="swatch-fill" style="background:#2E7D5B"></span><span class="swatch-label">Pagada</span><span class="swatch-hex">#2E7D5B</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#B8791A"></span><span class="swatch-label">Pendiente</span><span class="swatch-hex">#B8791A</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#B3392C"></span><span class="swatch-label">Atrasada</span><span class="swatch-hex">#B3392C</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#6A4C93"></span><span class="swatch-label">Futura</span><span class="swatch-hex">#6A4C93</span></div>
+          </div>
+          <div class="type-specimen">
+            <p class="specimen-body" style="font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif; font-weight:600;">Cobranza de julio $186,400</p>
+            <p class="specimen-meta">UI / etiquetas · pila: Segoe UI / Roboto / Arial — referencia: IBM Plex Sans</p>
+            <p class="specimen-body" style="font-family:var(--font-mono);">$1,350.00</p>
+            <p class="specimen-meta">Cifras y folios · pila: SF Mono / Consolas — referencia: IBM Plex Mono, tabular-nums</p>
+          </div>
+        </div>
+        <div class="proposal-mock">
+          <div class="mock mock--torre">
+            <div class="dash-surface">
+              <div class="stat-row">
+                <div class="stat-tile"><p class="stat-label">Cobranza julio</p><p class="stat-value">$186,400</p></div>
+                <div class="stat-tile"><p class="stat-label">Morosidad</p><p class="stat-value">8.2%</p></div>
+                <div class="stat-tile"><p class="stat-label">Unidades</p><p class="stat-value">84</p></div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Unidad</th><th>Concepto</th><th>Monto</th><th>Estatus</th></tr></thead>
+                  <tbody>
+                    <tr><td>14B</td><td>Cuota julio</td><td>$1,350</td><td><span class="chip chip--pagada">Pagada</span></td></tr>
+                    <tr><td>07A</td><td>Cuota mayo</td><td>$1,200</td><td><span class="chip chip--atrasada">Atrasada</span></td></tr>
+                    <tr><td>22C</td><td>Cuota agosto</td><td>$1,350</td><td><span class="chip chip--futura">Futura</span></td></tr>
+                    <tr><td>03A</td><td>Moratorio junio</td><td>$120</td><td><span class="chip chip--pendiente">Pendiente</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- DASHBOARD B -->
+    <article class="proposal proposal--dash">
+      <div class="proposal-head">
+        <p class="proposal-eyebrow">Propuesta B</p>
+        <h3>Mesa de Trabajo</h3>
+        <p>Para el administrador que revisa unidad por unidad, no un centro de operaciones. Paleta más cálida, una tarjeta a la vez, un encabezado con más carácter.</p>
+      </div>
+      <div class="proposal-body">
+        <div class="proposal-specs">
+          <div class="swatch-row">
+            <div class="swatch"><span class="swatch-fill" style="background:#A66A1E"></span><span class="swatch-label">Ámbar Cálido</span><span class="swatch-hex">#A66A1E</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#ECE5D6"></span><span class="swatch-label">Base Papel</span><span class="swatch-hex">#ECE5D6</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#2B231C"></span><span class="swatch-label">Tinta Café</span><span class="swatch-hex">#2B231C</span></div>
+          </div>
+          <p class="specimen-meta" style="margin-top:-0.5rem;">Estados semánticos (independientes del acento):</p>
+          <div class="swatch-row">
+            <div class="swatch"><span class="swatch-fill" style="background:#3F7D4A"></span><span class="swatch-label">Pagada</span><span class="swatch-hex">#3F7D4A</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#C77D24"></span><span class="swatch-label">Pendiente</span><span class="swatch-hex">#C77D24</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#B23A2E"></span><span class="swatch-label">Atrasada</span><span class="swatch-hex">#B23A2E</span></div>
+            <div class="swatch"><span class="swatch-fill" style="background:#5B6EC7"></span><span class="swatch-label">Futura</span><span class="swatch-hex">#5B6EC7</span></div>
+          </div>
+          <div class="type-specimen">
+            <p class="specimen-display" style="font-family:Rockwell,Georgia,serif; font-size:1.25rem; font-weight:700; color:#2B231C;">Unidad 14B</p>
+            <p class="specimen-meta">Encabezados de tarjeta · pila: Rockwell / Georgia — referencia: Zilla Slab (uso restringido a títulos)</p>
+            <p class="specimen-body" style="font-family:'Segoe UI',Arial,sans-serif;">Laura Pérez · saldo $0.00 · al corriente.</p>
+            <p class="specimen-meta">Texto / UI · pila: Segoe UI / Arial</p>
+          </div>
+        </div>
+        <div class="proposal-mock">
+          <div class="mock mock--mesa">
+            <div class="unit-card">
+              <p class="unit-eyebrow">Unidad 14B</p>
+              <p class="unit-name">Laura Pérez</p>
+              <div class="unit-rows">
+                <div class="unit-row"><span>Saldo actual</span><strong>$0.00</strong></div>
+                <div class="unit-row"><span>Próxima cuota</span><strong>Agosto · $1,350</strong></div>
+                <div class="unit-row"><span>Estatus</span><span class="chip chip--pagada">Al corriente</span></div>
+              </div>
+              <button class="unit-cta" type="button">Registrar pago en efectivo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <footer class="doc-foot">
+    <p>Las cinco direcciones son independientes entre sí — se pueden mezclar. Por ejemplo, "Recibo" para el sitio junto con "Torre de Control" para el panel, si se busca un tono financiero consistente en ambos lados del producto.</p>
+  </footer>
+
+</main>

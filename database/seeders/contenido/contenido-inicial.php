@@ -105,6 +105,13 @@ return [
             ['concepto' => 'Remanente', 'monto' => 49270.48, 'destacada' => true],
         ],
 
+        /*
+         * El mes trae un ingreso que no se repite y que pesa un tercio del
+         * total. Sin decirlo, el remanente de $49,270.48 se lee como el
+         * excedente normal del fraccionamiento, y no lo es.
+         */
+        'aclaracion' => 'Las Recuperaciones ($33,280.00) son el cobro de adeudos de meses anteriores, no cuotas de este mes. Es un ingreso extraordinario: no forma parte del ingreso regular del fraccionamiento y no hay que esperarlo cada mes. Sin él, el remanente de junio habría sido de $15,990.48.',
+
     ],
 
 ];

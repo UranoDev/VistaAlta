@@ -78,7 +78,7 @@ class PaginaPropuestaTest extends TestCase
     {
         $respuesta = $this->get(route('propuesta'));
 
-        $respuesta->assertSee('Lo que cambia el día que la figura existe');
+        $respuesta->assertSee('Lo que cambia el día que la figura jurídica exista');
         $respuesta->assertSee('Lo que no cambia');
         $respuesta->assertSee('Tu casa sigue siendo tuya.');
         $respuesta->assertSee('No hay cuota nueva.');

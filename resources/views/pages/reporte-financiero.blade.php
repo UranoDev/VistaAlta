@@ -44,6 +44,18 @@
                 </x-recibo.tarjeta>
 
                 {{--
+                    Lo que las cifras no dicen solas. Va pegada a la tarjeta y
+                    antes de la nota de procedencia porque matiza los números que
+                    se acaban de leer: un remanente inflado por un ingreso que no
+                    se repite se malinterpreta si nadie lo advierte a tiempo.
+                --}}
+                @if ($reporte->tieneAclaracion())
+                    <x-recibo.nota variante="aviso" class="mt-4">
+                        {{ $reporte->aclaracion }}
+                    </x-recibo.nota>
+                @endif
+
+                {{--
                     El resumen es un resumen: si alguien busca de dónde sale una
                     cifra, el lugar es la hoja, no esta página.
                 --}}

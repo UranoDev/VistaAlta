@@ -1,5 +1,15 @@
 # Changelog
 
+## [2026.07.30.1] - 2026 jul 30
+### Features
+- **URVA-23**: Panel del Reporte financiero: botón arriba que abra la página pública en una pestaña nueva
+- **URVA-22**: Runbook de despliegue: pasar de SQLite a MariaDB 10.5 en producción
+- **URVA-21**: Página Propuesta: sección «Lo que necesitamos de ti» con el Comité de Supervisión, enlazada desde el encabezado
+- **URVA-20**: Reporte financiero: aclaración del periodo, para que un ingreso extraordinario no se lea como el excedente normal
+
+## [2026.07.30] - 2026 jul 30
+_Sin issues cerrados en esta ventana_
+
 ## [2026.07.29.1] - 2026 jul 29
 _Sin issues cerrados en esta ventana_
 

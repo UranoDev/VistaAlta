@@ -27,7 +27,7 @@ use Illuminate\Support\Collection;
  * Se lee **sin ninguna barrera**: ver `docs/adr/0004`. Si alguien le agrega un
  * login, está revirtiendo una decisión deliberada.
  */
-#[Fillable(['periodo', 'cifras', 'hoja_url'])]
+#[Fillable(['periodo', 'cifras', 'aclaracion', 'hoja_url'])]
 class ReporteFinanciero extends Model
 {
     protected $table = 'reporte_financiero';
@@ -76,6 +76,19 @@ class ReporteFinanciero extends Model
     public function tieneHoja(): bool
     {
         return filled($this->hoja_url);
+    }
+
+    /**
+     * La aclaración del Periodo: lo que las cifras no dicen solas. Un mes con un
+     * ingreso extraordinario infla el remanente, y quien lea el resumen sin ese
+     * contexto concluye que ese excedente es lo normal.
+     *
+     * Es opcional por diseño: la mayoría de los meses no necesitan una, y una
+     * aclaración obligatoria terminaría llenándose de relleno.
+     */
+    public function tieneAclaracion(): bool
+    {
+        return filled($this->aclaracion);
     }
 
     public function estaVacio(): bool

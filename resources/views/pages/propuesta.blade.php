@@ -8,31 +8,25 @@
     cambia, porque una propuesta que solo enumera ventajas se lee como una venta.
 --}}
 <x-layout.app title="Propuesta">
-    <x-recibo.seccion rotulo="Ante la Asamblea" :lectura="false">
+    <x-recibo.seccion rotulo="Ante los Colonos" :lectura="false">
         <div class="grid gap-8 sm:grid-cols-10 sm:gap-10">
             <div class="sm:col-span-4">
                 <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
-                    Formalizar el fraccionamiento como Asociación Civil
+                    Formalizar el fraccionamiento
                 </h1>
                 <p class="mt-4 text-grafito/85">
-                    Dando seguimiento a la propuesta de constituirnos como asociación civil, es importante aclarar
-                    que el Fraccionamiento Vista Alta no tiene una personalidad jurídica.
-                    Si bien el fraccionamiento sigue funcionando es necesario registrarnos con un nombre propio asi
-                    como tener la posibilidad de contar con una cuenta bancaria para una adecuada administración de
-                    los recursos económicos, tener personalidad jurídica frente al municipio, entre muchos otros
-                    beneficios.
+                    Dando seguimiento a lo planteado en la última Asamblea, la Mesa Directiva propone constituir legalmente la Asociación Civil.
                 </p>
                 <p class="mt-4 text-grafito/85">
-                    Esto es lo que la Mesa Directiva propone: constituir la Asociación
-                    Civil que le dé al fraccionamiento un nombre propio con el cual abrir una cuenta, firmar y
-                    responder. <br>Tener personalidad jurídica ante el Municipio, por ejemplo.
+                    Necesitamos tres colonos para que nos acompañen en esta tarea.
+                    <a href="#participar" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Aquí explicamos para qué</a>.
                 </p>
                 <p class="mt-4 text-sm text-grafito/75">
                     Es el único asunto del periodo. Las
                     <a href="{{ route('actividades') }}" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Actividades</a>
                     y el
                     <a href="{{ route('reporte-financiero') }}" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Reporte financiero</a>
-                    están aquí para las revisen.
+                    están aquí para que las revises.
                 </p>
             </div>
 
@@ -64,22 +58,22 @@
             $cambios = [
                 [
                     'titulo' => 'Contar con una cuenta bancaria.',
-                    'texto' => 'Al dia de hoy no contamos con un instrumento bancario en donde se puedan recibir las cuotas por
+                    'texto' => 'A la fecha no contamos con un instrumento bancario en donde se puedan recibir las cuotas por
                                 lo que se ha estado manejando solo efectivo, lo que dificulta la administración de los recursos
                                 económicos.
-                                Con la creación de la asociación se contara con una cuenta bancaria perteneciente al
-                                fraccionamiento, sin importar quien entra y sale de la Mesa Directiva, la cuenta (y el dinero) se queda.',
+                                Con la creación de la asociación se contará con una cuenta bancaria perteneciente al
+                                fraccionamiento, sin importar quién entra y sale de la Mesa Directiva, la cuenta (y el dinero) se queda.',
                 ],
                 [
                     'titulo' => 'Se podrán hacer contratos con los prestadores de servicios.',
-                    'texto' => 'Actualmente los servicios de vigilancia, jardinería, mantenimiento, etc, se realizan mediante
-                                acuerdos de palabra y algun representante de la administración, a titulo personal, los firma.
+                    'texto' => 'Actualmente los servicios de vigilancia, jardinería, mantenimiento, etc., se realizan mediante
+                                acuerdos de palabra y algún representante de la administración, a título personal, los firma.
                                 Una Asociación Civil contrata, exige lo pactado y tiene con qué reclamar cuando un proveedor no cumple.',
                 ],
                 [
                     'titulo' => 'La cuota se vuelve exigible',
                     'texto' => 'Hoy quien no paga simplemente no paga, y lo que deja de aportar lo terminan cubriendo
-                                los vecinos que sí pagaron. Se trata de establecer que asi como tendremos derechos,
+                                los vecinos que sí pagaron. Se trata de establecer que así como tendremos derechos,
                                 también tendremos obligaciones que cumplir cada uno de los asociados, siempre actuando
                                  en beneficio de todos.',
                 ],
@@ -138,6 +132,29 @@
         </dl>
     </x-recibo.seccion>
 
+    {{--
+        La única petición de la página. Va después de «Lo que no cambia» a
+        propósito: pedirle algo al Colono antes de haber contestado lo que teme
+        se lee como reclutamiento. El Comité se explica antes de pedir a nadie
+        que lo ocupe, porque nadie sabe qué es y tres lugares vacíos no se
+        llenan pidiendo un cheque en blanco.
+    --}}
+    <x-recibo.seccion id="participar" rotulo="Participar" titulo="Lo que necesitamos de ti">
+        <p class="text-grafito/85">
+            La Asociación no la forma sola la Mesa Directiva. Además de las cuatro personas que hoy la integran, la
+            propuesta contempla un <strong class="font-semibold">Comité de Supervisión de tres personas</strong>: los
+            vecinos que revisan las cuentas y el trabajo de la Mesa, y que pueden pedirle explicaciones.
+        </p>
+        <p class="mt-4 text-grafito/85">
+            No es un cargo honorífico. Existe para vigilar a quien administra, y por eso no puede ocuparlo nadie de la
+            propia Mesa Directiva.
+        </p>
+        <p class="mt-4 text-grafito/85">
+            Esas tres personas todavía no están. Si te interesa, déjalo en un
+            <a href="#comentarios" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">comentario aquí abajo</a>.
+        </p>
+    </x-recibo.seccion>
+
     <x-recibo.seccion rotulo="Para entenderla" titulo="Preguntas frecuentes">
         <dl class="border-t border-linea">
             @foreach ($preguntasFrecuentes as $pregunta => $respuesta)
@@ -152,7 +169,7 @@
     <x-recibo.seccion id="comentarios" rotulo="Tu voz" titulo="Preguntas y comentarios de los colonos">
         <p class="text-grafito/85">
             La Asamblea es donde muchas cosas se deciden, pero no tiene por qué ser el único lugar donde se pregunte. Si algo
-            de la Propuesta no te cuadra, escríbelo aquí: la Mesa Directiva lo lee y lo conteesta antes de tomar alguna acción.
+            de la Propuesta no te cuadra, escríbelo aquí: la Mesa Directiva lo lee y lo contesta antes de tomar alguna acción.
         </p>
 
         <div class="mt-8">

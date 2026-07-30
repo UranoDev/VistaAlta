@@ -9,6 +9,7 @@ use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Repeater\TableColumn;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -51,6 +52,37 @@ class ReporteFinanciero extends Page
      */
     public ?array $data = [];
 
+    /**
+     * El puente a lo que ve el Colono. Esta es la pantalla donde más falta:
+     * lo que se captura aquí sale publicado como un comprobante, y el orden de
+     * los renglones, cuál quedó destacado y cómo cae la aclaración solo se
+     * aprecian en la página pública.
+     *
+     * Va arriba porque el formulario crece con cada cifra, y un enlace al pie
+     * queda fuera de vista justo cuando se está trabajando en la parte alta de
+     * la lista. Y va en gris, sin peso: la acción principal sigue siendo
+     * Guardar.
+     *
+     * El botón **no guarda antes de abrir**, a propósito. La página pública
+     * muestra lo guardado, así que lo honesto es decirlo —de ahí la etiqueta y
+     * el tooltip— y no publicar por su cuenta lo que nadie pidió publicar: lo
+     * que se guarda aquí sale sin contraseña (docs/adr/0004), y esa decisión la
+     * toma quien captura, no un atajo de navegación.
+     *
+     * @return array<Action>
+     */
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('verPaginaPublica')
+                ->label('Ver lo publicado')
+                ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
+                ->color('gray')
+                ->tooltip('Abre la página pública en una pestaña nueva. Muestra lo que ya está guardado: si tienes cambios sin guardar, ahí no se ven todavía.')
+                ->url(route('reporte-financiero'), shouldOpenInNewTab: true),
+        ];
+    }
+
     public function mount(): void
     {
         $reporte = Reporte::actual();
@@ -58,6 +90,7 @@ class ReporteFinanciero extends Page
         $this->form->fill([
             'periodo' => $reporte->periodo,
             'cifras' => $reporte->cifras ?? [],
+            'aclaracion' => $reporte->aclaracion,
             'hoja_url' => $reporte->hoja_url,
         ]);
     }
@@ -102,6 +135,13 @@ class ReporteFinanciero extends Page
                             ->addActionLabel('Agregar una cifra')
                             ->reorderable()
                             ->defaultItems(0)
+                            ->columnSpanFull(),
+
+                        Textarea::make('aclaracion')
+                            ->label('Aclaración del periodo')
+                            ->helperText('Opcional. Lo que las cifras no dicen solas: un ingreso extraordinario que no se repite, un gasto que se adelantó, un mes que no se compara con los demás. Sale destacada arriba de las cifras. Déjala vacía si el resumen se explica solo.')
+                            ->rows(3)
+                            ->maxLength(1000)
                             ->columnSpanFull(),
                     ]),
 

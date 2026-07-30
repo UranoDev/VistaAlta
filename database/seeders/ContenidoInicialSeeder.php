@@ -96,6 +96,7 @@ class ContenidoInicialSeeder extends Seeder
     {
         $cifras = $this->cifrasValidas($reporte['cifras'] ?? []);
         $periodo = $this->textoONulo($reporte['periodo'] ?? null);
+        $aclaracion = $this->textoONulo($reporte['aclaracion'] ?? null);
         $hojaUrl = $this->textoONulo($reporte['hoja_url'] ?? null);
 
         if ($cifras === [] && $periodo === null && $hojaUrl === null) {
@@ -108,6 +109,7 @@ class ContenidoInicialSeeder extends Seeder
         $actual->fill([
             'periodo' => $periodo,
             'cifras' => $cifras,
+            'aclaracion' => $aclaracion,
             'hoja_url' => $hojaUrl,
         ]);
         $actual->save();

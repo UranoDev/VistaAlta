@@ -1,5 +1,8 @@
 # Changelog
 
+## [2026.07.29.1] - 2026 jul 29
+_Sin issues cerrados en esta ventana_
+
 ## [2026.07.29] - 2026 jul 29
 ### Features
 - **URVA-19**: Separar el buzón de comprobantes del institucional: dos llaves en config y comprobantes@ en /demanda

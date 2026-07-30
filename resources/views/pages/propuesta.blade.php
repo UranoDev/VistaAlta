@@ -15,7 +15,12 @@
                     Formalizar el fraccionamiento como Asociación Civil
                 </h1>
                 <p class="mt-4 text-grafito/85">
-                    El Fraccionamiento sigue funcionando. Lo que no existe es Vista Alta ante la ley: no tenemos una cuenta donde puedan depositar las cuotas.
+                    Dando seguimiento a la propuesta de constituirnos como asociación civil, es importante aclarar
+                    que el Fraccionamiento Vista Alta no tiene una personalidad jurídica.
+                    Si bien el fraccionamiento sigue funcionando es necesario registrarnos con un nombre propio asi
+                    como tener la posibilidad de contar con una cuenta bancaria para una adecuada administración de
+                    los recursos económicos, tener personalidad jurídica frente al municipio, entre muchos otros
+                    beneficios.
                 </p>
                 <p class="mt-4 text-grafito/85">
                     Esto es lo que la Mesa Directiva propone: constituir la Asociación
@@ -54,26 +59,29 @@
         pasaría— en vez de en abstracto: «personalidad jurídica» no le dice nada
         a nadie hasta que se cuenta a nombre de quién está la cuenta.
     --}}
-    <x-recibo.seccion rotulo="El argumento" titulo="Lo que cambia el día que la figura existe">
+    <x-recibo.seccion rotulo="Beneficios" titulo="Lo que cambia el día que la figura jurídica exista">
         @php
             $cambios = [
                 [
-                    'titulo' => 'Podremos tener una cuenta bancaria.',
-                    'texto' => 'Hoy no tenemos cuenta donde caigan las cuotas, tenemos que manejar soloefectivo, lo que complica el control y seguimiento.
-                                Con la Asociación constituida la cuenta es del
-                                fraccionamiento: sin importar quien entra y sale de la Mesa Directiva, la cuenta (y el dinero) se queda.',
+                    'titulo' => 'Contar con una cuenta bancaria.',
+                    'texto' => 'Al dia de hoy no contamos con un instrumento bancario en donde se puedan recibir las cuotas por
+                                lo que se ha estado manejando solo efectivo, lo que dificulta la administración de los recursos
+                                económicos.
+                                Con la creación de la asociación se contara con una cuenta bancaria perteneciente al
+                                fraccionamiento, sin importar quien entra y sale de la Mesa Directiva, la cuenta (y el dinero) se queda.',
                 ],
                 [
-                    'titulo' => 'Los acuerdos se pueden firmar',
-                    'texto' => 'Vigilancia, jardinería, mantenimiento, reparaciones. Hoy se acuerdan de palabra o los
-                                firma un particular que pone su nombre. Una Asociación Civil contrata, exige lo
-                                pactado y tiene con qué reclamar cuando un proveedor no cumple.',
+                    'titulo' => 'Se podrán hacer contratos con los prestadores de servicios.',
+                    'texto' => 'Actualmente los servicios de vigilancia, jardinería, mantenimiento, etc, se realizan mediante
+                                acuerdos de palabra y algun representante de la administración, a titulo personal, los firma.
+                                Una Asociación Civil contrata, exige lo pactado y tiene con qué reclamar cuando un proveedor no cumple.',
                 ],
                 [
                     'titulo' => 'La cuota se vuelve exigible',
                     'texto' => 'Hoy quien no paga simplemente no paga, y lo que deja de aportar lo terminan cubriendo
-                                los vecinos que sí pagaron. No se trata de demandar a nadie: se trata de que dejar de
-                                pagar tenga una consecuencia posible en vez de vivir de gratis.',
+                                los vecinos que sí pagaron. Se trata de establecer que asi como tendremos derechos,
+                                también tendremos obligaciones que cumplir cada uno de los asociados, siempre actuando
+                                 en beneficio de todos.',
                 ],
                 [
                     'titulo' => 'Rendir cuentas deja de ser un gesto de buena voluntad',

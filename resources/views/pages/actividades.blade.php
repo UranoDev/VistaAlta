@@ -63,10 +63,16 @@
         @endif
 
         {{--
-            La contraparte de la Bitácora: los mismos renglones, pero con la
-            casilla sin marcar. Va después y no antes porque el orden es el
-            argumento —primero lo que ya se hizo, y solo entonces lo que falta;
-            al revés se lee como una lista de promesas.
+            La contraparte de la Bitácora. Va después y no antes porque el orden
+            es el argumento —primero lo que ya se hizo, y solo entonces lo que
+            falta; al revés se lee como una lista de promesas.
+
+            Sin casilla de verificación a propósito, y sin sangría: un cuadrito
+            vacío por renglón convierte la rendición de cuentas en una lista de
+            tareas, y arriba la Bitácora tampoco marca nada. Lo que separa un
+            pendiente del siguiente es la misma línea que separa un día del
+            siguiente, que es lo que hace que las dos mitades se lean como una
+            sola página.
 
             Sin fechas a propósito: varios de estos pendientes dependen de un
             tercero, y comprometer una fecha que no se controla es prometer de
@@ -88,13 +94,9 @@
         @if ($pendientes->isNotEmpty())
             <ul class="mt-6 border-b border-linea">
                 @foreach ($pendientes as $pendiente)
-                    <li class="grid grid-cols-[0.7rem_1fr] gap-x-3 border-t border-linea py-4 first:border-t-0 sm:gap-x-4">
-                        {{-- Casilla vacía: el renglón existe, pero todavía no se estampa. --}}
-                        <span aria-hidden="true" class="mt-1.5 size-2.5 border border-tinta/70"></span>
-                        <div>
-                            <h4 class="font-semibold">{{ $pendiente->titulo }}</h4>
-                            <p class="mt-1 whitespace-pre-line text-sm text-grafito/85">{{ $pendiente->detalle }}</p>
-                        </div>
+                    <li class="border-t border-linea py-4 first:border-t-0">
+                        <h4 class="font-semibold">{{ $pendiente->titulo }}</h4>
+                        <p class="mt-1 whitespace-pre-line text-sm text-grafito/85">{{ $pendiente->detalle }}</p>
                     </li>
                 @endforeach
             </ul>

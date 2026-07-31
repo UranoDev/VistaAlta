@@ -1,5 +1,8 @@
 # Changelog
 
+## [2026.07.30.3] - 2026 jul 30
+_Sin issues cerrados en esta ventana_
+
 ## [2026.07.30.2] - 2026 jul 30
 ### Features
 - **URVA-25**: «Lo que sigue»: mover los pendientes de la vista a la base y darles pantalla en el panel

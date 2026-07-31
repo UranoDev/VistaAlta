@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Legal;
 
+use App\Models\ViaDeRecepcion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -24,6 +25,16 @@ class EnlacesEnElFormularioTest extends TestCase
     use RefreshDatabase;
 
     private const AVISO = 'Al validar tu teléfono aceptas el';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Las tres ramas del formulario solo existen con la Vía de recepción en
+        // `otp`. La de WhatsApp lleva su propia línea del Aviso, y se prueba en
+        // ViaDeRecepcionTest.
+        ViaDeRecepcion::usarOtp();
+    }
 
     public function test_la_rama_que_pide_el_celular_enlaza_al_aviso_y_a_los_terminos(): void
     {

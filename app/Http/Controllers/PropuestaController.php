@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Enums\Visibilidad;
 use App\Models\Comentario;
 use App\Models\RecepcionDeComentarios;
+use App\Models\ViaDeRecepcion;
 use App\Support\Otp\OtpService;
 use App\Support\VentanaDeValidacion;
 use Illuminate\Http\RedirectResponse;
@@ -20,14 +21,17 @@ use Illuminate\View\View;
  *
  * Portado de `AsociacionCivilController` de nvavista (ver docs/adr/0003), sin
  * tenancy y con lo que allá no existe: Ventana de validación de 30 minutos,
- * elección de visibilidad, la lista de comentarios y el respeto a la Recepción
- * de comentarios.
+ * elección de visibilidad, la lista de comentarios y el respeto a los dos
+ * interruptores del panel —la Recepción de comentarios, que decide si se admiten
+ * comentarios nuevos, y la Vía de recepción, que decide por dónde llegan—.
  */
 class PropuestaController extends Controller
 {
     private const PROPOSITO = 'comentario';
 
     private const RECEPCION_CERRADA = 'La Mesa Directiva cerró la recepción de comentarios. Lo que ya se publicó sigue aquí.';
+
+    private const RECEPCION_POR_WHATSAPP = 'Ahora los comentarios se reciben por WhatsApp. Escríbele a la Mesa Directiva desde el enlace de esta página.';
 
     public function __construct(
         private readonly OtpService $otp,
@@ -41,6 +45,7 @@ class PropuestaController extends Controller
             'preguntasFrecuentes' => config('contenido.preguntas_frecuentes', []),
             'comentariosPublicos' => Comentario::publicados()->get(),
             'recepcionAbierta' => RecepcionDeComentarios::estaAbierta(),
+            'via' => ViaDeRecepcion::actual(),
             'telefonoValidado' => $this->ventana->telefonoValidado($peticion),
             'telefonoPendiente' => $peticion->session()->get('comentario.telefono'),
         ]);
@@ -52,7 +57,7 @@ class PropuestaController extends Controller
      */
     public function enviarOtp(Request $peticion): RedirectResponse
     {
-        if ($rechazo = $this->rechazoSiLaRecepcionEstaCerrada()) {
+        if ($rechazo = $this->rechazoSiElSitioNoRecibeComentarios()) {
             return $rechazo;
         }
 
@@ -81,7 +86,7 @@ class PropuestaController extends Controller
      */
     public function verificarOtp(Request $peticion): RedirectResponse
     {
-        if ($rechazo = $this->rechazoSiLaRecepcionEstaCerrada()) {
+        if ($rechazo = $this->rechazoSiElSitioNoRecibeComentarios()) {
             return $rechazo;
         }
 
@@ -114,7 +119,7 @@ class PropuestaController extends Controller
      */
     public function cambiarTelefono(Request $peticion): RedirectResponse
     {
-        if ($rechazo = $this->rechazoSiLaRecepcionEstaCerrada()) {
+        if ($rechazo = $this->rechazoSiElSitioNoRecibeComentarios()) {
             return $rechazo;
         }
 
@@ -130,7 +135,7 @@ class PropuestaController extends Controller
      */
     public function store(Request $peticion): RedirectResponse
     {
-        if ($rechazo = $this->rechazoSiLaRecepcionEstaCerrada()) {
+        if ($rechazo = $this->rechazoSiElSitioNoRecibeComentarios()) {
             return $rechazo;
         }
 
@@ -177,16 +182,31 @@ class PropuestaController extends Controller
     }
 
     /**
-     * Con la recepción cerrada no se admite nada nuevo — ni el código, ni la
-     * validación, ni el comentario. Lo ya publicado no se toca.
+     * Las dos razones por las que ninguna de estas cuatro rutas hace nada. Se
+     * revisan en este orden porque el interruptor manda sobre la vía: con la
+     * recepción cerrada no se admite nada por ningún lado, así que decir por
+     * cuál habrían llegado sería contestar otra pregunta.
+     *
+     * 1. **Recepción de comentarios cerrada:** no se admite nada nuevo — ni el
+     *    código, ni la validación, ni el comentario. Lo ya publicado no se toca.
+     * 2. **Vía de recepción en `whatsapp`:** el sitio no es por donde se
+     *    reciben. Esconder el formulario no basta: son rutas públicas, y
+     *    dejarlas vivas permite quemar saldo de Twilio contra un canal que ni
+     *    siquiera está activo. Se cierran las cuatro y no solo las dos del OTP:
+     *    en esta vía el sitio no recibe comentarios por ninguna de ellas, y el
+     *    aviso manda a WhatsApp en vez de dejar un callejón sin salida.
      */
-    private function rechazoSiLaRecepcionEstaCerrada(): ?RedirectResponse
+    private function rechazoSiElSitioNoRecibeComentarios(): ?RedirectResponse
     {
-        if (RecepcionDeComentarios::estaAbierta()) {
-            return null;
+        if (! RecepcionDeComentarios::estaAbierta()) {
+            return redirect()->route('propuesta')->with('comentario.aviso', self::RECEPCION_CERRADA);
         }
 
-        return redirect()->route('propuesta')->with('comentario.aviso', self::RECEPCION_CERRADA);
+        if (ViaDeRecepcion::actual()->esWhatsApp()) {
+            return redirect()->route('propuesta')->with('comentario.aviso', self::RECEPCION_POR_WHATSAPP);
+        }
+
+        return null;
     }
 
     /**

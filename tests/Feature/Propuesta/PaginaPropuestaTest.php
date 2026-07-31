@@ -6,6 +6,7 @@ namespace Tests\Feature\Propuesta;
 
 use App\Models\Comentario;
 use App\Models\RecepcionDeComentarios;
+use App\Models\ViaDeRecepcion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,6 +17,15 @@ use Tests\TestCase;
 class PaginaPropuestaTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // El formulario del sitio solo se muestra con la Vía de recepción en
+        // `otp`; de fábrica es WhatsApp (URVA-26).
+        ViaDeRecepcion::usarOtp();
+    }
 
     public function test_sin_video_configurado_muestra_el_marcador(): void
     {

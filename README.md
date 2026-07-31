@@ -87,6 +87,31 @@ Tres pantallas:
   página de la Propuesta pero **no despublica nada**. No confundirlo con la
   moderación, que decide *qué se publica*: son cosas distintas y las dos advertencias
   siguen escritas en la propia pantalla.
+
+  Debajo va el segundo interruptor, la **Vía de recepción**, que decide *por dónde
+  llegan* cuando sí se admiten: `otp` —el colono escribe en el sitio validando su
+  celular por SMS— o `whatsapp` —la página no pide teléfono y muestra un enlace a la
+  conversación con la Mesa Directiva, con el número que se captura ahí mismo—. El
+  primero manda: con la recepción cerrada la vía no se usa. **Hoy sale al aire en
+  `whatsapp`** porque el SMS de Twilio no se entrega en producción (error 30008: las
+  operadoras filtran el tráfico A2P de un long code sin registrar); cuando eso se
+  destrabe, volver a `otp` es mover el selector, no desplegar.
+
+  La diferencia de fondo entre las dos no es el canal: **es quién elige la
+  visibilidad**. En `otp` la elige el autor y queda fija; en `whatsapp` el comentario
+  llega a un chat y lo captura la Mesa Directiva, así que el mensaje del enlace ya
+  viene prellenado pidiéndole al autor que la diga por escrito
+  (`config/contenido.php` → `whatsapp_mensaje`). Esa línea del texto no es
+  decorativa: es lo que mantiene la elección siendo del autor.
+
+  > **Pendiente conocido de la vía `whatsapp`:** el panel todavía **no tiene dónde
+  > capturar** un Comentario que llegó por chat —`canCreate` sigue en falso desde
+  > URVA-7, y el modelo exige `crearPublico()`/`crearPrivado()`—, así que en esta vía
+  > nada nuevo puede llegar a publicarse en la página. Por eso el texto de la página
+  > promete lo que sí se hace hoy (leer y contestar en el chat) y no promete
+  > publicación. Esa pantalla es lo que falta para que la vía sirva completa, y trae
+  > una decisión con ella: si un Comentario transcrito debe quedar marcado como tal,
+  > porque de él el sitio ya no puede afirmar que su autor eligió la visibilidad.
 - **Actividades** — alta, edición y borrado de lo que la Mesa Directiva llevó a cabo
   durante el Periodo. A diferencia de los Comentarios, esto sí lo redacta la Mesa
   Directiva, y lo que se da de alta sale de inmediato en la página pública: no hay

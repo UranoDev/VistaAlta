@@ -6,13 +6,18 @@ namespace Tests\Feature\Propuesta;
 
 use App\Models\Comentario;
 use App\Models\RecepcionDeComentarios;
+use App\Models\ViaDeRecepcion;
 use App\Support\Otp\ArrayOtpSender;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
  * El interruptor decide *si se puede escribir*. Nunca *qué se publica* — eso es
- * de la Cola de moderación.
+ * de la Cola de moderación, ni *por dónde llega* — eso es la Vía de recepción.
+ *
+ * La vía queda fijada en `otp` para que lo que se afirme aquí sea del
+ * interruptor y no del canal; que la recepción cerrada manda sobre la vía se
+ * prueba en ViaDeRecepcionTest.
  */
 class RecepcionDeComentariosTest extends TestCase
 {
@@ -27,6 +32,7 @@ class RecepcionDeComentariosTest extends TestCase
         parent::setUp();
 
         ArrayOtpSender::$enviados = [];
+        ViaDeRecepcion::usarOtp();
     }
 
     public function test_nace_abierta(): void

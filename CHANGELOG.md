@@ -1,5 +1,12 @@
 # Changelog
 
+## [2026.07.30.5] - 2026 jul 30
+### Features
+- **URVA-26**: Interruptor en el panel para recibir Comentarios por OTP o por WhatsApp
+
+## [2026.07.30.4] - 2026 jul 30
+_Sin issues cerrados en esta ventana_
+
 ## [2026.07.30.3] - 2026 jul 30
 _Sin issues cerrados en esta ventana_
 

@@ -7,6 +7,7 @@ namespace Tests\Feature\Propuesta;
 use App\Enums\EstadoModeracion;
 use App\Enums\Visibilidad;
 use App\Models\Comentario;
+use App\Models\ViaDeRecepcion;
 use App\Support\Otp\ArrayOtpSender;
 use App\Support\VentanaDeValidacion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,6 +18,10 @@ use Tests\TestCase;
  *
  * Corre con OTP_CHANNEL=array (phpunit.xml), así que no sale ningún SMS y el
  * código se lee del sender de pruebas.
+ *
+ * Y con la Vía de recepción fijada en `otp`: de fábrica es WhatsApp (URVA-26) y
+ * ahí este camino no existe. Lo que pasa en el otro modo se prueba aparte, en
+ * ViaDeRecepcionTest.
  */
 class DejarComentarioTest extends TestCase
 {
@@ -31,6 +36,7 @@ class DejarComentarioTest extends TestCase
         parent::setUp();
 
         ArrayOtpSender::$enviados = [];
+        ViaDeRecepcion::usarOtp();
     }
 
     /**

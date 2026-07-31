@@ -131,6 +131,18 @@ el formulario.
 _Avoid_: Cierre, archivado, moderación (la Cola de moderación decide **qué se
 publica**; esto decide **si se puede escribir** — son cosas distintas)
 
+**Vía de recepción**:
+Por dónde llegan los Comentarios cuando sí se admiten: escritos en el sitio con
+el celular validado por SMS (`otp`), o recibidos por WhatsApp (`whatsapp`). La
+mueve la Mesa Directiva desde la misma pantalla del panel, debajo de la Recepción
+de comentarios, que manda sobre ella —cerrada, la vía no se usa—. La diferencia
+que importa no es el canal sino **quién elige la visibilidad**: en `otp` la elige
+el autor y queda fija; en `whatsapp` la captura la Mesa Directiva, y por eso el
+mensaje del enlace se la pide al autor por escrito.
+_Avoid_: Canal, modo, método. **Recepción de comentarios** — ése es el apagador
+(¿se admiten, sí o no?), éste es el selector (¿por dónde?); confundirlos es el
+error fácil
+
 **Cola de moderación**:
 El conjunto de Comentarios públicos que ya fueron escritos pero que todavía no
 aparecen en el sitio. Ningún comentario público existe de cara a la Asamblea hasta

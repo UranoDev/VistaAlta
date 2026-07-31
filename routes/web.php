@@ -30,8 +30,10 @@ Route::get('/reporte-financiero/{mes}', [ReporteFinancieroController::class, 'me
 
 /*
  * Dejar un Comentario sobre la Propuesta: primero el OTP que valida el
- * teléfono, luego el comentario. Las tres rechazan si la Recepción de
- * comentarios está cerrada.
+ * teléfono, luego el comentario. Las cuatro rechazan si la Recepción de
+ * comentarios está cerrada, y también si la Vía de recepción está en WhatsApp
+ * —el sitio deja de ser por donde se reciben, y son rutas públicas: esconder el
+ * formulario no las apaga—.
  */
 Route::post('/comentarios/codigo', [PropuestaController::class, 'enviarOtp'])->name('comentarios.codigo');
 Route::post('/comentarios/validar', [PropuestaController::class, 'verificarOtp'])->name('comentarios.validar');

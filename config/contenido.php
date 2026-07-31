@@ -49,6 +49,33 @@ return [
     'comprobantes_recibidos' => 4,
 
     /*
+     * El mensaje con el que sale prellenado el enlace de WhatsApp de la página
+     * de la Propuesta, cuando la Vía de recepción está en `whatsapp`.
+     *
+     * No es cortesía ni plantilla decorativa. En esa vía el Comentario llega a
+     * un chat y lo captura la Mesa Directiva, así que la visibilidad —que es
+     * definitiva y que en el sitio elige el propio autor— pasaría a decidirla
+     * quien lo captura. Pedirla por escrito aquí es lo que la mantiene siendo
+     * del autor. Si se reescribe este texto, esa línea se queda.
+     *
+     * El número al que apunta el enlace no vive aquí: vive en la base
+     * (`App\Models\ViaDeRecepcion`), para que cambiarlo no pida un despliegue.
+     * El texto sí, porque es copy y no tiene pantalla en el panel — el mismo
+     * criterio que las preguntas frecuentes.
+     */
+    'whatsapp_mensaje' => <<<'TEXTO'
+        Hola, quiero dejar un comentario sobre la Propuesta de Vista Alta.
+
+        Mi nombre:
+
+        Mi comentario:
+
+        Quiero que mi comentario sea (deja solo una de las dos líneas):
+        - PÚBLICO: que aparezca en la página con mi nombre.
+        - PRIVADO: solo para la Mesa Directiva, que no se publique.
+        TEXTO,
+
+    /*
      * Las dos páginas legales. Solo la fecha: el correo que citan es
      * `correo_contacto`, el institucional, y escribirlo otra vez aquí sería
      * repetir el problema que esa llave resuelve.

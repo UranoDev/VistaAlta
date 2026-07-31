@@ -6,6 +6,7 @@ namespace Tests\Feature\Propuesta;
 
 use App\Models\Otp;
 use App\Models\RecepcionDeComentarios;
+use App\Models\ViaDeRecepcion;
 use App\Support\Otp\ArrayOtpSender;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -30,6 +31,8 @@ class CambiarTelefonoTest extends TestCase
         parent::setUp();
 
         ArrayOtpSender::$enviados = [];
+        // La pantalla del código solo existe con la Vía de recepción en `otp`.
+        ViaDeRecepcion::usarOtp();
     }
 
     private function pedirCodigo(string $telefono = self::TELEFONO): void

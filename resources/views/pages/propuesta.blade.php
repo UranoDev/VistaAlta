@@ -174,9 +174,19 @@
 
         <div class="mt-8">
             @if ($recepcionAbierta)
+                {{--
+                    Los dos interruptores del panel, en el orden en que mandan: si
+                    la Recepción está abierta, la Vía decide por dónde se recibe.
+                    Cerrada, la vía es irrelevante y ninguno de los dos se muestra.
+                --}}
                 <x-recibo.tarjeta>
-                    <x-comentarios.formulario :telefono-validado="$telefonoValidado"
-                                              :telefono-pendiente="$telefonoPendiente" />
+                    @if ($via->esOtp())
+                        <x-comentarios.formulario :telefono-validado="$telefonoValidado"
+                                                  :telefono-pendiente="$telefonoPendiente" />
+                    @else
+                        <x-comentarios.whatsapp :enlace="$via->enlaceDeWhatsApp()"
+                                                :numero="$via->numeroLegible()" />
+                    @endif
                 </x-recibo.tarjeta>
             @else
                 {{--

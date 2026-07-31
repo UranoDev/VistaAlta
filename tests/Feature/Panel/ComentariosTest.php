@@ -11,6 +11,7 @@ use App\Filament\Resources\Comentarios\Pages\ListComentarios;
 use App\Models\Comentario;
 use App\Models\RecepcionDeComentarios;
 use App\Models\User;
+use App\Models\ViaDeRecepcion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -33,6 +34,12 @@ class ComentariosTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create());
+
+        // Lo que se afirme aquí sobre el interruptor de Recepción tiene que ser
+        // del interruptor: con la vía de fábrica (WhatsApp) la página no muestra
+        // el formulario aunque la recepción esté abierta, y «no se ve» dejaría de
+        // probar nada. La Vía de recepción tiene su propia sección más abajo.
+        ViaDeRecepcion::usarOtp();
     }
 
     // ── Una sola lista ────────────────────────────────────────────────────────
@@ -455,6 +462,100 @@ class ComentariosTest extends TestCase
             ->assertSee('Cerrarla no despublica nada')
             ->assertSee('La cola no se atiende sola')
             ->assertSee('indefinidamente');
+    }
+
+    // ── La Vía de recepción, en la misma pantalla ────────────────────────────
+
+    public function test_la_pantalla_llega_con_la_via_puesta(): void
+    {
+        Livewire::test(ListComentarios::class)
+            ->assertSet('via', 'otp')
+            ->assertSet('numeroDeWhatsApp', ViaDeRecepcion::NUMERO_DE_FABRICA);
+    }
+
+    public function test_el_selector_mueve_la_recepcion_a_whatsapp(): void
+    {
+        Livewire::test(ListComentarios::class)->set('via', 'whatsapp');
+
+        $this->assertTrue(ViaDeRecepcion::actual()->esWhatsApp());
+
+        auth()->logout();
+        $this->get(route('propuesta'))
+            ->assertSee('Escribir por WhatsApp')
+            ->assertDontSee('Enviarme el código', escape: false);
+    }
+
+    /**
+     * El punto del interruptor: cuando Twilio destrabe el registro del remitente,
+     * volver al canal bueno se hace desde aquí y sin desplegar nada.
+     */
+    public function test_el_selector_regresa_la_recepcion_al_sitio(): void
+    {
+        ViaDeRecepcion::usarWhatsApp();
+
+        Livewire::test(ListComentarios::class)
+            ->assertSet('via', 'whatsapp')
+            ->set('via', 'otp');
+
+        $this->assertTrue(ViaDeRecepcion::actual()->esOtp());
+
+        auth()->logout();
+        $this->get(route('propuesta'))
+            ->assertSee('Enviarme el código', escape: false)
+            ->assertDontSee('Escribir por WhatsApp');
+    }
+
+    public function test_el_numero_de_whatsapp_se_captura_desde_el_panel(): void
+    {
+        Livewire::test(ListComentarios::class)
+            ->set('via', 'whatsapp')
+            ->set('numeroDeWhatsApp', '+52 33 1111 2222');
+
+        $this->assertSame('523311112222', ViaDeRecepcion::actual()->numeroDeWhatsApp());
+
+        auth()->logout();
+        $this->get(route('propuesta'))->assertSee('https://wa.me/523311112222?text=', escape: false);
+    }
+
+    /**
+     * Un enlace de `wa.me` mal formado no falla en el panel: falla en el celular
+     * de un colono que ya se fue a otra pantalla.
+     */
+    public function test_un_numero_que_no_se_puede_marcar_no_se_guarda(): void
+    {
+        ViaDeRecepcion::cambiarNumeroDeWhatsApp('523311112222');
+
+        Livewire::test(ListComentarios::class)->set('numeroDeWhatsApp', '55 31');
+
+        $this->assertSame('523311112222', ViaDeRecepcion::actual()->numeroDeWhatsApp());
+    }
+
+    public function test_cambiar_de_via_no_despublica_nada_ni_vacia_la_cola(): void
+    {
+        Comentario::factory()->publicado()->create(['comentario' => 'Publicado antes de cambiar de vía.']);
+        $enCola = Comentario::factory()->enCola()->create();
+
+        Livewire::test(ListComentarios::class)->set('via', 'whatsapp');
+
+        $this->assertSame(1, Comentario::enCola()->count());
+
+        auth()->logout();
+        $this->get(route('propuesta'))->assertSee('Publicado antes de cambiar de vía.');
+
+        $enCola->publicar();
+        $this->get(route('propuesta'))->assertSee($enCola->comentario);
+    }
+
+    /**
+     * La consecuencia que no es obvia de la vía de WhatsApp: ahí la visibilidad
+     * —que es definitiva— la marca quien captura, no el autor. Tiene que estar
+     * escrito en la pantalla donde se mueve el interruptor.
+     */
+    public function test_la_pantalla_advierte_quien_decide_la_visibilidad_en_whatsapp(): void
+    {
+        Livewire::test(ListComentarios::class)
+            ->assertSee('En WhatsApp, la visibilidad la marcas tú')
+            ->assertSee('respeta lo que haya pedido');
     }
 
     // ── Una sola entrada, no tres ────────────────────────────────────────────

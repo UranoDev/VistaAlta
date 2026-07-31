@@ -16,8 +16,8 @@ declare(strict_types=1);
 |     php artisan db:seed --class=ContenidoInicialSeeder
 |
 | Correrlo dos veces deja el sitio igual: las Actividades se reconocen por su
-| fecha y su texto, y el Reporte financiero es un solo renglón que se
-| sobreescribe. Lo que se haya editado desde el panel sí se pisa — mientras
+| fecha y su texto, los Pendientes por su título, y el Reporte financiero por el
+| mes que cubre. Lo que se haya editado desde el panel sí se pisa — mientras
 | este archivo tenga contenido, este archivo es la versión buena.
 |
 | Todo nace vacío a propósito. Una Actividad o una cifra de relleno en un
@@ -71,11 +71,57 @@ return [
     ],
 
     /*
-     * El Reporte financiero del Periodo: el resumen que la Asamblea lee de un
+     * «Lo que sigue»: lo que la Mesa Directiva todavía no ha hecho, en el orden
+     * en que se publica debajo de la Bitácora. Aquí el orden sí importa —el
+     * primer renglón es el pendiente del que cuelgan los demás—, y es el que se
+     * respeta al sembrar.
+     *
+     * Ninguno lleva fecha comprometida, y no es que falte capturarla: el
+     * Pendiente no tiene ese campo (ver App\Models\Pendiente). Varios dependen
+     * de un tercero que lleva su propio paso, y una fecha que no se controla se
+     * lee como promesa.
+     *
+     * Cada renglón:
+     *
+     *     ['titulo' => 'Qué falta, en una línea.', 'detalle' => 'Por qué sigue pendiente.'],
+     */
+    'pendientes' => [
+        [
+            'titulo' => 'Constituir la Asociación Civil',
+            'detalle' => 'De ahí sale la cuenta a nombre del fraccionamiento y la posibilidad de firmar como Vista Alta.',
+        ],
+        [
+            'titulo' => 'Vigilancia las 24 horas, los siete días',
+            'detalle' => 'Hoy quedan horas del día (y todo el domingo) sin vigilante en el acceso. Falta cerrar el turno completo para que no queden huecos.',
+        ],
+        [
+            'titulo' => 'Cámaras en las zonas que hoy no se ven',
+            'detalle' => 'Lo instalado deja puntos ciegos. Cubrirlos es lo que hace que la grabación sirva el día que haya algo que revisar.',
+        ],
+        [
+            'titulo' => 'Cerca eléctrica reparada en todos sus tramos',
+            'detalle' => 'Hay tramos sin funcionar. Mientras uno falle, el perímetro protege menos de lo que aparenta.',
+        ],
+        [
+            'titulo' => 'Alumbrado público al 100%',
+            'detalle' => 'Reponer lo que está apagado y mantenerlo así. No es una reparación de una vez: es mantenimiento que no se puede soltar.',
+        ],
+        [
+            'titulo' => 'Coladera repuesta',
+            'detalle' => 'La reposición, para la calle de Margarita le corresponde a la Fraccionadora, quien ya aceptó comprarla. Lo que nos toca es supervisar que se instale correctamente.',
+        ],
+    ],
+
+    /*
+     * El Reporte financiero de un mes: el resumen que la Asamblea lee de un
      * vistazo, más el enlace a la hoja de cálculo donde está el detalle.
      *
-     * - `periodo`  — cómo se nombra el tramo que se rinde. Texto libre, se
-     *                muestra tal cual: 'Marzo – Mayo de 2026'.
+     * - `mes`      — el mes que se rinde, como 'AAAA-MM'. Un reporte cubre
+     *                siempre un mes: de aquí salen el título de la página
+     *                ('Junio de 2026') y su dirección
+     *                (/reporte-financiero/2026-06), así que no es texto libre.
+     *                Cambiarlo por otro mes **no** reemplaza al anterior: lo
+     *                agrega, y el que ya estaba pasa al histórico.
      * - `hoja_url` — la hoja de Google. Tiene que estar compartida en
      *                «Cualquier persona con el enlace: puede ver»; si queda
      *                restringida a cuentas invitadas, quien la abra desde el
@@ -88,7 +134,7 @@ return [
      */
     'reporte_financiero' => [
 
-        'periodo' => 'Mes de Junio de 2026',
+        'mes' => '2026-06',
 
         'hoja_url' => null,
 

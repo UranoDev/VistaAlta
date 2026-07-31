@@ -1,3 +1,12 @@
+@props([
+    'title' => null,
+    // Solo para las páginas que se sirven en más de una dirección —hoy el
+    // Reporte financiero vigente, que vive en la raíz y en su URL con fecha—.
+    // Sin esto los buscadores indexan las dos y reparten entre ellas lo que
+    // vale una.
+    'canonical' => null,
+])
+
 <!DOCTYPE html>
 <html lang="es-MX" class="scroll-smooth">
     <head>
@@ -5,7 +14,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#1E4D3B">
 
-        <title>{{ isset($title) ? $title . ' · ' . config('app.name') : config('app.name') }}</title>
+        <title>{{ filled($title) ? $title . ' · ' . config('app.name') : config('app.name') }}</title>
+
+        @if ($canonical)
+            <link rel="canonical" href="{{ $canonical }}">
+        @endif
 
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])

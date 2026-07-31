@@ -46,11 +46,36 @@ rinde únicamente en el Reporte financiero, para no publicar dos cuentas del mis
 gasto.
 _Avoid_: Publicación (en nvavista es otra cosa), evento, obra, tarea
 
+**Pendiente**:
+Algo que la Mesa Directiva todavía no ha hecho, publicado en «Lo que sigue» —la
+segunda mitad de `/actividades`, después de la Bitácora. Deliberadamente **no**
+lleva fecha comprometida: varios dependen de un tercero que lleva su propio paso,
+y publicar un plazo que no se controla es prometer de más. Tampoco se marca como
+cumplido: el que se cumple se convierte en Actividad y se retira (acción «Ya se
+hizo» del panel). Su orden es contenido, no capricho — el primero es del que
+cuelgan los demás.
+_Avoid_: Tarea, compromiso (sugiere el plazo que justamente no se da), meta,
+objetivo. **Lo que sigue** es el rótulo de la sección en la página; la entidad se
+llama Pendiente
+
 **Reporte financiero**:
-La rendición de cuentas económica de un Periodo: un resumen de cifras que el sitio
+La rendición de cuentas económica de **un mes**: un resumen de cifras que el sitio
 muestra, más el enlace a la hoja de cálculo de Google donde vive el detalle. El
 resumen existe para ser mostrado; la hoja es la fuente de verdad y no se copia aquí.
-_Avoid_: Estado de cuenta (eso es por colono, y no existe aquí), balance, corte de caja
+Un mes, siempre — de ahí salen su título y su dirección, y de ahí que no se retire
+nunca: cada mes rendido se queda publicado (ver `Histórico`).
+_Avoid_: Estado de cuenta (eso es por colono, y no existe aquí), balance, corte de
+caja. **Trimestral** — el Reporte no sigue al Periodo aunque lo respalde: las
+Actividades se agrupan por Periodo, el dinero se rinde mes por mes
+
+**Histórico**:
+Los meses ya rendidos, que siguen publicados con su propia dirección
+(`/reporte-financiero/2026-06`). No es un archivo muerto ni una copia: es el mismo
+Reporte financiero de ese mes, tal como se rindió, y nunca se corrige hacia atrás
+para que cuadre con otro. `/reporte-financiero` publica siempre el mes más reciente
+y los anteriores cascadean solos (`docs/adr/0005`).
+_Avoid_: Archivo (sugiere que se retiró de circulación), versiones anteriores (no
+son versiones de un mismo reporte, son meses distintos)
 
 **Comprobante de depósito**:
 La constancia de que un propietario depositó a la administración anterior a esta

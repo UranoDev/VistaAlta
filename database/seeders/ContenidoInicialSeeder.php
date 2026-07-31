@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Actividad;
+use App\Models\Pendiente;
 use App\Models\ReporteFinanciero;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -20,10 +21,11 @@ use Illuminate\Database\Seeder;
  * tener que leer PHP más allá de una lista, y quien toca este archivo no
  * debería estar editando cifras.
  *
- * Es idempotente. Las Actividades se reconocen por su fecha y su texto, así que
- * volver a correrlo no duplica ninguna; el Reporte financiero es un solo
- * renglón y se sobreescribe. Lo que esté vacío en el archivo no se toca —
- * sembrar un contenido no borra los otros.
+ * Es idempotente. Las Actividades se reconocen por su fecha y su texto y los
+ * Pendientes por su título, así que volver a correrlo no duplica ninguno; el
+ * Reporte financiero se reconoce por su mes, así que volver a sembrarlo corrige
+ * ese mes y nunca deja dos de junio. Lo que esté vacío en el archivo no se toca
+ * — sembrar un contenido no borra los otros.
  */
 class ContenidoInicialSeeder extends Seeder
 {
@@ -43,6 +45,7 @@ class ContenidoInicialSeeder extends Seeder
         $contenido = $this->contenido ?? require database_path('seeders/contenido/contenido-inicial.php');
 
         $this->sembrarActividades($contenido['actividades'] ?? []);
+        $this->sembrarPendientes($contenido['pendientes'] ?? []);
         $this->sembrarReporteFinanciero($contenido['reporte_financiero'] ?? []);
     }
 
@@ -87,34 +90,86 @@ class ContenidoInicialSeeder extends Seeder
     }
 
     /**
-     * El Reporte es una tabla de un solo renglón, así que sembrarlo es llenar
-     * ese renglón —exista o no— y nunca agregar un segundo.
+     * Cada Pendiente se identifica por su título: es lo que lo hace ser ese y no
+     * otro. Su posición sale del orden del archivo, que es como se lee la lista
+     * —el primero es del que cuelgan los demás— y solo se fija al crearlo: si la
+     * Mesa Directiva ya reacomodó la lista desde el panel, volver a sembrar no
+     * le deshace el arrastre.
+     *
+     * @param  array<int, array<string, mixed>>  $pendientes
+     */
+    private function sembrarPendientes(array $pendientes): void
+    {
+        $sembrados = 0;
+        $orden = 0;
+
+        foreach ($pendientes as $pendiente) {
+            $titulo = trim((string) ($pendiente['titulo'] ?? ''));
+            $detalle = trim((string) ($pendiente['detalle'] ?? ''));
+
+            // Un pendiente a medias no se publica a medias, igual que una
+            // Actividad: el título sin el detalle deja un renglón que no
+            // explica por qué sigue pendiente.
+            if ($titulo === '' || $detalle === '') {
+                $this->aviso('Se saltó un Pendiente sin título o sin detalle.');
+
+                continue;
+            }
+
+            Pendiente::query()->firstOrCreate(
+                ['titulo' => $titulo],
+                ['detalle' => $detalle, 'orden' => $orden],
+            );
+
+            $orden++;
+            $sembrados++;
+        }
+
+        $this->aviso($sembrados > 0
+            ? "Pendientes sembrados: {$sembrados}."
+            : 'Sin Pendientes en el archivo: la página lo dice en vez de inventarlos.');
+    }
+
+    /**
+     * Un Reporte se identifica por el mes que cubre: es lo que lo hace ser el de
+     * junio y no el de julio. Sembrar el mismo mes dos veces lo corrige;
+     * sembrar otro mes lo agrega al histórico sin tocar los que ya estaban.
      *
      * @param  array<string, mixed>  $reporte
      */
     private function sembrarReporteFinanciero(array $reporte): void
     {
         $cifras = $this->cifrasValidas($reporte['cifras'] ?? []);
-        $periodo = $this->textoONulo($reporte['periodo'] ?? null);
         $aclaracion = $this->textoONulo($reporte['aclaracion'] ?? null);
         $hojaUrl = $this->textoONulo($reporte['hoja_url'] ?? null);
 
-        if ($cifras === [] && $periodo === null && $hojaUrl === null) {
+        if ($cifras === [] && $hojaUrl === null) {
             $this->aviso('Sin Reporte financiero en el archivo: la página lo dice en vez de mostrar un comprobante en blanco.');
 
             return;
         }
 
-        $actual = ReporteFinanciero::actual();
-        $actual->fill([
-            'periodo' => $periodo,
-            'cifras' => $cifras,
-            'aclaracion' => $aclaracion,
-            'hoja_url' => $hojaUrl,
-        ]);
-        $actual->save();
+        // Sin mes no hay dónde publicarlo: de él salen la dirección del reporte
+        // y su lugar en el histórico. Se salta y se avisa, igual que una
+        // Actividad sin fecha.
+        $mes = $this->mes($reporte['mes'] ?? null);
 
-        $this->aviso('Reporte financiero sembrado: '.count($cifras).' cifra(s)'.($hojaUrl ? ' y la hoja de cálculo.' : ', sin hoja de cálculo.'));
+        if ($mes === null) {
+            $this->aviso('Se saltó el Reporte financiero: le falta el mes que cubre, o no se entiende. Va como «AAAA-MM».');
+
+            return;
+        }
+
+        ReporteFinanciero::query()->updateOrCreate(
+            ['mes' => $mes->toDateString()],
+            [
+                'cifras' => $cifras,
+                'aclaracion' => $aclaracion,
+                'hoja_url' => $hojaUrl,
+            ],
+        );
+
+        $this->aviso('Reporte financiero de '.ReporteFinanciero::nombreDelMes($mes).' sembrado: '.count($cifras).' cifra(s)'.($hojaUrl ? ' y la hoja de cálculo.' : ', sin hoja de cálculo.'));
     }
 
     /**
@@ -162,6 +217,29 @@ class ContenidoInicialSeeder extends Seeder
         }
 
         return rescue(fn (): CarbonImmutable => CarbonImmutable::parse($texto)->startOfDay(), null, report: false);
+    }
+
+    /**
+     * El mes del Reporte, escrito como «AAAA-MM» y normalizado al día 1. Se
+     * valida el número de mes a mano porque `2026-13` no es un error de dedo
+     * que convenga tolerar: Carbon lo desbordaría a enero de 2027 y el reporte
+     * se publicaría en un mes que nadie escribió.
+     */
+    private function mes(mixed $valor): ?CarbonImmutable
+    {
+        $texto = trim((string) ($valor ?? ''));
+
+        if (preg_match('/^(\d{4})-(\d{2})$/', $texto, $partes) !== 1) {
+            return null;
+        }
+
+        $numero = (int) $partes[2];
+
+        if ($numero < 1 || $numero > 12) {
+            return null;
+        }
+
+        return CarbonImmutable::create((int) $partes[1], $numero, 1)->startOfDay();
     }
 
     private function textoONulo(mixed $valor): ?string

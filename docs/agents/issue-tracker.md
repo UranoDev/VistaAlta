@@ -48,10 +48,13 @@ There is **no `blocked by`** link type. Represent a "blocked by" edge with `depe
 { "targetIssueId": "<blocked>", "linkType": "depends on", "issueToLinkId": "<blocker>" }
 ```
 
-Two rules that are easy to skip and matter:
+Three rules that are easy to skip and matter:
 
 1. **Ordered subtasks get formal `depends on` links** — not just a sentence in the description saying "after URVA-5". If step 2 cannot start until step 1 lands, that edge must exist as a link, so the order survives outside the description.
-2. **Every issue hangs off its umbrella.** Break work down as an Epic (`Type: Epic`) plus subtasks linked to it, via `parentIssue` at creation or `subtask of` afterwards. Umbrella issues are excluded from changelog generation by their `Type: Epic`.
+2. **Every issue hangs off its umbrella.** Break work down as an Epic (`Type: Epic`) plus subtasks linked to it. Pass `parentIssue` **in the create call** — `subtask of` afterwards is the repair, not the routine: an issue born loose stays loose if anything interrupts before you get back to it. Umbrella issues are excluded from changelog generation by their `Type: Epic`. The umbrella here is `URVA-1`.
+3. **New issues carry `Triage: ready-for-agent`**, set in that same create call. Two exceptions: the project must actually have the `Triage` field, and an issue created *already resolved* — the retroactive record of work that is already done — takes no `Triage` at all, because there is nothing left to pick up.
+
+None of this is enforced by a YouTrack workflow. Nothing fails when it is skipped, which is exactly why it gets skipped: the issue looks correct on its own, and only the Epic's subtask list — which nobody opens while writing a ticket — shows what is missing.
 
 ## When a skill says "publish to the issue tracker"
 

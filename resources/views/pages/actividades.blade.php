@@ -72,29 +72,10 @@
             tercero, y comprometer una fecha que no se controla es prometer de
             más.
         --}}
-        @php
-            $pendientes = [
-                'Constituir la Asociación Civil' => 'De ahí
-                                                     sale la cuenta a nombre del fraccionamiento y la posibilidad de
-                                                     firmar como Vista Alta.',
-                'Vigilancia las 24 horas, los siete días' => 'Hoy quedan horas del día (y todo el domingo) sin
-                                                              vigilante en el acceso. Falta cerrar el turno completo
-                                                              para que no queden huecos.',
-                'Cámaras en las zonas que hoy no se ven' => 'Lo instalado deja puntos ciegos. Cubrirlos es lo que hace
-                                                             que la grabación sirva el día que haya algo que revisar.',
-                'Cerca eléctrica reparada en todos sus tramos' => 'Hay tramos sin funcionar. Mientras uno falle, el
-                                                                   perímetro protege menos de lo que aparenta.',
-                'Alumbrado público al 100%' => 'Reponer lo que está apagado y mantenerlo así. No es una reparación de
-                                                una vez: es mantenimiento que no se puede soltar.',
-                'Coladera repuesta' => 'La reposición, para la calle de Margarita le corresponde a la Fraccionadora, quien ya aceptó comprarla. Lo
-                                        que nos toca es supervisar que se instale correctamente.',
-            ];
-        @endphp
-
         <div class="mt-10 flex items-baseline justify-between gap-4 border-b border-linea pb-2">
             <h3 class="text-lg font-bold tracking-tight">Lo que sigue</h3>
             <span class="cifra text-xs text-grafito/70">
-                {{ trans_choice('{1}:count pendiente|[2,*]:count pendientes', count($pendientes), ['count' => count($pendientes)]) }}
+                {{ trans_choice('{1}:count pendiente|[2,*]:count pendientes', $pendientes->count(), ['count' => $pendientes->count()]) }}
             </span>
         </div>
 
@@ -104,18 +85,29 @@
             que se hizo.
         </p>
 
-        <ul class="mt-6 border-b border-linea">
-            @foreach ($pendientes as $pendiente => $detalle)
-                <li class="grid grid-cols-[0.7rem_1fr] gap-x-3 border-t border-linea py-4 first:border-t-0 sm:gap-x-4">
-                    {{-- Casilla vacía: el renglón existe, pero todavía no se estampa. --}}
-                    <span aria-hidden="true" class="mt-1.5 size-2.5 border border-tinta/70"></span>
-                    <div>
-                        <h4 class="font-semibold">{{ $pendiente }}</h4>
-                        <p class="mt-1 text-sm text-grafito/85">{{ $detalle }}</p>
-                    </div>
-                </li>
-            @endforeach
-        </ul>
+        @if ($pendientes->isNotEmpty())
+            <ul class="mt-6 border-b border-linea">
+                @foreach ($pendientes as $pendiente)
+                    <li class="grid grid-cols-[0.7rem_1fr] gap-x-3 border-t border-linea py-4 first:border-t-0 sm:gap-x-4">
+                        {{-- Casilla vacía: el renglón existe, pero todavía no se estampa. --}}
+                        <span aria-hidden="true" class="mt-1.5 size-2.5 border border-tinta/70"></span>
+                        <div>
+                            <h4 class="font-semibold">{{ $pendiente->titulo }}</h4>
+                            <p class="mt-1 whitespace-pre-line text-sm text-grafito/85">{{ $pendiente->detalle }}</p>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            {{--
+                Antes no podía pasar, con la lista escrita en esta misma vista.
+                Ahora que se mantiene desde el panel sí: sin esto el encabezado
+                quedaría colgando con «0 pendientes» y nada debajo.
+            --}}
+            <p class="py-4 text-sm text-grafito/70">
+                No hay pendientes publicados en este momento.
+            </p>
+        @endif
 
         {{--
             Aquí no aparece cuánto costó cada Actividad, y no es un olvido: el
@@ -123,8 +115,13 @@
             lea como una omisión.
         --}}
         <p class="mt-8 text-grafito/85">
-            De los pendientes de arriba, el primero es el más importante. Por
-            eso les pedimos que vean nuestra
+            {{-- Sin lista arriba, la referencia a «el primero» apuntaría a nada. --}}
+            @if ($pendientes->isNotEmpty())
+                De los pendientes de arriba, el primero es el más importante. Por
+                eso les pedimos que vean nuestra
+            @else
+                Les pedimos que vean nuestra
+            @endif
             <a href="{{ route('propuesta') }}" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Propuesta</a>
             de constituir la Asociación Civil.
         </p>

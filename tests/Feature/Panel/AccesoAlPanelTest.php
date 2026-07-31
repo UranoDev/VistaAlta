@@ -21,6 +21,7 @@ class AccesoAlPanelTest extends TestCase
     {
         $this->get('/admin/comentarios')->assertRedirect('/admin/login');
         $this->get('/admin/actividades')->assertRedirect('/admin/login');
+        $this->get('/admin/pendientes')->assertRedirect('/admin/login');
         $this->get('/admin/reporte-financiero')->assertRedirect('/admin/login');
     }
 
@@ -65,6 +66,7 @@ class AccesoAlPanelTest extends TestCase
 
         $this->get('/admin/comentarios')->assertOk();
         $this->get('/admin/actividades')->assertOk();
+        $this->get('/admin/pendientes')->assertOk();
         $this->get('/admin/reporte-financiero')->assertOk();
     }
 

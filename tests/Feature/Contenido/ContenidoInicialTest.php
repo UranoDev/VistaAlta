@@ -68,11 +68,58 @@ class ContenidoInicialTest extends TestCase
         $this->assertDatabaseHas('actividades', ['descripcion' => 'La única completa.']);
     }
 
+    public function test_siembra_los_pendientes_en_el_orden_del_archivo(): void
+    {
+        $this->sembrar([
+            'pendientes' => [
+                ['titulo' => 'Constituir la Asociación Civil', 'detalle' => 'De ahí sale la cuenta a nombre del fraccionamiento.'],
+                ['titulo' => 'Alumbrado público al 100%', 'detalle' => 'Reponer lo que está apagado y mantenerlo así.'],
+            ],
+        ]);
+
+        $this->assertDatabaseCount('pendientes', 2);
+        $this->assertDatabaseHas('pendientes', ['titulo' => 'Constituir la Asociación Civil', 'orden' => 0]);
+        $this->assertDatabaseHas('pendientes', ['titulo' => 'Alumbrado público al 100%', 'orden' => 1]);
+
+        $this->get(route('actividades'))->assertSeeInOrder([
+            'Constituir la Asociación Civil',
+            'Alumbrado público al 100%',
+        ]);
+    }
+
+    public function test_sembrar_dos_veces_no_duplica_pendientes(): void
+    {
+        $contenido = [
+            'pendientes' => [
+                ['titulo' => 'Coladera repuesta', 'detalle' => 'Le corresponde a la Fraccionadora.'],
+            ],
+        ];
+
+        $this->sembrar($contenido);
+        $this->sembrar($contenido);
+
+        $this->assertDatabaseCount('pendientes', 1);
+    }
+
+    public function test_un_pendiente_sin_titulo_o_sin_detalle_no_se_siembra(): void
+    {
+        $this->sembrar([
+            'pendientes' => [
+                ['titulo' => 'Sin detalle', 'detalle' => ''],
+                ['titulo' => '', 'detalle' => 'Sin título.'],
+                ['titulo' => 'El único completo', 'detalle' => 'Con las dos partes.'],
+            ],
+        ]);
+
+        $this->assertDatabaseCount('pendientes', 1);
+        $this->assertDatabaseHas('pendientes', ['titulo' => 'El único completo']);
+    }
+
     public function test_siembra_el_reporte_financiero_con_su_resumen_y_su_hoja(): void
     {
         $this->sembrar([
             'reporte_financiero' => [
-                'periodo' => 'Marzo – Mayo de 2026',
+                'mes' => '2026-05',
                 'hoja_url' => 'https://docs.google.com/spreadsheets/d/abc123/edit',
                 'cifras' => [
                     ['concepto' => 'Cuotas recibidas', 'monto' => 48250.5],
@@ -83,7 +130,8 @@ class ContenidoInicialTest extends TestCase
 
         $reporte = ReporteFinanciero::actual();
 
-        $this->assertSame('Marzo – Mayo de 2026', $reporte->periodo);
+        $this->assertSame('2026-05', $reporte->mesEnUrl());
+        $this->assertSame('Mayo de 2026', $reporte->periodo);
         $this->assertSame('https://docs.google.com/spreadsheets/d/abc123/edit', $reporte->hoja_url);
         $this->assertCount(2, $reporte->resumen());
         $this->assertTrue($reporte->resumen()->last()->destacada);
@@ -94,22 +142,72 @@ class ContenidoInicialTest extends TestCase
     }
 
     /**
-     * El Reporte es una tabla de un solo renglón: sembrarlo otra vez lo
-     * actualiza, nunca deja dos reportes conviviendo.
+     * Un Reporte se identifica por el mes que cubre: sembrar el mismo mes otra
+     * vez lo corrige, nunca deja dos junios conviviendo sin que se sepa cuál
+     * vale.
      */
-    public function test_sembrar_dos_veces_no_crea_un_segundo_reporte(): void
+    public function test_sembrar_dos_veces_el_mismo_mes_lo_corrige_en_vez_de_duplicarlo(): void
     {
-        $this->sembrar(['reporte_financiero' => ['periodo' => 'Primera captura']]);
-        $this->sembrar(['reporte_financiero' => ['periodo' => 'Segunda captura']]);
+        $this->sembrar(['reporte_financiero' => [
+            'mes' => '2026-06',
+            'cifras' => [['concepto' => 'Cifra con un error', 'monto' => 1]],
+        ]]);
+        $this->sembrar(['reporte_financiero' => [
+            'mes' => '2026-06',
+            'cifras' => [['concepto' => 'Cifra corregida', 'monto' => 2]],
+        ]]);
 
         $this->assertDatabaseCount('reporte_financiero', 1);
-        $this->assertSame('Segunda captura', ReporteFinanciero::actual()->periodo);
+        $this->assertSame('Cifra corregida', ReporteFinanciero::actual()->resumen()->first()->concepto);
+    }
+
+    /**
+     * El contrato inverso, y el que hace posible el histórico (docs/adr/0005):
+     * sembrar otro mes lo agrega en vez de pisar al anterior.
+     */
+    public function test_sembrar_otro_mes_lo_agrega_al_historico(): void
+    {
+        $this->sembrar(['reporte_financiero' => [
+            'mes' => '2026-06',
+            'cifras' => [['concepto' => 'Cuotas de junio', 'monto' => 1]],
+        ]]);
+        $this->sembrar(['reporte_financiero' => [
+            'mes' => '2026-07',
+            'cifras' => [['concepto' => 'Cuotas de julio', 'monto' => 2]],
+        ]]);
+
+        $this->assertDatabaseCount('reporte_financiero', 2);
+        $this->assertSame('2026-07', ReporteFinanciero::actual()->mesEnUrl());
+
+        $this->get(route('reporte-financiero.mes', ['mes' => '2026-06']))
+            ->assertOk()
+            ->assertSee('Cuotas de junio');
+    }
+
+    /**
+     * Sin mes no hay dónde publicarlo: de él salen la dirección del reporte y
+     * su lugar en el histórico. Se salta y se avisa, igual que una Actividad
+     * sin fecha.
+     */
+    public function test_un_reporte_sin_mes_o_con_un_mes_que_no_se_entiende_no_se_siembra(): void
+    {
+        $this->sembrar(['reporte_financiero' => [
+            'cifras' => [['concepto' => 'Sin mes', 'monto' => 1]],
+        ]]);
+
+        $this->sembrar(['reporte_financiero' => [
+            'mes' => 'Junio',
+            'cifras' => [['concepto' => 'Con un mes que no se entiende', 'monto' => 1]],
+        ]]);
+
+        $this->assertDatabaseCount('reporte_financiero', 0);
     }
 
     public function test_una_cifra_sin_concepto_o_sin_monto_no_se_siembra(): void
     {
         $this->sembrar([
             'reporte_financiero' => [
+                'mes' => '2026-06',
                 'cifras' => [
                     ['concepto' => 'Sin monto'],
                     ['concepto' => '', 'monto' => 100],
@@ -130,10 +228,12 @@ class ContenidoInicialTest extends TestCase
     {
         $this->sembrar([
             'actividades' => [],
-            'reporte_financiero' => ['periodo' => null, 'hoja_url' => null, 'cifras' => []],
+            'pendientes' => [],
+            'reporte_financiero' => ['mes' => null, 'hoja_url' => null, 'cifras' => []],
         ]);
 
         $this->assertDatabaseCount('actividades', 0);
+        $this->assertDatabaseCount('pendientes', 0);
         $this->assertDatabaseCount('reporte_financiero', 0);
     }
 
@@ -147,8 +247,9 @@ class ContenidoInicialTest extends TestCase
         $contenido = require database_path('seeders/contenido/contenido-inicial.php');
 
         $this->assertIsArray($contenido['actividades']);
+        $this->assertIsArray($contenido['pendientes']);
         $this->assertIsArray($contenido['reporte_financiero']['cifras']);
-        $this->assertArrayHasKey('periodo', $contenido['reporte_financiero']);
+        $this->assertArrayHasKey('mes', $contenido['reporte_financiero']);
         $this->assertArrayHasKey('hoja_url', $contenido['reporte_financiero']);
 
         // Y tiene que poder sembrarse tal como está en el repo.

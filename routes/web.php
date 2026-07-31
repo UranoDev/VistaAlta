@@ -19,6 +19,16 @@ Route::get('/reporte-financiero', [ReporteFinancieroController::class, 'index'])
 Route::view('/demanda', 'pages.demanda')->name('demanda');
 
 /*
+ * Cada mes ya rendido conserva su propia dirección, para que la rendición de
+ * cuentas se pueda consultar hacia atrás (docs/adr/0005). La restricción a
+ * `AAAA-MM` no es cosmética: sin ella, el parámetro se tragaría cualquier ruta
+ * hermana que se agregue después bajo `/reporte-financiero/`.
+ */
+Route::get('/reporte-financiero/{mes}', [ReporteFinancieroController::class, 'mes'])
+    ->where('mes', '[0-9]{4}-[0-9]{2}')
+    ->name('reporte-financiero.mes');
+
+/*
  * Dejar un Comentario sobre la Propuesta: primero el OTP que valida el
  * teléfono, luego el comentario. Las tres rechazan si la Recepción de
  * comentarios está cerrada.

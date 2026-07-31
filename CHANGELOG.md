@@ -1,5 +1,10 @@
 # Changelog
 
+## [2026.07.30.2] - 2026 jul 30
+### Features
+- **URVA-25**: «Lo que sigue»: mover los pendientes de la vista a la base y darles pantalla en el panel
+- **URVA-24**: Histórico de Reportes financieros: un reporte por mes, con URL propia y archivo consultable
+
 ## [2026.07.30.1] - 2026 jul 30
 ### Features
 - **URVA-23**: Panel del Reporte financiero: botón arriba que abra la página pública en una pestaña nueva

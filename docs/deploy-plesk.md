@@ -383,8 +383,11 @@ php artisan db:seed --class=ContenidoInicialSeeder --force
 Es idempotente: correrlo dos veces deja el sitio igual. Las Actividades se
 reconocen por fecha + texto exacto, así que **si editas una descripción en el
 seeder después de sembrar, la próxima siembra crea un duplicado en vez de
-actualizar**. Cuando el sitio ya esté al aire, las Actividades nuevas se capturan
-desde `/admin`, no aquí.
+actualizar**. El Reporte financiero se reconoce por el mes que cubre (`mes`), así
+que resembrarlo corrige ese mes; **cambiar el `mes` en el archivo agrega un
+reporte nuevo al histórico en vez de reemplazar al que ya estaba**
+(`docs/adr/0005`). Cuando el sitio ya esté al aire, las Actividades y los meses
+nuevos se capturan desde `/admin`, no aquí.
 
 ### La cuenta del panel
 Proceso interactivo

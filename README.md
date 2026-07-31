@@ -27,7 +27,13 @@ Seis, todas de lectura y sin autenticación (`routes/web.php`). Cuatro están en
 navegación de arriba:
 
 - **`/`** — la Propuesta. El único asunto que se somete a la Asamblea.
-- **`/actividades`** y **`/reporte-financiero`** — lo que la respalda.
+- **`/actividades`** y **`/reporte-financiero`** — lo que la respalda. El Reporte
+  financiero se rinde **un mes a la vez** y los meses se acumulan: la raíz publica
+  siempre el más reciente y cada mes anterior conserva su propia dirección
+  (`/reporte-financiero/2026-06`), listada al pie de la página. El vigente vive en las
+  dos direcciones, así que la página declara la raíz como canónica en vez de redirigir
+  — la URL con fecha tiene que seguir sirviendo junio el día que junio deje de ser lo
+  vigente (`docs/adr/0005`).
 - **`/demanda`** — Demanda. Pide los comprobantes de depósito a la administración
   pasada para documentar cuánto se entregó. La única que **pide** algo en vez de
   rendir cuentas, y por eso va al final de la navegación y **no lleva enlaces de
@@ -87,12 +93,17 @@ Tres pantallas:
   borradores ni cola de por medio. El formulario tiene **dos campos y solo dos**,
   fecha y descripción: sin costo, porque el dinero se rinde completo en el Reporte
   financiero, y sin adjunto, porque en el sitio no se cargan documentos.
-- **Reporte financiero** — el resumen de cifras del Periodo y el enlace a la hoja de
-  cálculo de Google. Las cifras **se capturan a mano**: la hoja es la fuente de verdad
-  y el sitio no la lee ni la importa, así que cuando la hoja cambia hay que volver a
-  esta pantalla. Y lo que se guarde aquí queda **público y sin contraseña** — es una
-  decisión tomada (`docs/adr/0004`), no un pendiente. Las dos advertencias están
-  también dentro de la propia pantalla.
+- **Reporte financiero** — un listado, con un reporte por mes: el resumen de cifras y
+  el enlace a la hoja de cálculo de Google de cada uno. **Capturar un mes nuevo no
+  borra al anterior**, lo empuja al histórico; corregir un mes es editarlo, no volver
+  a capturarlo, y la base impide que existan dos del mismo mes. El mes se elige de una
+  lista y no se escribe: de él salen el título («Junio de 2026») y la dirección
+  pública, que así no pueden contradecirse. Las cifras **se capturan a mano**: la hoja
+  es la fuente de verdad y el sitio no la lee ni la importa, así que cuando la hoja
+  cambia hay que volver a esta pantalla. Y lo que se guarde aquí queda **público y sin
+  contraseña**, y para siempre — son decisiones tomadas (`docs/adr/0004` y
+  `docs/adr/0005`), no un pendiente. Las dos advertencias están también dentro de la
+  propia pantalla.
 
 > **Al entregar el panel, decirlo explícitamente:** la Recepción de comentarios nace
 > abierta y nadie la cierra sola, así que los Comentarios públicos van a seguir

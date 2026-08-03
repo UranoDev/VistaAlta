@@ -6,7 +6,14 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            // El tema del panel se compila aparte del sitio: Filament carga su
+            // hoja por su cuenta (`viteTheme`) y no comparte bundle con `app.css`,
+            // aunque los dos importen la misma paleta.
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+                'resources/css/filament/admin/theme.css',
+            ],
             refresh: true,
             fonts: [
                 // Auto-hospedadas desde node_modules (@fontsource), no desde un CDN:

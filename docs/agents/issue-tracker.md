@@ -52,7 +52,11 @@ Three rules that are easy to skip and matter:
 
 1. **Ordered subtasks get formal `depends on` links** — not just a sentence in the description saying "after URVA-5". If step 2 cannot start until step 1 lands, that edge must exist as a link, so the order survives outside the description.
 2. **Every issue hangs off its umbrella.** Break work down as an Epic (`Type: Epic`) plus subtasks linked to it. Pass `parentIssue` **in the create call** — `subtask of` afterwards is the repair, not the routine: an issue born loose stays loose if anything interrupts before you get back to it. Umbrella issues are excluded from changelog generation by their `Type: Epic`. The umbrella here is `URVA-1`.
-3. **New issues carry `Triage: ready-for-agent`**, set in that same create call. Two exceptions: the project must actually have the `Triage` field, and an issue created *already resolved* — the retroactive record of work that is already done — takes no `Triage` at all, because there is nothing left to pick up.
+3. **New issues carry `Triage: ready-for-agent`**, set in that same create call. Three exceptions: the project must actually have the `Triage` field; an issue created *already resolved* — the retroactive record of work that is already done — takes no `Triage` at all, because there is nothing left to pick up; and work an agent **cannot** do is born `ready-for-human` instead.
+
+   That last one is narrow on purpose. It is not "this looks hard" or "I'd rather a person did it" — it is work whose nature rules an agent out: paperwork with signatures, a trámite before a third party, anything gated on a credential or an account only a person can open. Filing it `ready-for-agent` does not make it happen; it just costs a billed loop iteration to rediscover that nobody in the loop can do it, and the agent ends up setting `ready-for-human` anyway (see `.ralph/prompt.md`, step 6). Anything short of that bar starts `ready-for-agent` and gets reassigned later if it turns out to be blocked.
+
+   `needs-triage`, `needs-info` and `wontfix` are never valid at creation: each leaves the issue in nobody's queue.
 
 None of this is enforced by a YouTrack workflow. Nothing fails when it is skipped, which is exactly why it gets skipped: the issue looks correct on its own, and only the Epic's subtask list — which nobody opens while writing a ticket — shows what is missing.
 

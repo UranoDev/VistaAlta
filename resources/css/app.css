@@ -1,37 +1,12 @@
 @import 'tailwindcss';
 
+/* La paleta y la tipografía las comparte con el panel — ver palette-receipt.css. */
+@import './palette-receipt.css';
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
-/*
- * Sistema visual "Recibo" — docs/design/paletas-condominios.html (Propuesta 2).
- *
- * El concepto es el comprobante de pago: tinta de folio, números tabulares,
- * papel térmico. La marca es la prueba de que se rindió cuentas bien, que es
- * justamente el argumento del sitio.
- */
 @theme {
-    /* Paleta */
-    --color-tinta: #1e4d3b; /* acento principal, texto de énfasis */
-    --color-sello: #a22e2e; /* RESERVADO a alertas/urgencia — no decorar con esto */
-    --color-papel: #eeede4; /* fondo base */
-    --color-grafito: #2a2a28; /* texto */
-    --color-menta: #bfe0ce; /* resaltes suaves de éxito */
-
-    /* Derivados de la paleta, para superficies y filetes del comprobante */
-    --color-papel-alto: #f6f5f0; /* tarjeta sobre el fondo base */
-    --color-linea: #cfcdc2; /* filete punteado del recibo */
-    --color-tinta-suave: #2f6a53; /* hover del acento */
-
-    /*
-     * Tipografía: IBM Plex auto-hospedada (ver vite.config.js). `--font-plex-*`
-     * las declara el directivo `@fonts`, ya con las familias de respaldo
-     * ajustadas por métrica — por eso se toman de ahí en vez de repetir la pila.
-     * El valor literal queda como red por si la hoja de fuentes no cargó.
-     */
-    --font-sans: var(--font-plex-sans, 'IBM Plex Sans', 'Segoe UI', Roboto, Arial, sans-serif);
-    --font-mono: var(--font-plex-mono, 'IBM Plex Mono', SFMono-Regular, Consolas, monospace);
-
     /* Ancho de lectura: la Asamblea lee esto en el celular */
     --container-lectura: 44rem;
 }
@@ -61,12 +36,6 @@
 }
 
 @layer components {
-    /* Las cifras siempre alineadas en columna, como en un comprobante. */
-    .cifra {
-        font-family: var(--font-mono);
-        font-variant-numeric: tabular-nums;
-    }
-
     /*
      * Perforación de papel térmico. Va en el borde superior de un contenedor
      * `relative`; el color del troquel se pasa por `--recibo-fondo` para que se

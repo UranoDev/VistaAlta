@@ -136,7 +136,7 @@ return [
 
         'mes' => '2026-06',
 
-        'hoja_url' => null,
+        'hoja_url' => 'https://docs.google.com/spreadsheets/d/190VNjSqxbU2EyQMlHADjivYU7x83GWcgw0SnM6zIhso/edit?usp=sharing',
 
         'cifras' => [
             ['concepto' => 'Cuotas de junio', 'monto' => 57600],

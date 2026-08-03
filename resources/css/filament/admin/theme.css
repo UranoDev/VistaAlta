@@ -1,0 +1,155 @@
+/*
+ * El tema del panel de la Mesa Directiva: Filament con la ropa de Palette
+ * Receipt, para que quien administra vea la misma hoja que la Asamblea lee.
+ *
+ * Lo que Filament ya toma de la paleta por su cuenta —primary, danger,
+ * success— se declara en AdminPanelProvider, que es donde vive el resto de la
+ * configuración del panel. Aquí queda lo que su API de colores no alcanza.
+ */
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../palette-receipt.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/*
+ * El selector es `html.fi` y no `:root` a propósito. `@filamentStyles` imprime
+ * sus variables en un `<style>` del `<head>`, y aunque hoy esta hoja se carga
+ * después, colgarse del orden del documento es frágil: `html.fi` gana por
+ * especificidad y deja de importar quién va primero.
+ */
+html.fi {
+    /*
+     * Los grises de Filament (Zinc, frío) cambiados por los neutros cálidos de
+     * Palette Receipt: papel arriba, grafito abajo.
+     *
+     * Van en CSS y no en `->colors(['gray' => ...])` porque `Color::hex()`
+     * aplana a gris puro cualquier semilla con croma menor a 0.03
+     * (Color.php:669), y los neutros de la paleta caen justo debajo de ese
+     * umbral: pasarlos por ahí les quitaría exactamente lo que los hace papel.
+     * Los valores son oklch porque es lo único que Filament acepta al resolver
+     * un tono (AssetManager::resolveColorShadeFromPalette).
+     */
+    --gray-50: oklch(0.9444 0.012 101.49); /* #eeede4 papel — fondo de página */
+    --gray-100: oklch(0.9113 0.0149 98.3); /* #e4e2d7 — hover sobre superficie */
+    --gray-200: oklch(0.8468 0.0152 98.32); /* #cfcdc2 línea — filetes y bordes */
+    --gray-300: oklch(0.7777 0.0168 99.06); /* #b9b7ab */
+    --gray-400: oklch(0.6749 0.0204 96.99); /* #9a9789 */
+    --gray-500: oklch(0.5783 0.0197 96.28); /* #7d7a6d — texto secundario */
+    --gray-600: oklch(0.4952 0.0189 95.44); /* #656256 */
+    --gray-700: oklch(0.4192 0.0148 96.68); /* #4f4d44 */
+    --gray-800: oklch(0.351 0.0119 100.33); /* #3c3b34 */
+    --gray-900: oklch(0.3161 0.0105 99.21); /* #33322c */
+    --gray-950: oklch(0.2843 0.0036 106.63); /* #2a2a28 grafito — texto */
+
+    /*
+     * El verde, a la intensidad de Palette Receipt.
+     *
+     * `Color::hex()` se queda solo con el TONO de la semilla y reconstruye
+     * luminosidad y croma desde una tabla fija, la misma para todos los colores
+     * (Color::generatePalette). Por eso pasarle Tinta daba el tono correcto con
+     * el doble de saturación: un esmeralda de tablero, no tinta de folio.
+     *
+     * La corrección conserva la luminosidad de cada tono —es la que carga los
+     * contrastes que Filament da por hechos entre fondo y texto de sus
+     * componentes— y multiplica el croma por un factor k, elegido para que la
+     * rampa pase por el croma real de la semilla a la luminosidad de la
+     * semilla. Para regenerarlas si la paleta cambia: tono y croma salen de
+     * convertir el hex a oklch, la luminosidad de la tabla de Filament, y
+     * k = croma de la semilla ÷ croma que la tabla da a esa luminosidad.
+     *
+     * Danger no aparece aquí a propósito: para Sello el mismo cálculo da
+     * k = 1.119, o sea que la rampa de fábrica ya está prácticamente en su
+     * intensidad. Y debe gritar, que para eso está reservado.
+     */
+
+    /* Tinta #1e4d3b — L=0.3818 C=0.0604 H=165.44, k=0.626 */
+    --primary-50: oklch(0.9772 0.0087 165.44);
+    --primary-100: oklch(0.9504 0.0205 165.44);
+    --primary-200: oklch(0.9055 0.0395 165.44);
+    --primary-300: oklch(0.8405 0.0663 165.44);
+    --primary-400: oklch(0.7535 0.094 165.44);
+    --primary-500: oklch(0.6827 0.1064 165.44);
+    --primary-600: oklch(0.5978 0.1058 165.44);
+    --primary-700: oklch(0.5149 0.0935 165.44);
+    --primary-800: oklch(0.4461 0.0771 165.44);
+    --primary-900: oklch(0.3946 0.0623 165.44);
+    --primary-950: oklch(0.2779 0.0446 165.44);
+
+    /* Menta #bfe0ce — L=0.8777 C=0.0426 H=161.58, k=0.523. Queda un punto más
+       lavado que Tinta, que es justo su papel: resalte suave, no acento. */
+    --success-50: oklch(0.9772 0.0073 161.58);
+    --success-100: oklch(0.9504 0.0171 161.58);
+    --success-200: oklch(0.9055 0.033 161.58);
+    --success-300: oklch(0.8405 0.0555 161.58);
+    --success-400: oklch(0.7535 0.0786 161.58);
+    --success-500: oklch(0.6827 0.089 161.58);
+    --success-600: oklch(0.5978 0.0885 161.58);
+    --success-700: oklch(0.5149 0.0782 161.58);
+    --success-800: oklch(0.4461 0.0645 161.58);
+    --success-900: oklch(0.3946 0.0521 161.58);
+    --success-950: oklch(0.2779 0.0373 161.58);
+
+    /*
+     * `info` es el azul de fábrica, y en Palette Receipt no hay azul: los
+     * Callout de contexto («Cerrarla no despublica nada») se veían pegados de
+     * otro sistema. Se alían a los neutros en vez de inventarles un tono, que
+     * es además lo que significan — la letra chica del comprobante, no una
+     * categoría nueva.
+     */
+    --info-50: var(--gray-50);
+    --info-100: var(--gray-100);
+    --info-200: var(--gray-200);
+    --info-300: var(--gray-300);
+    --info-400: var(--gray-400);
+    --info-500: var(--gray-500);
+    --info-600: var(--gray-600);
+    --info-700: var(--gray-700);
+    --info-800: var(--gray-800);
+    --info-900: var(--gray-900);
+    --info-950: var(--gray-950);
+
+    /*
+     * Filament pinta tarjetas, topbar, sidebar y modales con `bg-white`
+     * literal. En Palette Receipt la superficie que va sobre el papel no es
+     * blanca sino papel-alto, así que se redefine el blanco del panel en lugar
+     * de perseguir componente por componente. Arrastra también `text-white`
+     * —el texto sobre los botones de tinta—, que es justo el contraste que se
+     * busca: papel sobre tinta, no blanco de pantalla.
+     */
+    --color-white: #f6f5f0;
+
+    /*
+     * Filament arma sus `--font-sans` y `--font-mono` a partir de estas dos, y
+     * las llena desde `->font()` metiendo el nombre de la familia entre
+     * comillas: por ahí no cabe una pila con respaldos. Se escriben aquí para
+     * conservar las familias de respaldo ajustadas por métrica que trae
+     * `--font-plex-*`, las mismas que usa el sitio público.
+     */
+    --font-family: var(--font-plex-sans, 'IBM Plex Sans', 'Segoe UI', Roboto, Arial);
+    --mono-font-family: var(--font-plex-mono, 'IBM Plex Mono', SFMono-Regular, Consolas);
+}
+
+@layer components {
+    /*
+     * Las cifras del panel cuadran en columna igual que en el recibo público.
+     * Va sobre la tabla completa y no columna por columna porque
+     * `tabular-nums` solo toca los dígitos: el texto de las demás columnas se
+     * queda igual, y así ninguna columna de dinero nueva nace desalineada.
+     */
+    .fi-ta-table,
+    .fi-in-text,
+    .fi-input {
+        font-variant-numeric: tabular-nums;
+    }
+
+    /*
+     * El filete que separa registros va punteado, como en `.recibo-renglon`.
+     * El `divide-y` de la tabla lo pinta en el borde de abajo del renglón, no
+     * en el de arriba; el del `thead` se queda sólido a propósito, que es la
+     * raya bajo los encabezados de columna.
+     */
+    .fi-ta-table tbody > tr {
+        border-bottom-style: dashed;
+    }
+}

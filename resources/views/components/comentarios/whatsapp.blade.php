@@ -16,7 +16,7 @@
 --}}
 <div {{ $attributes->class(['space-y-5']) }}>
     @if (session('comentario.aviso'))
-        <x-recibo.nota variante="aviso">{{ session('comentario.aviso') }}</x-recibo.nota>
+        <x-palette-receipt.nota variante="aviso">{{ session('comentario.aviso') }}</x-palette-receipt.nota>
     @endif
 
     <div class="space-y-3">
@@ -49,9 +49,9 @@
     </div>
 
     <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <x-recibo.boton :href="$enlace" target="_blank" rel="noopener noreferrer">
+        <x-palette-receipt.boton :href="$enlace" target="_blank" rel="noopener noreferrer">
             Escribir por WhatsApp
-        </x-recibo.boton>
+        </x-palette-receipt.boton>
 
         <span class="text-sm text-grafito/70">
             o guarda el número: <span class="cifra font-semibold text-grafito">{{ $numero }}</span>

@@ -13,7 +13,7 @@
 @php($titulo = $esVigente ? 'Reporte financiero' : 'Reporte financiero · '.$reporte->periodo)
 
 <x-layout.app :title="$titulo" :canonical="$canonical">
-    <x-recibo.seccion rotulo="Rendición de cuentas del Periodo" titulo="Reporte financiero">
+    <x-palette-receipt.seccion rotulo="Rendición de cuentas del Periodo" titulo="Reporte financiero">
         <p class="text-grafito/85">
             De dónde salió y en qué se fue el dinero del fraccionamiento durante el mes. Abajo van las cifras de
             resumen; el detalle, movimiento por movimiento, está completo en la hoja de cálculo y se abre sin pedir
@@ -21,7 +21,7 @@
         </p>
 
         @if ($reporte->periodo)
-            <x-recibo.rotulo class="mt-6">Periodo: {{ $reporte->periodo }}</x-recibo.rotulo>
+            <x-palette-receipt.rotulo class="mt-6">Periodo: {{ $reporte->periodo }}</x-palette-receipt.rotulo>
         @endif
 
         @unless ($esVigente)
@@ -30,12 +30,12 @@
                 lo único que evita que alguien lea cifras viejas como si fueran
                 las de hoy. Va antes de las cifras, no después.
             --}}
-            <x-recibo.nota variante="aviso" class="mt-4">
+            <x-palette-receipt.nota variante="aviso" class="mt-4">
                 Este es el reporte de {{ $reporte->periodo }} y ya no es el más reciente. Se conserva tal como se
                 rindió.
                 <a href="{{ route('reporte-financiero') }}"
                    class="font-medium underline underline-offset-2">Ver el reporte vigente</a>.
-            </x-recibo.nota>
+            </x-palette-receipt.nota>
         @endunless
 
         @if ($reporte->estaVacio())
@@ -54,15 +54,15 @@
                     </span>
                 </div>
 
-                <x-recibo.tarjeta class="mt-4">
+                <x-palette-receipt.tarjeta class="mt-4">
                     @foreach ($reporte->resumen() as $cifra)
                         {{-- El renglón del total va destacado, como en un comprobante. --}}
-                        <x-recibo.renglon :concepto="$cifra->concepto"
+                        <x-palette-receipt.renglon :concepto="$cifra->concepto"
                                           class="{{ $cifra->destacada ? 'mt-1 border-t-2 border-t-tinta pt-3 text-base font-semibold text-tinta' : '' }}">
                             {{ $cifra->montoFormateado() }}
-                        </x-recibo.renglon>
+                        </x-palette-receipt.renglon>
                     @endforeach
-                </x-recibo.tarjeta>
+                </x-palette-receipt.tarjeta>
 
                 {{--
                     Lo que las cifras no dicen solas. Va pegada a la tarjeta y
@@ -71,20 +71,20 @@
                     se repite se malinterpreta si nadie lo advierte a tiempo.
                 --}}
                 @if ($reporte->tieneAclaracion())
-                    <x-recibo.nota variante="aviso" class="mt-4">
+                    <x-palette-receipt.nota variante="aviso" class="mt-4">
                         {{ $reporte->aclaracion }}
-                    </x-recibo.nota>
+                    </x-palette-receipt.nota>
                 @endif
 
                 {{--
                     El resumen es un resumen: si alguien busca de dónde sale una
                     cifra, el lugar es la hoja, no esta página.
                 --}}
-                <x-recibo.nota class="mt-4">
+                <x-palette-receipt.nota class="mt-4">
                     Estas son cifras de resumen, capturadas a mano por la Mesa Directiva. Si quieres saber de dónde
                     sale alguna, el lugar no es esta página: es la hoja de cálculo, donde está cada movimiento con su
                     fecha y su concepto.
-                </x-recibo.nota>
+                </x-palette-receipt.nota>
             </div>
         @endif
 
@@ -100,13 +100,13 @@
                     Sale del sitio: abre en pestaña nueva y lo dice antes de que
                     alguien lo toque, con el dominio a la vista.
                 --}}
-                <x-recibo.boton :href="$reporte->hoja_url"
+                <x-palette-receipt.boton :href="$reporte->hoja_url"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 class="mt-4">
                     Ver el desglose en la hoja de cálculo
                     <span aria-hidden="true">&nearr;</span>
-                </x-recibo.boton>
+                </x-palette-receipt.boton>
 
                 @php($dominio = $reporte->dominioDeLaHoja())
                 <p class="mt-3 text-xs text-grafito/70">
@@ -165,5 +165,5 @@
                 </ul>
             </div>
         @endif
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 </x-layout.app>

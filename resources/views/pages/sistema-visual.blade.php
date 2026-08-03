@@ -1,10 +1,11 @@
 {{--
-    Referencia del sistema visual "Recibo". Existe para construir las páginas
-    encima con piezas ya resueltas, y para revisar de un vistazo que la paleta, la
-    tipografía y los componentes siguen coherentes. No se sirve en producción.
+    Referencia del sistema visual "Palette Receipt". Existe para construir las
+    páginas encima con piezas ya resueltas, y para revisar de un vistazo que la
+    paleta, la tipografía y los componentes siguen coherentes. No se sirve en
+    producción.
 --}}
 <x-layout.app title="Sistema visual">
-    <x-recibo.seccion rotulo="Referencia interna" titulo="Sistema visual «Recibo»" :lectura="false">
+    <x-palette-receipt.seccion rotulo="Referencia interna" titulo="Sistema visual «Palette Receipt»" :lectura="false">
         <p class="max-w-(--container-lectura) text-base text-grafito/80">
             Tinta de folio, números tabulares, papel térmico. La marca es la prueba de que
             se rindió cuentas bien.
@@ -30,60 +31,60 @@
 
         <h3 class="mt-12 text-lg font-bold">Tipografía</h3>
         <div class="mt-4 grid gap-4 sm:grid-cols-2">
-            <x-recibo.tarjeta :troquel="false">
+            <x-palette-receipt.tarjeta :troquel="false">
                 <p class="cifra text-3xl font-bold text-tinta">$1,350.00</p>
                 <p class="mt-2 text-xs text-grafito/60">IBM Plex Mono · cifras y rótulos, con números tabulares</p>
-            </x-recibo.tarjeta>
-            <x-recibo.tarjeta :troquel="false">
+            </x-palette-receipt.tarjeta>
+            <x-palette-receipt.tarjeta :troquel="false">
                 <p class="text-base">
                     La Mesa Directiva somete a consideración de la Asamblea formalizar el
                     fraccionamiento como figura legal.
                 </p>
                 <p class="mt-2 text-xs text-grafito/60">IBM Plex Sans · texto</p>
-            </x-recibo.tarjeta>
+            </x-palette-receipt.tarjeta>
         </div>
 
         <h3 class="mt-12 text-lg font-bold">Comprobante</h3>
         <div class="mt-4 max-w-sm">
-            <x-recibo.tarjeta>
-                <x-recibo.rotulo>Periodo</x-recibo.rotulo>
+            <x-palette-receipt.tarjeta>
+                <x-palette-receipt.rotulo>Periodo</x-palette-receipt.rotulo>
                 <div class="mt-4">
-                    <x-recibo.renglon concepto="Actividades publicadas">14</x-recibo.renglon>
-                    <x-recibo.renglon concepto="Ingresos">$48,600.00</x-recibo.renglon>
-                    <x-recibo.renglon concepto="Egresos">$41,275.00</x-recibo.renglon>
-                    <x-recibo.renglon concepto="Saldo">$7,325.00</x-recibo.renglon>
+                    <x-palette-receipt.renglon concepto="Actividades publicadas">14</x-palette-receipt.renglon>
+                    <x-palette-receipt.renglon concepto="Ingresos">$48,600.00</x-palette-receipt.renglon>
+                    <x-palette-receipt.renglon concepto="Egresos">$41,275.00</x-palette-receipt.renglon>
+                    <x-palette-receipt.renglon concepto="Saldo">$7,325.00</x-palette-receipt.renglon>
                 </div>
-                <x-recibo.sello class="mt-5">Presentado</x-recibo.sello>
-            </x-recibo.tarjeta>
+                <x-palette-receipt.sello class="mt-5">Presentado</x-palette-receipt.sello>
+            </x-palette-receipt.tarjeta>
         </div>
 
         <h3 class="mt-12 text-lg font-bold">Botones</h3>
         <div class="mt-4 flex flex-wrap items-center gap-3">
-            <x-recibo.boton>Enviar comentario</x-recibo.boton>
-            <x-recibo.boton variante="contorno">Ver el detalle</x-recibo.boton>
-            <x-recibo.boton disabled>Deshabilitado</x-recibo.boton>
+            <x-palette-receipt.boton>Enviar comentario</x-palette-receipt.boton>
+            <x-palette-receipt.boton variante="contorno">Ver el detalle</x-palette-receipt.boton>
+            <x-palette-receipt.boton disabled>Deshabilitado</x-palette-receipt.boton>
         </div>
 
         <h3 class="mt-12 text-lg font-bold">Notas</h3>
         <div class="mt-4 grid max-w-(--container-lectura) gap-3">
-            <x-recibo.nota variante="exito">Tu teléfono quedó validado por 30 minutos.</x-recibo.nota>
-            <x-recibo.nota variante="aviso">El código expiró. Pide uno nuevo para continuar.</x-recibo.nota>
-            <x-recibo.nota>La Recepción de comentarios está cerrada.</x-recibo.nota>
+            <x-palette-receipt.nota variante="exito">Tu teléfono quedó validado por 30 minutos.</x-palette-receipt.nota>
+            <x-palette-receipt.nota variante="aviso">El código expiró. Pide uno nuevo para continuar.</x-palette-receipt.nota>
+            <x-palette-receipt.nota>La Recepción de comentarios está cerrada.</x-palette-receipt.nota>
         </div>
 
         <h3 class="mt-12 text-lg font-bold">Campos</h3>
         <div class="mt-4 grid max-w-(--container-lectura) gap-5 sm:grid-cols-2">
-            <x-recibo.campo
+            <x-palette-receipt.campo
                 nombre="telefono"
                 etiqueta="Teléfono celular"
                 tipo="tel"
                 ayuda="A este número llega el código de validación."
                 placeholder="10 dígitos" />
-            <x-recibo.campo
+            <x-palette-receipt.campo
                 nombre="codigo"
                 etiqueta="Código"
                 inputmode="numeric"
                 error="El código no coincide." />
         </div>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 </x-layout.app>

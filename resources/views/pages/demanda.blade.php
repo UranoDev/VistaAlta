@@ -34,7 +34,7 @@
 @endphp
 
 <x-layout.app title="Demanda">
-    <x-recibo.seccion rotulo="Demanda" titulo="Faltan tus comprobantes">
+    <x-palette-receipt.seccion rotulo="Demanda" titulo="Faltan tus comprobantes">
         {{--
             Para qué se piden los comprobantes. Va antes del número porque sin
             esto la página pide un documento sin decir a qué se destina.
@@ -81,10 +81,10 @@
             Con eso no se sostiene nada.
         </p>
 
-        <x-recibo.nota variante="aviso" class="mt-4">
+        <x-palette-receipt.nota variante="aviso" class="mt-4">
             Sin comprobantes no hay forma de documentar cuánto se entregó, y sin eso el asunto se queda exactamente
             donde está: parado. No es que no se quiera avanzar — es que no se puede.
-        </x-recibo.nota>
+        </x-palette-receipt.nota>
 
         <p class="mt-6 text-grafito/85">
             Si tú depositaste, tu comprobante cambia la situación. No importa que sea de hace años, que sea la foto de un
@@ -101,7 +101,7 @@
             para que en celular abra el correo con la dirección puesta.
         --}}
         <div class="mt-10 border border-linea bg-papel-alto px-6 py-8 text-center">
-            <x-recibo.rotulo>Mándalo a</x-recibo.rotulo>
+            <x-palette-receipt.rotulo>Mándalo a</x-palette-receipt.rotulo>
             <a href="mailto:{{ $correo }}"
                class="cifra mt-3 block break-words text-2xl font-bold text-tinta underline underline-offset-4 hover:text-tinta-suave sm:text-3xl">
                 {{ $correo }}
@@ -116,5 +116,5 @@
             Es un buzón que la Mesa Directiva abrió solo para esto. Lo que se hace con los comprobantes es una sola
             cosa: documentar cuánto se entregó.
         </p>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 </x-layout.app>

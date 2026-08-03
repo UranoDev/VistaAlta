@@ -7,11 +7,11 @@
 
 <div {{ $attributes->class(['space-y-5']) }}>
     @if (session('comentario.exito'))
-        <x-recibo.nota variante="exito">{{ session('comentario.exito') }}</x-recibo.nota>
+        <x-palette-receipt.nota variante="exito">{{ session('comentario.exito') }}</x-palette-receipt.nota>
     @endif
 
     @if (session('comentario.info'))
-        <x-recibo.nota variante="neutra">{{ session('comentario.info') }}</x-recibo.nota>
+        <x-palette-receipt.nota variante="neutra">{{ session('comentario.info') }}</x-palette-receipt.nota>
     @endif
 
     @if ($telefonoValidado)
@@ -19,12 +19,12 @@
         <form method="POST" action="{{ route('comentarios.store') }}" class="space-y-5">
             @csrf
 
-            <x-recibo.nota variante="neutra">
+            <x-palette-receipt.nota variante="neutra">
                 Teléfono validado: <span class="cifra font-semibold">{{ $telefonoValidado }}</span>.
                 Puedes comentar durante {{ \App\Support\VentanaDeValidacion::MINUTOS }} minutos sin volver a validarte.
-            </x-recibo.nota>
+            </x-palette-receipt.nota>
 
-            <x-recibo.campo nombre="nombre"
+            <x-palette-receipt.campo nombre="nombre"
                             etiqueta="Tu nombre"
                             ayuda="Tal cual lo escribas es como aparece, si eliges que tu comentario sea público."
                             :value="old('nombre')"
@@ -104,10 +104,10 @@
             </fieldset>
 
             @error('telefono')
-                <x-recibo.nota variante="aviso">{{ $message }}</x-recibo.nota>
+                <x-palette-receipt.nota variante="aviso">{{ $message }}</x-palette-receipt.nota>
             @enderror
 
-            <x-recibo.boton type="submit">Enviar comentario</x-recibo.boton>
+            <x-palette-receipt.boton type="submit">Enviar comentario</x-palette-receipt.boton>
         </form>
     @elseif ($telefonoPendiente)
         {{-- Código mandado, falta confirmarlo. --}}
@@ -119,7 +119,7 @@
                 Escríbelo aquí para poder comentar.
             </p>
 
-            <x-recibo.campo nombre="codigo"
+            <x-palette-receipt.campo nombre="codigo"
                             etiqueta="Código de 6 dígitos"
                             tipo="text"
                             inputmode="numeric"
@@ -130,7 +130,7 @@
                             autofocus />
 
             <div class="flex flex-wrap items-center gap-3">
-                <x-recibo.boton type="submit">Validar mi teléfono</x-recibo.boton>
+                <x-palette-receipt.boton type="submit">Validar mi teléfono</x-palette-receipt.boton>
                 <span class="text-xs text-grafito/70">El código vence a los 5 minutos.</span>
             </div>
         </form>
@@ -166,7 +166,7 @@
                 una persona a la que se le puede responder: tu número no se publica en ninguna parte del sitio.
             </p>
 
-            <x-recibo.campo nombre="telefono"
+            <x-palette-receipt.campo nombre="telefono"
                             etiqueta="Tu celular"
                             ayuda="A 10 dígitos, como lo marcas normalmente."
                             tipo="tel"
@@ -176,7 +176,7 @@
                             class="max-w-64"
                             required />
 
-            <x-recibo.boton type="submit">Enviarme el código</x-recibo.boton>
+            <x-palette-receipt.boton type="submit">Enviarme el código</x-palette-receipt.boton>
 
             {{--
                 El Aviso tiene que estar donde se recaban los datos, y ese lugar

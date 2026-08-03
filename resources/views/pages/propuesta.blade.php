@@ -8,7 +8,7 @@
     cambia, porque una propuesta que solo enumera ventajas se lee como una venta.
 --}}
 <x-layout.app title="Propuesta">
-    <x-recibo.seccion rotulo="Ante los Colonos" :lectura="false">
+    <x-palette-receipt.seccion rotulo="Ante los Colonos" :lectura="false">
         <div class="grid gap-8 sm:grid-cols-10 sm:gap-10">
             <div class="sm:col-span-4">
                 <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -46,14 +46,14 @@
                 @endif
             </div>
         </div>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 
     {{--
         El argumento. Va en presente y en concreto —lo que pasa hoy y lo que
         pasaría— en vez de en abstracto: «personalidad jurídica» no le dice nada
         a nadie hasta que se cuenta a nombre de quién está la cuenta.
     --}}
-    <x-recibo.seccion rotulo="Beneficios" titulo="Lo que cambia el día que la figura jurídica exista">
+    <x-palette-receipt.seccion rotulo="Beneficios" titulo="Lo que cambia el día que la figura jurídica exista">
         @php
             $cambios = [
                 [
@@ -99,14 +99,14 @@
                 </li>
             @endforeach
         </ol>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 
     {{--
         La contraparte del argumento. Lo que la gente teme de una figura legal
         —perder algo suyo, pagar de más, entregarle poder a alguien— se contesta
         aquí y no en la Asamblea, donde ya no hay tiempo de contestarlo bien.
     --}}
-    <x-recibo.seccion rotulo="Con todas sus letras" titulo="Lo que no cambia">
+    <x-palette-receipt.seccion rotulo="Con todas sus letras" titulo="Lo que no cambia">
         @php
             $permanencias = [
                 'Tu casa sigue siendo tuya.' => 'La Asociación administra lo común. Tu propiedad y tu escritura no
@@ -130,7 +130,7 @@
                 </div>
             @endforeach
         </dl>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 
     {{--
         La única petición de la página. Va después de «Lo que no cambia» a
@@ -139,7 +139,7 @@
         que lo ocupe, porque nadie sabe qué es y tres lugares vacíos no se
         llenan pidiendo un cheque en blanco.
     --}}
-    <x-recibo.seccion id="participar" rotulo="Participar" titulo="Lo que necesitamos de ti">
+    <x-palette-receipt.seccion id="participar" rotulo="Participar" titulo="Lo que necesitamos de ti">
         <p class="text-grafito/85">
             La Asociación no la forma sola la Mesa Directiva. Además de las cuatro personas que hoy la integran, la
             propuesta contempla un <strong class="font-semibold">Comité de Supervisión de tres personas</strong>: los
@@ -153,9 +153,9 @@
             Esas tres personas todavía no están. Si te interesa, déjalo en un
             <a href="#comentarios" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">comentario aquí abajo</a>.
         </p>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 
-    <x-recibo.seccion rotulo="Para entenderla" titulo="Preguntas frecuentes">
+    <x-palette-receipt.seccion rotulo="Para entenderla" titulo="Preguntas frecuentes">
         <dl class="border-t border-linea">
             @foreach ($preguntasFrecuentes as $pregunta => $respuesta)
                 <div class="border-b border-linea py-4">
@@ -164,9 +164,9 @@
                 </div>
             @endforeach
         </dl>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 
-    <x-recibo.seccion id="comentarios" rotulo="Tu voz" titulo="Preguntas y comentarios de los colonos">
+    <x-palette-receipt.seccion id="comentarios" rotulo="Tu voz" titulo="Preguntas y comentarios de los colonos">
         <p class="text-grafito/85">
             La Asamblea es donde muchas cosas se deciden, pero no tiene por qué ser el único lugar donde se pregunte. Si algo
             de la Propuesta no te cuadra, escríbelo aquí: la Mesa Directiva lo lee y lo contesta antes de tomar alguna acción.
@@ -179,7 +179,7 @@
                     la Recepción está abierta, la Vía decide por dónde se recibe.
                     Cerrada, la vía es irrelevante y ninguno de los dos se muestra.
                 --}}
-                <x-recibo.tarjeta>
+                <x-palette-receipt.tarjeta>
                     @if ($via->esOtp())
                         <x-comentarios.formulario :telefono-validado="$telefonoValidado"
                                                   :telefono-pendiente="$telefonoPendiente" />
@@ -187,19 +187,19 @@
                         <x-comentarios.whatsapp :enlace="$via->enlaceDeWhatsApp()"
                                                 :numero="$via->numeroLegible()" />
                     @endif
-                </x-recibo.tarjeta>
+                </x-palette-receipt.tarjeta>
             @else
                 {{--
                     Recepción de comentarios cerrada: se retira el formulario, pero
                     nada de lo ya publicado se oculta.
                 --}}
-                <x-recibo.nota variante="aviso">
+                <x-palette-receipt.nota variante="aviso">
                     @if (session('comentario.aviso'))
                         {{ session('comentario.aviso') }}
                     @else
                         La Mesa Directiva cerró la recepción de comentarios. Lo que ya se publicó sigue aquí abajo.
                     @endif
-                </x-recibo.nota>
+                </x-palette-receipt.nota>
             @endif
         </div>
 
@@ -212,7 +212,7 @@
             </div>
 
             @forelse ($comentariosPublicos as $comentario)
-                <x-recibo.tarjeta :troquel="false" style="--recibo-fondo: var(--color-papel)">
+                <x-palette-receipt.tarjeta :troquel="false" style="--recibo-fondo: var(--color-papel)">
                     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                         <p class="font-semibold">{{ $comentario->nombre }}</p>
                         <time datetime="{{ $comentario->created_at->toDateString() }}"
@@ -221,7 +221,7 @@
                         </time>
                     </div>
                     <p class="mt-2 whitespace-pre-line text-sm text-grafito/85">{{ $comentario->comentario }}</p>
-                </x-recibo.tarjeta>
+                </x-palette-receipt.tarjeta>
             @empty
                 <p class="py-2 text-sm text-grafito/70">
                     Todavía no hay comentarios públicos. Los que se envían aparecen aquí una vez que la Mesa
@@ -229,5 +229,5 @@
                 </p>
             @endforelse
         </div>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 </x-layout.app>

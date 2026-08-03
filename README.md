@@ -23,8 +23,13 @@ npm run dev        # y, en otra terminal, php artisan serve
 
 ## Páginas públicas
 
-Seis, todas de lectura y sin autenticación (`routes/web.php`). Cuatro están en la
-navegación de arriba:
+Hoy son seis, todas de lectura y sin autenticación (`routes/web.php`). **Ese número y
+esa regla describen este momento, no un principio del sitio**: el control de cuotas
+agrega el portal del Colono, que sí pide sesión (ver «Decidido y todavía no
+construido»). Lo que no cambia es que estas seis siguen leyéndose sin cuenta — la
+rendición de cuentas no se esconde detrás de un login.
+
+Cuatro están en la navegación de arriba:
 
 - **`/`** — la Propuesta. El único asunto que se somete a la Asamblea.
 - **`/actividades`** y **`/reporte-financiero`** — lo que la respalda. El Reporte
@@ -53,23 +58,26 @@ Comentarios, donde se recaban los datos:
 
 ## Panel de la Mesa Directiva
 
-Vive en `/admin` y es **el único lugar del sitio que pide autenticación**: las
-páginas públicas no piden nada nunca. Está construido con Filament 4.
+Vive en `/admin` y **hoy es el único lugar del sitio que pide autenticación**: las
+seis páginas públicas no piden nada. Deja de ser el único cuando entre el portal del
+Colono; lo que no cambia es que la rendición de cuentas se lee sin cuenta. Está
+construido con Filament 4.
 
 ```bash
 php artisan make:filament-user   # una cuenta por integrante de la Mesa Directiva
 ```
 
-No hay registro abierto ni roles: el Colono no es una entidad del sistema y no tiene
-cuenta (`CONTEXT.md`), así que estar en la tabla `users` *es* el permiso. Dar de baja
-a alguien es borrar su cuenta.
+No hay registro abierto: las cuentas se crean a mano. El panel **todavía** no
+distingue permisos —cualquier cuenta de `users` ve las tres pantallas—, pero eso es
+un estado de tránsito y no la regla del sitio: el control de cuotas trae **cuatro
+roles acumulables** (`Mesa Directiva`, `Cobrador`, `Comité de Vigilancia` y `Colono`,
+ver `CONTEXT.md` → `Roles`) con `spatie/laravel-permission`, y las cuentas se
+**desactivan, nunca se borran** — en un sistema de dinero, quién hizo qué no se puede
+borrar.
 
-> **Las dos frases anteriores están decididas en contra** y se caen con el control de
-> cuotas (ver «Decidido y todavía no construido»). Van a ser cuatro roles acumulables
-> con `spatie/laravel-permission`, y las cuentas van a **desactivarse, nunca
-> borrarse** — en un sistema de dinero, quién hizo qué no se puede borrar. Antes de
-> portar código de nvavista que apunte a `users`, revisar que ninguna llave foránea
-> venga con `cascadeOnDelete`.
+> No construyas nada nuevo dando por hecho que estar en `users` *es* el permiso, ni
+> que dar de baja a alguien es borrar su cuenta. Y antes de portar código de nvavista
+> que apunte a `users`, revisar que ninguna llave foránea venga con `cascadeOnDelete`.
 
 Tres pantallas:
 
@@ -99,10 +107,11 @@ Tres pantallas:
   llegan* cuando sí se admiten: `otp` —el colono escribe en el sitio validando su
   celular por SMS— o `whatsapp` —la página no pide teléfono y muestra un enlace a la
   conversación con la Mesa Directiva, con el número que se captura ahí mismo—. El
-  primero manda: con la recepción cerrada la vía no se usa. **Hoy sale al aire en
-  `whatsapp`** porque el SMS de Twilio no se entrega en producción (error 30008: las
-  operadoras filtran el tráfico A2P de un long code sin registrar); cuando eso se
-  destrabe, volver a `otp` es mover el selector, no desplegar.
+  primero manda: con la recepción cerrada la vía no se usa. **Salió al aire en
+  `whatsapp`** porque el SMS no se entregaba (error 30008), y **eso ya se resolvió**:
+  no era el registro A2P del long code como se creyó, sino el formato del destino —
+  `+52` a diez dígitos rebota, `+521` entrega (URVA-58). Volver a `otp` es **mover el
+  selector, no desplegar**.
 
   La diferencia de fondo entre las dos no es el canal: **es quién elige la
   visibilidad**. En `otp` la elige el autor y queda fija; en `whatsapp` el comentario
@@ -124,7 +133,8 @@ Tres pantallas:
   Directiva, y lo que se da de alta sale de inmediato en la página pública: no hay
   borradores ni cola de por medio. El formulario tiene **dos campos y solo dos**,
   fecha y descripción: sin costo, porque el dinero se rinde completo en el Reporte
-  financiero, y sin adjunto, porque en el sitio no se cargan documentos.
+  financiero, y sin adjunto, porque una Actividad se lee en la propia página y no
+  lleva documento que la respalde (`CONTEXT.md` → `Actividad`).
 - **Reporte financiero** — un listado, con un reporte por mes: el resumen de cifras y
   el enlace a la hoja de cálculo de Google de cada uno. **Capturar un mes nuevo no
   borra al anterior**, lo empuja al histórico; corregir un mes es editarlo, no volver
@@ -150,11 +160,7 @@ solo en el `post-autoload-dump` de composer. Su **tema** es otra cosa y sí se
 versiona: es una entrada más de Vite, así que sale de `npm run build` junto con el
 resto del sitio (ver «Sistema visual»).
 
-## Sistema visual «Recibo» → «Palette Receipt»
-
-> **Este sistema se renombra a «Palette Receipt»** (URVA-31). El nombre «Recibo» queda
-> libre para lo que significa en la calle: el comprobante de un pago, que el sitio va a
-> empezar a emitir. Mientras no se haga el renombre, «Recibo» sigue siendo esto.
+## Sistema visual «Palette Receipt»
 
 La dirección visual es la Propuesta 2 de `docs/design/paletas-condominios.html`: el
 comprobante de pago —tinta de folio, números tabulares, papel térmico—, porque el
@@ -166,8 +172,10 @@ argumento del sitio es la transparencia.
   decorativo. Tienen archivo propio, y no `app.css`, porque los importan dos hojas:
   la del sitio y la del tema del panel. Ahí se escriben una sola vez.
 - Las piezas reutilizables son componentes anónimos de Blade en
-  `resources/views/components/recibo/`: `tarjeta`, `renglon`, `rotulo`, `sello`,
-  `boton`, `nota`, `campo`, `seccion`.
+  `resources/views/components/palette-receipt/`: `tarjeta`, `renglon`, `rotulo`,
+  `sello`, `boton`, `nota`, `campo`, `seccion`. Se usan como
+  `<x-palette-receipt.tarjeta>` — el nombre largo se acepta a cambio de que no haya
+  ambigüedad con las vistas de la entidad `Recibo`, que es un comprobante de pago.
 - `/sistema-visual` muestra las piezas juntas. Es una herramienta de construcción y
   **no se sirve en producción**.
 - Las tipografías son IBM Plex Sans e IBM Plex Mono, auto-hospedadas desde
@@ -200,33 +208,35 @@ primera tarea de cada Epic.
 
 ### Control de cuotas — URVA-27
 
-El sitio deja de ser solo rendición de cuentas y se vuelve **portal operativo**. Esto
-revierte de frente lo que `CONTEXT.md` dice hoy: el Colono pasa a tener cuenta, iniciar
-sesión y existir en un padrón, y aquí sí se van a pagar cuotas y consultar estados de
-cuenta.
+El sitio deja de ser solo rendición de cuentas y se vuelve **portal operativo**: el
+Colono pasa a tener cuenta, iniciar sesión y existir en un padrón, y aquí sí se van a
+pagar cuotas y consultar estados de cuenta.
+
+**El vocabulario ya está construido y no vive aquí**: `CONTEXT.md` lo trae completo en
+sus secciones «Padrón», «Cobranza» y «Roles» (`Unidad`, `Sección`, `Titularidad`,
+`Cuota`, `Vigencia de cuota`, `Sobrecargo`, `Cobrador`, `Recibo`, `Corte de caja`,
+`Comité de Vigilancia`), y es vinculante desde ya. Lo que falta es el código.
 
 Se **porta el código de nvavista** (padrón, cuotas, recibos, identidad, roles) **sin
 tenancy** — cuarta copia divergente después de la que ya advirtió `docs/adr/0003`.
 
-Lo que conviene saber antes de tocar nada de esto:
+Las reglas del cobro —la Unidad debe y no la persona, monto único con vigencias, la
+Cuota congela sus tres condiciones, el sobrecargo se aplica una sola vez, un Recibo por
+Unidad, el Cobrador entrega en Cortes de caja— están en `CONTEXT.md` y no se repiten
+aquí. Lo que sí conviene saber antes de tocar el código y no cabe en el glosario:
 
-- **La Unidad debe, no la persona.** Hay historial de titularidad con vigencias, así que
-  una Cuota sabe quién era el dueño cuando se generó — pero la deuda se queda con el lote.
-- **Monto único**, sin excepciones por Unidad. Vive en una tabla de vigencias con
-  `monto`, `sobrecargo` y `dias_gracia`: un adeudo de 2024 se cobra al precio de 2024.
-- **La Cuota congela sus tres condiciones al generarse.** Corregir una vigencia **no**
-  recalcula nada ya generado, ni siquiera lo pendiente.
-- **El sobrecargo se aplica una sola vez** al vencer la gracia y **no crece**. Es
-  deliberado: una deuda que crece sola llega a un número que nadie va a pagar nunca.
-- **Un Recibo, una Unidad.** Quien tiene tres lotes hace tres pagos. Repartir un abono
-  entre propiedades exigiría un criterio, y ése es del colono.
+- **Dónde viven las vigencias**: una tabla con `monto`, `sobrecargo` y `dias_gracia`, y
+  la Cuota copia los tres al generarse. Corregir una vigencia no dispara ningún
+  recálculo — no hay job, no hay comando, es a propósito.
+- **Un abono no se reparte entre Unidades.** Quien tiene tres lotes hace tres pagos:
+  repartirlo exigiría un criterio, y ése es del colono, no del sistema.
 - **El teléfono confirmado es obligatorio; el correo no.** Por eso la confirmación puede
   asentarse a mano (`otp`, `con_llamada`, `en_persona`, `con_documento`) y nunca es un
   booleano: el Comité de Vigilancia tiene que poder auditar cuántas no fueron por OTP.
-  Existe porque **el SMS no se entrega en producción** (ver abajo).
-- **Cobradores**: reciben efectivo, capturan desde el celular y entregan en **Cortes de
-  caja**. Un faltante **lo repone el Cobrador** — es deuda suya, no un egreso, y no toca
-  ningún Reporte financiero.
+  Nació porque el SMS no se entregaba (ver abajo) — que ya se haya destrabado no
+  reabre la decisión por sí solo: el asiento manual sigue en la spec de URVA-27.
+- **Un faltante de un Cobrador es deuda suya**, no un egreso: no toca ningún Reporte
+  financiero.
 
 ### Reporte financiero derivado — URVA-46
 
@@ -249,13 +259,32 @@ de los gastos no sabe nada.
 
 ### Avisos al Colono — URVA-57
 
-Nadie le avisa al colono que se le venció la cuota, y es **a propósito**: hoy no hay
-canal que sirva. El SMS no se entrega, WhatsApp es un enlace manual y el correo no lo
-tiene todo el mundo. Se retoma cuando alguno se destrabe.
+Nadie le avisa al colono que se le venció la cuota. Estaba diferido porque no había
+canal que sirviera; **ese argumento se cayó** cuando URVA-58 destrabó el SMS, que es
+justamente el canal que llega a todos —el teléfono confirmado es requisito del padrón—.
 
-### Pendiente de operación
+Sigue pendiente de grilling, pero ya no está bloqueado. Conviene esperar a **URVA-59**
+antes de mandar el primero: hoy el SMS llega mostrando `22622` o `Sms Twilio`, y un
+recordatorio de cobro que viene de un remitente desconocido **se lee como fraude**.
 
-**El SMS de Twilio no se entrega en producción** (error 30008: las operadoras filtran el
-tráfico A2P de un long code sin registrar). Es lo que mantiene los Comentarios en la vía
-`whatsapp`, lo que obliga a la confirmación manual de teléfonos, y lo que tiene detenidos
-los avisos. Destrabarlo desbloquea tres cosas de un golpe.
+### El SMS: qué se resolvió y qué no
+
+Conviene tenerlo junto, porque durante un tiempo se creyó una causa equivocada y esa
+versión quedó escrita en varios lados.
+
+**El SMS ya entrega.** El error 30008 **no** venía de que el long code no estuviera
+registrado para tráfico A2P: venía del formato del destino. `+52` a diez dígitos rebota;
+`+521` —con el `1` de móvil— entrega. Comprobado con envíos reales a dos operadoras
+(URVA-58). La mitigación está aplicada en el `.env` de producción, pero **vive en un
+archivo que no se commitea**: un `.env` nuevo, un redeploy que lo regenere o alguien
+copiando `.env.example` traen el 30008 de vuelta sin que nadie lo note. Hacerlo
+permanente es lo que cierra URVA-58.
+
+**Lo que sigue abierto es de quién viene el mensaje, no si llega.** Hoy el SMS aparece
+como `22622` o `Sms Twilio` — el carrier reescribe el remitente mientras el Sender ID no
+esté registrado ante él. Eso son dos issues: **URVA-59** (identificar a Vista Alta en el
+cuerpo del mensaje, que se puede hoy) y **URVA-60** (el trámite de registro, que se mide
+en semanas y es papeleo con firma).
+
+Nada de esto bloquea ya la cobranza ni los avisos. Sí conviene resolver URVA-59 antes de
+usar el SMS para cobrar.

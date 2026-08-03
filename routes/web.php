@@ -50,7 +50,7 @@ Route::view('/aviso-de-privacidad', 'pages.privacidad')->name('privacidad');
 Route::view('/terminos-de-servicio', 'pages.terminos')->name('terminos');
 
 /*
- * Referencia del sistema visual "Recibo". Es una herramienta de construcción, no
+ * Referencia del sistema visual "Palette Receipt". Es una herramienta de construcción, no
  * una página del sitio: no se sirve en producción.
  */
 if (! app()->isProduction()) {

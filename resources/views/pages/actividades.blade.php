@@ -4,7 +4,7 @@
     documento que descargar.
 --}}
 <x-layout.app title="Actividades">
-    <x-recibo.seccion rotulo="Lo realizado en el Periodo" titulo="Actividades">
+    <x-palette-receipt.seccion rotulo="Lo realizado en el Periodo" titulo="Actividades">
         <div class="mt-8 flex items-baseline justify-between gap-4 border-b border-linea pb-2">
             <h3 class="text-lg font-bold tracking-tight">Mantener el fraccionamiento funcionando</h3>
         </div>
@@ -128,11 +128,11 @@
             de constituir la Asociación Civil.
         </p>
 
-        <x-recibo.nota class="mt-8">
+        <x-palette-receipt.nota class="mt-8">
             La transparencia en el manejo del dinero se rinde completo y en un solo
             lugar —el
             <a href="{{ route('reporte-financiero') }}" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Reporte financiero</a>
             del periodo.
-        </x-recibo.nota>
-    </x-recibo.seccion>
+        </x-palette-receipt.nota>
+    </x-palette-receipt.seccion>
 </x-layout.app>

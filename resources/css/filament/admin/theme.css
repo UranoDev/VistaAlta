@@ -91,6 +91,36 @@ html.fi {
     --success-950: oklch(0.2779 0.0373 161.58);
 
     /*
+     * `warning` era el Amber de fábrica, y con croma 0.179 resultaba **el color
+     * más saturado del panel** — por encima de Sello (0.169), que es el que
+     * Palette Receipt reserva para la urgencia. Lo que marcaba era «En cola»,
+     * el estado rutinario de la Cola de moderación: lo más ruidoso de la
+     * pantalla era lo más normal que pasa en ella.
+     *
+     * Palette Receipt no tiene un ocre propio, así que en vez de inventarle
+     * uno se conserva el tono de Amber —que desaturado se lee como lápiz sobre
+     * papel— y se le baja el croma al nivel de Menta (0.0885 en el tono 600):
+     * «En cola» es un estado, igual que «Publicado», y debe pesar lo mismo.
+     *
+     * Los tonos 600 y 700 además se oscurecen un punto. No es estética: la
+     * rampa de Amber ya venía apretada de contraste y bajarle el croma a secas
+     * dejaba el badge «En cola» en 4.39:1, debajo del mínimo AA. Con el ajuste
+     * los tres pares suben en vez de bajar —callout 4.87→5.17, badge
+     * 4.54→4.81, ícono 3.08→3.20—.
+     */
+    --warning-50: oklch(0.987 0.0109 95.277);
+    --warning-100: oklch(0.962 0.0292 95.617);
+    --warning-200: oklch(0.924 0.0593 95.746);
+    --warning-300: oklch(0.879 0.0836 91.605);
+    --warning-400: oklch(0.828 0.0934 84.429);
+    --warning-500: oklch(0.769 0.0929 70.08);
+    --warning-600: oklch(0.649 0.0885 58.318);
+    --warning-700: oklch(0.533 0.0806 48.998);
+    --warning-800: oklch(0.473 0.0677 46.201);
+    --warning-900: oklch(0.414 0.0554 45.904);
+    --warning-950: oklch(0.279 0.0381 45.635);
+
+    /*
      * `info` es el azul de fábrica, y en Palette Receipt no hay azul: los
      * Callout de contexto («Cerrarla no despublica nada») se veían pegados de
      * otro sistema. Se alían a los neutros en vez de inventarles un tono, que

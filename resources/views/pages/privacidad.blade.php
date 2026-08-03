@@ -27,7 +27,7 @@
 @endphp
 
 <x-layout.app title="Aviso de Privacidad">
-    <x-recibo.seccion rotulo="Datos personales" titulo="Aviso de Privacidad">
+    <x-palette-receipt.seccion rotulo="Datos personales" titulo="Aviso de Privacidad">
         <p class="cifra text-xs text-grafito/70">Última actualización: {{ $actualizado }}</p>
 
         <div class="mt-8 space-y-8">
@@ -206,5 +206,5 @@
             </x-legal.seccion>
 
         </div>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 </x-layout.app>

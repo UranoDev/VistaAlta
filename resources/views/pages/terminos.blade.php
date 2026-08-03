@@ -22,7 +22,7 @@
 @endphp
 
 <x-layout.app title="Términos de Servicio">
-    <x-recibo.seccion rotulo="Uso del sitio" titulo="Términos de Servicio">
+    <x-palette-receipt.seccion rotulo="Uso del sitio" titulo="Términos de Servicio">
         <p class="cifra text-xs text-grafito/70">Última actualización: {{ $actualizado }}</p>
 
         <div class="mt-8 space-y-8">
@@ -174,5 +174,5 @@
             </x-legal.seccion>
 
         </div>
-    </x-recibo.seccion>
+    </x-palette-receipt.seccion>
 </x-layout.app>

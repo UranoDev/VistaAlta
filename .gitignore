@@ -45,4 +45,9 @@ Thumbs.db
 
 # Config local de YouTrack: puede contener un token permanente.
 /.ralph
-issues-resolved.json
+# Cache de issues y sus previews. El comodin no es de mas: el runbook pide
+# generar issues-resolved.preview.json y CHANGELOG.preview.md para revisarlos
+# antes de sobreescribir los reales, y release.ps1 hace `git add -A` -- sin esto
+# el archivo de revision se va dentro del commit de release.
+issues-resolved*.json
+CHANGELOG.preview.md

@@ -11,7 +11,8 @@
     scripts/youtrack-credentials.ps1. The split is what makes this portable: the
     token lives once per machine, the project travels with the repo.
     Queries every RESOLVED
-    issue of the project and writes them as a JSON array of
+    issue of the project, drops the ones whose State did not ship anything
+    (see -ShippedStates), and writes the rest as a JSON array of
     { Id, ResolvedAt, Type, Summary }, sorted oldest-first, one object per line
     (diff-friendly), with LF line endings and no BOM.
 
@@ -30,14 +31,31 @@
     Point it elsewhere (e.g. issues-resolved.preview.json) to review before
     overwriting the real cache.
 
+.PARAMETER ShippedStates
+    States that count as "this shipped" for changelog purposes. Default: Fixed,
+    Verified.
+
+    YouTrack calls an issue resolved as soon as it reaches ANY terminal state,
+    so `#Resolved` also returns Obsolete, Duplicate, Won't fix, Can't Reproduce
+    and Incomplete -- all with a resolution date. None of those put anything in
+    front of a user, and publishing them announces work that does not exist:
+    URVA-44 (Obsolete) and URVA-61 (Duplicate) is how this was found.
+
+    It is an allowlist and not a denylist on purpose. A terminal state added to
+    the project later stays out until someone decides it ships, so the failure
+    mode is a missing line spotted while reviewing the changelog preview --
+    not an invented one already published.
+
 .EXAMPLE
     ./scripts/refresh-issues-resolved.ps1
     ./scripts/refresh-issues-resolved.ps1 -OutputFile issues-resolved.preview.json
+    ./scripts/refresh-issues-resolved.ps1 -ShippedStates Fixed,Verified,Released
 #>
 [CmdletBinding()]
 param(
     [string[]]$Project,
-    [string]$OutputFile
+    [string]$OutputFile,
+    [string[]]$ShippedStates = @('Fixed', 'Verified')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -73,10 +91,23 @@ $uri     = "$YouTrackBaseUrl/api/issues?fields=$fields&`$top=1000&query=$([uri]:
 
 $raw = Invoke-RestMethod -Uri $uri -Headers $headers -Method Get
 
+# El filtro va aqui y no en la consulta para poder decir en voz alta que se
+# excluyo: un issue que desaparece del changelog sin explicacion se busca a mano
+# en YouTrack, y esa es justo la vuelta que este renglon evita.
+$excluidos = @()
+
 $issues = foreach ($i in $raw) {
     if (-not $i.resolved) { continue }   # skip anything without a resolved date
     $typeField = $i.customFields | Where-Object { $_.name -eq 'Type' } | Select-Object -First 1
     $type = if ($typeField -and $typeField.value) { $typeField.value.name } else { '' }
+
+    $stateField = $i.customFields | Where-Object { $_.name -eq 'State' } | Select-Object -First 1
+    $state = if ($stateField -and $stateField.value) { $stateField.value.name } else { '' }
+    if ($ShippedStates -notcontains $state) {
+        $excluidos += [PSCustomObject]@{ Id = $i.idReadable; State = $state }
+        continue
+    }
+
     $resolvedLocal = [DateTimeOffset]::FromUnixTimeMilliseconds([long]$i.resolved).LocalDateTime
     [PSCustomObject]@{
         Id         = $i.idReadable
@@ -106,3 +137,11 @@ $text = "[`n" + ($lines -join ",`n") + "`n]`n"
 [System.IO.File]::WriteAllText($OutputFile, $text, (New-Object System.Text.UTF8Encoding($false)))
 
 Write-Host "issues-resolved: $($issues.Count) resueltos de $($Project -join ', ') escritos en $OutputFile"
+
+if ($excluidos.Count -gt 0) {
+    $detalle = ($excluidos |
+        Group-Object State |
+        Sort-Object Name |
+        ForEach-Object { "$($_.Name) ($(($_.Group.Id | Sort-Object) -join ', '))" }) -join '; '
+    Write-Host "Excluidos $($excluidos.Count) resueltos que no despachan nada: $detalle" -ForegroundColor DarkYellow
+}

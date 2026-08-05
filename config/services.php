@@ -49,7 +49,10 @@ return [
         // 'log' escribe el código en el log (default/dev), 'array' es para pruebas,
         // 'twilio' manda un SMS de verdad.
         'channel' => env('OTP_CHANNEL', 'log'),
-        'pais_lada' => env('OTP_PAIS_LADA', '+52'),
+
+        // La lada del destino no vive aquí sino en 'twilio.pais_lada': es un
+        // detalle del formato que exige Twilio, no del OTP. Hubo un
+        // 'otp.pais_lada' duplicado que nadie leía y por eso se retiró.
 
         /*
         |----------------------------------------------------------------------
@@ -90,7 +93,18 @@ return [
         'sid' => env('TWILIO_SID'),
         'token' => env('TWILIO_AUTH_TOKEN'),
         'from' => env('TWILIO_FROM'),
-        'pais_lada' => env('TWILIO_PAIS_LADA', '+52'),
+
+        /*
+         * Lada que se le antepone a los diez dígitos del formulario. En México
+         * lleva el `1` de móvil: `+521`. Con `+52` a diez dígitos Twilio acepta
+         * el mensaje (HTTP 201) pero el carrier lo descarta después con el
+         * error 30008 y nunca llega — comprobado contra la cuenta real, ver
+         * docs/adr/0001. No lo "corrijas" a `+52`.
+         *
+         * El `1` es de móviles; el sitio solo pide celular. Si algún día entra
+         * un fijo, `+521` + fijo no es válido y esto hay que revisarlo.
+         */
+        'pais_lada' => env('TWILIO_PAIS_LADA', '+521'),
     ],
 
 ];

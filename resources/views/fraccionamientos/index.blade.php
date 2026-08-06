@@ -28,6 +28,8 @@
                                         <th class="px-6 py-3 bg-cantera-clara text-left text-xs font-medium text-contraste-azul uppercase tracking-wider font-bold">Nombre</th>
                                         <th class="px-6 py-3 bg-cantera-clara text-left text-xs font-medium text-contraste-azul uppercase tracking-wider font-bold">Slug</th>
                                         <th class="px-6 py-3 bg-cantera-clara text-left text-xs font-medium text-contraste-azul uppercase tracking-wider font-bold">Contacto</th>
+                                        <th class="px-6 py-3 bg-cantera-clara text-left text-xs font-medium text-contraste-azul uppercase tracking-wider font-bold">Administrador</th>
+                                        <th class="px-6 py-3 bg-cantera-clara text-left text-xs font-medium text-contraste-azul uppercase tracking-wider font-bold">Cuota vigente</th>
                                         <th class="px-6 py-3 bg-cantera-clara text-left text-xs font-medium text-contraste-azul uppercase tracking-wider font-bold text-center">Acciones</th>
                                     </tr>
                                 </thead>
@@ -37,8 +39,22 @@
                                             <td class="px-6 py-4 whitespace-nowrap font-medium text-contraste-azul">{{ $fraccionamiento->name }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $fraccionamiento->slug }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ $fraccionamiento->contact }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                {{ $fraccionamiento->administrator?->name ?? '—' }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                                                @php $fee = $fraccionamiento->currentFee() @endphp
+                                                @if($fee)
+                                                    ${{ number_format($fee->amount, 2) }}
+                                                @else
+                                                    <span class="text-gray-400 italic">—</span>
+                                                @endif
+                                            </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                                 <div class="flex justify-center space-x-3">
+                                                    <a href="{{ route('fraccionamientos.fees.index', $fraccionamiento) }}" class="text-contraste-azul hover:text-terracota transition-colors" title="Cuotas">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    </a>
                                                     <a href="{{ route('fraccionamientos.edit', $fraccionamiento) }}" class="text-terracota hover:text-terracota-dark transition-colors" title="Editar">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                     </a>

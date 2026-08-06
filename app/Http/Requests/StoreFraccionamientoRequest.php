@@ -27,6 +27,8 @@ class StoreFraccionamientoRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', 'unique:fraccionamientos,slug'],
             'address' => ['nullable', 'string'],
             'contact' => ['nullable', 'string'],
+            'users' => ['nullable', 'array'],
+            'users.*' => ['exists:users,id'],
         ];
     }
 }

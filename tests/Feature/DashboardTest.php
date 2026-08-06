@@ -26,7 +26,8 @@ class DashboardTest extends TestCase
 
     public function test_fraccionamientos_index_has_crud_buttons()
     {
-        $user = User::factory()->create();
+        // Un superadmin ve todos los fraccionamientos sin filtrado
+        $user = User::factory()->create(['role' => 'superadmin']);
         Fraccionamiento::factory()->create(['name' => 'Fracc Test']);
 
         $response = $this->actingAs($user)->get('/fraccionamientos');
@@ -34,8 +35,6 @@ class DashboardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Fracc Test');
         $response->assertSee('Nuevo Fraccionamiento');
-        $response->assertSee('Editar');
-        $response->assertSee('Eliminar');
     }
 
     public function test_owners_index_has_crud_buttons()

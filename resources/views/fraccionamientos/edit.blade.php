@@ -42,6 +42,28 @@
                             <x-input-error :messages="$errors->get('contact')" class="mt-2" />
                         </div>
 
+                        <!-- Administrador del Fraccionamiento (Solo SuperAdmin) -->
+                        @if(auth()->user()->isSuperAdmin())
+                            <div class="mt-4">
+                                <x-input-label for="admin_owner_id" :value="__('Administrador del Fraccionamiento')" />
+                                @if($propietarios->isEmpty())
+                                    <p class="mt-2 text-sm text-gray-500 italic">
+                                        No hay propietarios registrados en este fraccionamiento. Agrega propietarios primero para poder asignar un administrador.
+                                    </p>
+                                @else
+                                    <select id="admin_owner_id" name="admin_owner_id" class="block mt-1 w-full border-gray-300 focus:border-terracota focus:ring-terracota rounded-md shadow-sm">
+                                        <option value="">— Sin administrador —</option>
+                                        @foreach($propietarios as $propietario)
+                                            <option value="{{ $propietario->id }}" {{ old('admin_owner_id', $fraccionamiento->admin_owner_id) == $propietario->id ? 'selected' : '' }}>
+                                                {{ $propietario->name }}{{ $propietario->phone ? ' · ' . $propietario->phone : '' }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                                <x-input-error :messages="$errors->get('admin_owner_id')" class="mt-2" />
+                            </div>
+                        @endif
+
                         <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('fraccionamientos.index') }}" class="text-sm text-gray-600 hover:text-gray-900 underline mr-4">
                                 {{ __('Cancelar') }}

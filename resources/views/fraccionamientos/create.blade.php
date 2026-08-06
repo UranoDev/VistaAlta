@@ -41,6 +41,16 @@
                             <x-input-error :messages="$errors->get('contact')" class="mt-2" />
                         </div>
 
+                        <!-- Nota: el administrador se asigna desde la edición, una vez que existan propietarios -->
+                        @if(auth()->user()->isSuperAdmin())
+                            <div class="mt-4 p-3 bg-cantera-clara/30 border border-gray-200 rounded-md">
+                                <p class="text-sm text-gray-500">
+                                    <span class="font-medium text-contraste-azul">Administrador:</span>
+                                    Podrás designar al administrador del fraccionamiento después de guardar y agregar propietarios.
+                                </p>
+                            </div>
+                        @endif
+
                         <div class="flex items-center justify-end mt-4">
                             <a href="{{ route('fraccionamientos.index') }}" class="text-sm text-gray-600 hover:text-gray-900 underline mr-4">
                                 {{ __('Cancelar') }}

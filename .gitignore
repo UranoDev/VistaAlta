@@ -15,6 +15,7 @@ yarn-error.log*
 
 paletas.js
 
+claude.md
 # Excluir todos los archivos y directorios que inicien con .
 .*
 !.gitignore

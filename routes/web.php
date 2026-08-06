@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\FraccionamientoController;
+use App\Http\Controllers\MonthlyFeeController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PropertyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,6 +15,7 @@ Route::get('/dashboard', function () {
     return view('dashboard', [
         'fraccionamientosCount' => \App\Models\Fraccionamiento::count(),
         'ownersCount' => \App\Models\Owner::count(),
+        'propertiesCount' => \App\Models\Property::count(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -23,6 +26,10 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('owners', OwnerController::class);
     Route::resource('fraccionamientos', FraccionamientoController::class);
+    Route::resource('properties', PropertyController::class);
+    Route::resource('fraccionamientos.fees', MonthlyFeeController::class)
+        ->only(['index', 'create', 'store', 'destroy'])
+        ->parameters(['fees' => 'monthly_fee']);
 });
 
 require __DIR__.'/auth.php';

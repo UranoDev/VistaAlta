@@ -5,21 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Owner extends Model
+class Property extends Model
 {
-    /** @use HasFactory<\Database\Factories\OwnerFactory> */
     use HasFactory;
 
     protected $fillable = [
         'fraccionamiento_id',
-        'name',
-        'email',
-        'phone',
-        'is_committee_member',
-    ];
-
-    protected $casts = [
-        'is_committee_member' => 'boolean',
+        'owner_id',
+        'section',
+        'unit',
     ];
 
     public function fraccionamiento()
@@ -27,8 +21,8 @@ class Owner extends Model
         return $this->belongsTo(Fraccionamiento::class);
     }
 
-    public function properties()
+    public function owner()
     {
-        return $this->hasMany(Property::class);
+        return $this->belongsTo(Owner::class);
     }
 }

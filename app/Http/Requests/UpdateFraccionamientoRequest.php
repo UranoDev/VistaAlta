@@ -27,6 +27,7 @@ class UpdateFraccionamientoRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', 'unique:fraccionamientos,slug,' . $this->fraccionamiento->id],
             'address' => ['nullable', 'string'],
             'contact' => ['nullable', 'string'],
+            'admin_owner_id' => ['nullable', 'exists:owners,id'],
         ];
     }
 }

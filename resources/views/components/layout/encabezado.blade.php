@@ -4,13 +4,18 @@
     // respalda a la Propuesta — pide algo distinto, y entrar por ahí dejaría
     // la petición antes que el asunto que se somete a la Asamblea.
     //
-    // La etiqueta se mantiene corta a propósito: con cuatro entradas el menú
+    // La etiqueta se mantiene corta a propósito: con cinco entradas el menú
     // ya se aprieta en móvil, y aquí lo que salva el renglón es el largo de
     // cada una, no el `flex-wrap`.
+    //
+    // Vigilancia entró como cuarta y no como última: también rinde cuentas —del
+    // servicio que se paga con la cuota— y Demanda conserva el final por lo
+    // dicho arriba.
     $navegacion = [
         ['ruta' => 'propuesta', 'etiqueta' => 'Propuesta'],
         ['ruta' => 'actividades', 'etiqueta' => 'Actividades'],
         ['ruta' => 'reporte-financiero', 'etiqueta' => 'Reporte financiero'],
+        ['ruta' => 'vigilancia', 'etiqueta' => 'Vigilancia'],
         ['ruta' => 'demanda', 'etiqueta' => 'Demanda'],
     ];
 @endphp

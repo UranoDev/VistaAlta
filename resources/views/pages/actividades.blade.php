@@ -2,7 +2,17 @@
     Lo que la Mesa Directiva llevó a cabo durante el Periodo, más reciente
     primero. Se lee entera en esta página: no hay detalle al que entrar, ni
     documento que descargar.
+
+    El texto de la Bitácora y el de «Lo que sigue» pasan por `TextoConLigas` y no
+    por el escape normal de Blade. Lo único que eso habilita es una liga interna
+    escrita `[texto](/ruta)` desde el panel — hizo falta cuando una Actividad
+    tuvo que mandar al lector a otra página del sitio con una frase en vez de con
+    una URL pegada a media línea. Sigue siendo texto plano para todo lo demás, y
+    el escape ocurre **antes** de buscar el patrón, así que nada de lo capturado
+    puede salir como HTML.
 --}}
+@use('App\Support\Contenido\TextoConLigas')
+
 <x-layout.app title="Actividades">
     <x-palette-receipt.seccion rotulo="Lo realizado en el Periodo" titulo="Actividades">
         <div class="mt-8 flex items-baseline justify-between gap-4 border-b border-linea pb-2">
@@ -49,7 +59,7 @@
                         </time>
                         <ol>
                             @foreach ($actividadesDelDia as $actividad)
-                                <li class="mt-3 whitespace-pre-line border-t border-dotted border-linea pt-3 text-sm text-grafito/85 first:mt-0 first:border-t-0 first:pt-0">{{ $actividad->descripcion }}</li>
+                                <li class="mt-3 whitespace-pre-line border-t border-dotted border-linea pt-3 text-sm text-grafito/85 first:mt-0 first:border-t-0 first:pt-0">{{ TextoConLigas::aHtml($actividad->descripcion) }}</li>
                             @endforeach
                         </ol>
                     </li>
@@ -96,7 +106,7 @@
                 @foreach ($pendientes as $pendiente)
                     <li class="border-t border-linea py-4 first:border-t-0">
                         <h4 class="font-semibold">{{ $pendiente->titulo }}</h4>
-                        <p class="mt-1 whitespace-pre-line text-sm text-grafito/85">{{ $pendiente->detalle }}</p>
+                        <p class="mt-1 whitespace-pre-line text-sm text-grafito/85">{{ TextoConLigas::aHtml($pendiente->detalle) }}</p>
                     </li>
                 @endforeach
             </ul>

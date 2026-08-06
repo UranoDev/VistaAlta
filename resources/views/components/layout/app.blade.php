@@ -9,6 +9,14 @@
     // los buscadores usan como resumen. Cada página puede dar el suyo; este es
     // el que aplica cuando no lo hace.
     'descripcion' => 'Rendición de cuentas de la Mesa Directiva de Vista Alta: lo que se hizo, lo que falta y en qué se gastó.',
+    // Deja la página fuera de los buscadores. Es para lo que se publica al
+    // fraccionamiento sin que tenga por qué alcanzar a quien no vive aquí —hoy
+    // Vigilancia, que lleva nombre y cara de cuatro personas—.
+    //
+    // No es una protección y no debe usarse como si lo fuera: quien tenga la
+    // dirección entra igual, y la dirección va a andar circulando en un grupo de
+    // vecinos. Lo único que evita es que el contenido escale por buscadores.
+    'noindex' => false,
 ])
 
 <!DOCTYPE html>
@@ -22,6 +30,10 @@
 
         @if ($canonical)
             <link rel="canonical" href="{{ $canonical }}">
+        @endif
+
+        @if ($noindex)
+            <meta name="robots" content="noindex, nofollow">
         @endif
 
         {{--

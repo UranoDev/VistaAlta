@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActividadesController;
 use App\Http\Controllers\PropuestaController;
 use App\Http\Controllers\ReporteFinancieroController;
+use App\Http\Controllers\VigilanciaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,6 +18,16 @@ Route::get('/', [PropuestaController::class, 'index'])->name('propuesta');
 Route::get('/actividades', [ActividadesController::class, 'index'])->name('actividades');
 Route::get('/reporte-financiero', [ReporteFinancieroController::class, 'index'])->name('reporte-financiero');
 Route::view('/demanda', 'pages.demanda')->name('demanda');
+
+/*
+ * Quién cuida el fraccionamiento (URVA-79). Va antes de Demanda en el menú
+ * porque también rinde cuentas —del servicio que se paga con la cuota—, y
+ * Demanda se queda al final por lo dicho arriba.
+ *
+ * Lleva controlador y no `Route::view` porque no es estática: contesta según el
+ * reloj del acceso, y a las 22:00 dice algo distinto que a las 21:59.
+ */
+Route::get('/vigilancia', [VigilanciaController::class, 'index'])->name('vigilancia');
 
 /*
  * Cada mes ya rendido conserva su propia dirección, para que la rendición de

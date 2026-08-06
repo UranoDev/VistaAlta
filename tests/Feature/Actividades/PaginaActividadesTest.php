@@ -29,6 +29,41 @@ class PaginaActividadesTest extends TestCase
         $respuesta->assertSee('2026-05-14');
     }
 
+    /**
+     * La Bitácora enlaza hacia adentro del sitio: la entrada que cuenta cómo se
+     * cerró el turno de vigilancia manda a `/vigilancia` con una frase, no con
+     * una URL pegada a media línea.
+     *
+     * Se prueba sobre la página y no solo sobre `TextoConLigas` porque el helper
+     * puede seguir intacto mientras alguien devuelve la vista al `{{ }}` de
+     * antes, y entonces el lector vería los corchetes en crudo.
+     */
+    public function test_la_descripcion_puede_enlazar_a_otra_pagina_del_sitio(): void
+    {
+        Actividad::factory()->enFecha('2026-08-02')->create([
+            'descripcion' => 'Se consulta en [la página de Vigilancia](/vigilancia).',
+        ]);
+
+        $this->get(route('actividades'))
+            ->assertSee('<a href="/vigilancia"', escape: false)
+            ->assertSee('la página de Vigilancia</a>', escape: false)
+            ->assertDontSee('[la página de Vigilancia]', escape: false);
+    }
+
+    /**
+     * Y lo que se captura sigue sin poder salir como HTML.
+     */
+    public function test_la_descripcion_no_puede_meter_html(): void
+    {
+        Actividad::factory()->enFecha('2026-08-02')->create([
+            'descripcion' => 'Ojo <script>alert(1)</script>',
+        ]);
+
+        $this->get(route('actividades'))
+            ->assertDontSee('<script>alert(1)</script>', escape: false)
+            ->assertSee('&lt;script&gt;', escape: false);
+    }
+
     public function test_van_ordenadas_por_fecha_descendente(): void
     {
         Actividad::factory()->enFecha('2026-04-01')->create(['descripcion' => 'La más vieja.']);

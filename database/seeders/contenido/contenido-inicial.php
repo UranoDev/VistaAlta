@@ -47,6 +47,36 @@ return [
      *     ['fecha' => 'AAAA-MM-DD', 'descripcion' => 'Qué se hizo, en una o dos frases.'],
      */
     'actividades' => [
+
+        /*
+         * La entrada larga de la Bitácora, y la única con varios párrafos: es el
+         * cierre del pendiente «Vigilancia las 24 horas, los siete días» y trae
+         * la explicación completa de por qué la vigilancia no se contrató con
+         * una empresa.
+         *
+         * Va fechada el 2 de agosto —el domingo en que se incorporó la cuarta
+         * persona y quedó cubierta la semana entera— y no el día en que se
+         * publicó. La Bitácora dice cuándo pasó lo que pasó.
+         *
+         * El texto vive aquí y no en la página de Vigilancia a propósito: aquella
+         * dice quién está en el acceso ahora, ésta explica una decisión y tiene
+         * fecha. La liga interna se escribe `[texto](/ruta)` y la resuelve
+         * `App\Support\Contenido\TextoConLigas`.
+         */
+        ['fecha' => '2026-08-02', 'descripcion' => <<<'TEXTO'
+            Se cerró el turno de vigilancia que faltaba: el acceso quedó cubierto las 24 horas, los siete días de la semana, con cuatro personas.
+
+            Antes de decidirlo se pidieron cotizaciones a empresas de seguridad privada. La propuesta más baja fue de $16,000 más IVA por elemento al mes, con un esquema de dos elementos alternándose en turnos de 24 por 24 —uno cubre de las 07:00 del lunes a las 07:00 del martes, el siguiente de las 07:00 del martes a las 07:00 del miércoles, y así sucesivamente—. En total, $32,000 más IVA al mes: $37,120.
+
+            Para la Administración habría sido la opción más cómoda: un solo proveedor, una sola factura y ningún trato directo con el personal. La objeción no fue el costo, sino la continuidad. En ese esquema el fraccionamiento no elige quién viene: la empresa asigna y reasigna a su personal, y la rotación es alta. Cada relevo empieza de cero —las rutinas del acceso, los horarios de recolección, qué vehículos son de aquí y cuáles no— y ese aprendizaje se pierde con cada cambio.
+
+            Tres de las cuatro personas ya llevan tiempo trabajando con nosotros: cumplen su horario, no faltan y siguen las instrucciones que se les dan. Se prefirió continuar con ellas. La cuarta se incorporó este día y cuenta con experiencia previa en empresas de seguridad; con ella se cerró el turno de domingo.
+
+            También se aumentó el número de rondines nocturnos: el vigilante en turno recorre el fraccionamiento varias veces durante la noche, en lugar de permanecer únicamente en el acceso.
+
+            Quiénes son y quién está de guardia en este momento se consulta en [la página de Vigilancia](/vigilancia). Lo que se paga por este servicio aparece en el Reporte financiero, en el detalle de egresos de cada mes.
+            TEXTO],
+
         ['fecha' => '2026-07-28', 'descripcion' => 'Poda exterior, pasto y árboles'],
         ['fecha' => '2026-07-28', 'descripcion' => 'Se aplica mata hierba en todos los jardines'],
         ['fecha' => '2026-07-28', 'descripcion' => 'Barrido periódico de calles'],
@@ -90,9 +120,20 @@ return [
             'titulo' => 'Constituir la Asociación Civil',
             'detalle' => 'De ahí sale la cuenta a nombre del fraccionamiento y la posibilidad de firmar como Vista Alta.',
         ],
+        /*
+         * Ocupa el lugar de «Vigilancia las 24 horas, los siete días», que se
+         * cumplió el 2 de agosto de 2026 y subió a la Bitácora.
+         *
+         * No es un pendiente de relleno para no dejar el hueco. Los cuatro
+         * turnos cubren la semana entera **mientras nadie falte**: no hay quinta
+         * persona ni relevo, así que una incapacidad o unas vacaciones dejan el
+         * acceso solo o obligan a que alguien doble turno. Anunciar «24 horas,
+         * los siete días» sin decir esto haría que el primer martes descubierto
+         * convirtiera la página en mentira.
+         */
         [
-            'titulo' => 'Vigilancia las 24 horas, los siete días',
-            'detalle' => 'Hoy quedan horas del día (y todo el domingo) sin vigilante en el acceso. Falta cerrar el turno completo para que no queden huecos.',
+            'titulo' => 'Cubrir faltas y vacaciones sin dejar el acceso solo',
+            'detalle' => 'Los cuatro turnos cubren la semana completa mientras nadie falte. No hay relevo: una incapacidad o unas vacaciones dejan un hueco, o obligan a que alguien doble turno. Falta resolver cómo se cubre eso.',
         ],
         [
             'titulo' => 'Cámaras en las zonas que hoy no se ven',

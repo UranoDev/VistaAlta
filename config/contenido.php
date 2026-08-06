@@ -90,6 +90,101 @@ return [
     ],
 
     /*
+     * Las cuatro personas que hacen la vigilancia, y el rol con el que la
+     * página calcula quién está de guardia (URVA-79).
+     *
+     * ## Lo que la página publica y lo que no
+     *
+     * Los horarios están aquí porque sin ellos no se puede saber quién está en
+     * el acceso, pero **la página no los imprime en ningún lado**. Lo que se lee
+     * en cada tarjeta es `etiqueta`, un rótulo escrito a mano. Publicar el
+     * horario —o la hora del relevo— equivale a publicar el rol completo: quien
+     * consulte cuatro veces lo reconstruye, y son cuatro personas cubriendo un
+     * acceso. Hay una prueba que revisa que las horas no se cuelen al HTML.
+     *
+     * Por lo mismo `nombre` lleva nombre de pila e inicial y nunca el apellido
+     * completo: lo que le sirve al colono para reconocer a quien está en el
+     * acceso es la cara, y el apellido solo vuelve buscable a alguien que no
+     * pidió serlo.
+     *
+     * ## Cómo se llena
+     *
+     * - `nombre`   — nombre de pila e inicial: «Ernesto S.».
+     * - `etiqueta` — el rótulo del turno tal como se lee en la tarjeta.
+     * - `foto`     — archivo dentro de `public/img/vigilantes/`. Con `null` la
+     *                tarjeta se dibuja con las iniciales, y es una opción
+     *                legítima y definitiva: quien no quiera que se publique su
+     *                cara no tiene por qué.
+     * - `desde`    — `AAAA-MM-DD`, opcional. Solo la fecha de incorporación: la
+     *                situación laboral de una persona identificada no se publica
+     *                en el sitio de su lugar de trabajo.
+     * - `turnos`   — `dias` son días de **entrada** en ISO-8601 (1 lunes … 7
+     *                domingo), no de salida. `sale` menor o igual que `entra`
+     *                cruza la medianoche; iguales son 24 horas corridas.
+     *
+     * Los cuatro turnos de abajo cubren la semana completa sin hueco y sin
+     * traslape. Las costuras que hay que respetar al editarlos son sábado 22:00
+     * → domingo 06:00 y domingo 06:00 → lunes 06:00.
+     */
+    'vigilancia' => [
+
+        /*
+         * La aplicación corre en UTC (`config/app.php`), así que la hora del
+         * acceso hay que decirla. No es el reloj del visitante: el turno es un
+         * hecho del fraccionamiento, no del aparato de quien mira la página.
+         */
+        'zona_horaria' => 'America/Mexico_City',
+
+        'vigilantes' => [
+
+            [
+                'nombre' => 'Vigilante 1',
+                'etiqueta' => 'Turno de mañana',
+                'foto' => null,
+                'desde' => null,
+                'turnos' => [
+                    ['dias' => [1, 2, 3, 4, 5, 6], 'entra' => '06:00', 'sale' => '14:00'],
+                ],
+            ],
+
+            [
+                'nombre' => 'Vigilante 2',
+                'etiqueta' => 'Turno de tarde',
+                'foto' => null,
+                'desde' => null,
+                'turnos' => [
+                    ['dias' => [1, 2, 3, 4, 5, 6], 'entra' => '14:00', 'sale' => '22:00'],
+                ],
+            ],
+
+            [
+                'nombre' => 'Vigilante 3',
+                'etiqueta' => 'Turno de noche',
+                'foto' => null,
+                'desde' => null,
+                // Entra de lunes a sábado y sale al día siguiente. El domingo a
+                // la 01:00 quien está es el que entró el sábado.
+                'turnos' => [
+                    ['dias' => [1, 2, 3, 4, 5, 6], 'entra' => '22:00', 'sale' => '06:00'],
+                ],
+            ],
+
+            [
+                'nombre' => 'Vigilante 4',
+                'etiqueta' => 'Turno de domingo',
+                'foto' => null,
+                'desde' => '2026-08-02',
+                // 24 horas corridas: entra el domingo a las 06:00 y entrega el
+                // lunes a la misma hora. `sale` igual que `entra` es eso.
+                'turnos' => [
+                    ['dias' => [7], 'entra' => '06:00', 'sale' => '06:00'],
+                ],
+            ],
+
+        ],
+    ],
+
+    /*
      * Las preguntas frecuentes de la página de la Propuesta, en el orden en
      * que se leen: primero qué es y por qué, y al final las dos que la gente
      * pregunta de verdad —a quién le toca y cuánto cuesta—.

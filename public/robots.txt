@@ -1,2 +1,9 @@
+# El sitio es público y se quiere encontrar: la rendición de cuentas no sirve de
+# nada si no se llega a ella. La excepción es /vigilancia, que lleva el nombre y
+# la cara de cuatro personas y no tiene por qué alcanzar a quien no vive aquí.
+#
+# Esto no es una protección: quien tenga la dirección entra igual, y la dirección
+# va a andar circulando en el grupo de Colonos. Lo único que evita es que cuatro
+# caras y el rol de guardias escalen por los buscadores.
 User-agent: *
-Disallow:
+Disallow: /vigilancia

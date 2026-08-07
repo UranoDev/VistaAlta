@@ -74,6 +74,10 @@ class PaginaPendientesTest extends TestCase
      * La ausencia de fecha comprometida es la decisión, no un detalle de
      * captura: si la columna aparece, en el panel se llena, y la página empieza
      * a prometer plazos que dependen de un tercero.
+     *
+     * `cumplido_en` no es esa fecha y no la contradice: dice cuándo algo **se
+     * cumplió**, hacia atrás y como hecho, no cuándo se promete cumplirlo. La
+     * lista sigue sin comprometer plazos.
      */
     public function test_el_modelo_no_tiene_fecha_comprometida(): void
     {
@@ -81,7 +85,15 @@ class PaginaPendientesTest extends TestCase
             ->getSchemaBuilder()
             ->getColumnListing((new Pendiente)->getTable());
 
-        $this->assertSame(['id', 'titulo', 'detalle', 'orden', 'created_at', 'updated_at'], $columnas);
+        // Sin orden: `after()` lo respeta MySQL y lo ignora SQLite, así que
+        // comparar la secuencia haría que esta prueba dijera cosas distintas en
+        // local y en el servidor.
+        sort($columnas);
+
+        $esperadas = ['id', 'titulo', 'detalle', 'orden', 'cumplido_en', 'created_at', 'updated_at'];
+        sort($esperadas);
+
+        $this->assertSame($esperadas, $columnas);
     }
 
     public function test_la_pagina_no_pide_autenticacion(): void

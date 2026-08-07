@@ -100,9 +100,14 @@ class PendientesTest extends TestCase
 
     /**
      * El corazón de la pantalla: el pendiente que se cumple sube a la Bitácora
-     * con el día en que se hizo y sale de «Lo que sigue», en un solo movimiento.
+     * con el día en que se hizo, en un solo movimiento.
+     *
+     * Ya **no se borra**. El renglón se marca y se queda publicado unos días,
+     * tachado y en su lugar: un renglón que desaparece de un día para otro no
+     * distingue entre cumplirse y abandonarse, y esa diferencia es justamente lo
+     * que la página existe para contar.
      */
-    public function test_ya_se_hizo_crea_la_actividad_del_dia_y_retira_el_pendiente(): void
+    public function test_ya_se_hizo_crea_la_actividad_del_dia_y_marca_el_pendiente(): void
     {
         Carbon::setTestNow('2026-08-11 09:30:00');
 
@@ -112,7 +117,7 @@ class PendientesTest extends TestCase
             ->callTableAction('yaSeHizo', $pendiente, ['descripcion' => 'Se constituyó la Asociación Civil ante notario.'])
             ->assertHasNoActionErrors();
 
-        $this->assertDatabaseMissing('pendientes', ['id' => $pendiente->getKey()]);
+        $this->assertTrue($pendiente->fresh()->estaCumplido());
 
         $actividad = Actividad::query()->sole();
         $this->assertSame('Se constituyó la Asociación Civil ante notario.', $actividad->descripcion);
@@ -121,7 +126,45 @@ class PendientesTest extends TestCase
         auth()->logout();
         $this->get(route('actividades'))
             ->assertSee('Se constituyó la Asociación Civil ante notario.')
-            ->assertDontSee('Constituir la Asociación Civil');
+            ->assertSee('Se cumplió', escape: false)
+            // Sigue a la vista, tachado, durante la ventana de novedad.
+            ->assertSee('Constituir la Asociación Civil');
+    }
+
+    /**
+     * Y pasada la ventana se retira solo, sin que nadie tenga que ir a borrarlo
+     * — que era el costo que la decisión anterior quería evitar.
+     */
+    public function test_el_pendiente_cumplido_deja_de_publicarse_pasada_la_ventana(): void
+    {
+        config(['contenido.novedades.dias' => 7]);
+
+        $pendiente = Pendiente::factory()->create(['titulo' => 'Coladera repuesta']);
+        $pendiente->forceFill(['cumplido_en' => Carbon::now()->subDays(8)])->save();
+
+        auth()->logout();
+        $this->get(route('actividades'))->assertDontSee('Coladera repuesta');
+    }
+
+    /**
+     * «Ya se hizo» publica en una página pública de un solo clic. Poder
+     * devolverlo es lo que vuelve barato equivocarse.
+     */
+    public function test_deshacer_devuelve_el_pendiente_sin_tocar_lo_publicado(): void
+    {
+        $pendiente = Pendiente::factory()->create(['titulo' => 'Alumbrado público al 100%']);
+
+        Livewire::test(ListPendientes::class)
+            ->callTableAction('yaSeHizo', $pendiente, ['descripcion' => 'Se repuso el alumbrado.'])
+            ->assertHasNoActionErrors()
+            ->callTableAction('deshacerCumplido', $pendiente)
+            ->assertHasNoActionErrors();
+
+        $this->assertFalse($pendiente->fresh()->estaCumplido());
+
+        // Lo publicado se queda: son dos hechos distintos, y retirar contenido
+        // de la Bitácora sin que nadie lo pida sería peor que dejarlo.
+        $this->assertSame('Se repuso el alumbrado.', Actividad::query()->sole()->descripcion);
     }
 
     /**

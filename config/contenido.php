@@ -90,6 +90,33 @@ return [
     ],
 
     /*
+     * Cuántos días conserva la marca de novedad lo que se publica en
+     * `/actividades` — una entrada de la Bitácora, un Pendiente recién
+     * capturado o uno que se acaba de cumplir.
+     *
+     * La página se lee de corrido y crece por arriba, así que quien vuelve cada
+     * tantas semanas no tiene forma de saber qué apareció desde la última vez.
+     * La marca es para eso, y por eso caduca sola: una marca que hay que ir a
+     * quitar a mano se queda puesta para siempre, y una página donde todo está
+     * marcado como nuevo no marca nada.
+     *
+     * Se mide contra `created_at`, que es cuándo se **capturó**, no contra la
+     * fecha de la Actividad. Son cosas distintas a propósito: algo que pasó en
+     * junio y se captura hoy es novedad para el lector aunque su fecha sea
+     * vieja.
+     *
+     * El mismo número decide cuánto tiempo sigue publicado —tachado— un
+     * pendiente ya cumplido, y por eso es uno solo: son la misma pregunta
+     * —cuánto dura la novedad— y con dos valores la lista y su marca se
+     * apagarían en momentos distintos.
+     *
+     * En `0` se apaga entera, sin tocar ninguna vista.
+     */
+    'novedades' => [
+        'dias' => 7,
+    ],
+
+    /*
      * Las cuatro personas que hacen la vigilancia, y el rol con el que la
      * página calcula quién está de guardia (URVA-79).
      *
@@ -138,9 +165,9 @@ return [
         'vigilantes' => [
 
             [
-                'nombre' => 'Vigilante 1',
+                'nombre' => 'Maribel',
                 'etiqueta' => 'Turno de mañana',
-                'foto' => null,
+                'foto' => 'maribel.jpeg',
                 'desde' => null,
                 'turnos' => [
                     ['dias' => [1, 2, 3, 4, 5, 6], 'entra' => '06:00', 'sale' => '14:00'],
@@ -148,9 +175,9 @@ return [
             ],
 
             [
-                'nombre' => 'Vigilante 2',
+                'nombre' => 'Gabo',
                 'etiqueta' => 'Turno de tarde',
-                'foto' => null,
+                'foto' => 'gabo.jpeg',
                 'desde' => null,
                 'turnos' => [
                     ['dias' => [1, 2, 3, 4, 5, 6], 'entra' => '14:00', 'sale' => '22:00'],
@@ -158,9 +185,9 @@ return [
             ],
 
             [
-                'nombre' => 'Vigilante 3',
+                'nombre' => 'Hugo',
                 'etiqueta' => 'Turno de noche',
-                'foto' => null,
+                'foto' => 'hugo.jpeg',
                 'desde' => null,
                 // Entra de lunes a sábado y sale al día siguiente. El domingo a
                 // la 01:00 quien está es el que entró el sábado.
@@ -170,9 +197,9 @@ return [
             ],
 
             [
-                'nombre' => 'Vigilante 4',
+                'nombre' => 'Eduardo',
                 'etiqueta' => 'Turno de domingo',
-                'foto' => null,
+                'foto' => 'eduardo.jpeg',
                 'desde' => '2026-08-02',
                 // 24 horas corridas: entra el domingo a las 06:00 y entrega el
                 // lunes a la misma hora. `sale` igual que `entra` es eso.

@@ -34,35 +34,63 @@
 
         @if ($actividades->isNotEmpty())
             {{--
-                Un grupo por día, no una fila por Actividad: la fecha encabeza lo que
-                pasó ese día en vez de sellarse en cada renglón. El `<time>` vive en el
-                grupo y las descripciones de ese día van dentro, así que la asociación
-                entre una descripción y su fecha sigue en el marcado aunque la fecha se
-                dibuje una sola vez.
+                Un renglón por Actividad, con la fecha dibujada una sola vez por día:
+                la fecha encabeza lo que pasó ese día en vez de sellarse en cada
+                renglón. La agrupación se ve en los separadores —línea sólida de ancho
+                completo entre días, punteada entre Actividades del mismo día—, y en
+                escritorio la punteada arranca donde arrancan las descripciones, porque
+                cuelga de la segunda columna; abajo de `sm` la rejilla colapsa y la
+                distinción queda solo en el trazo.
+
+                La rejilla es de la Actividad y no del día porque la marca de novedad
+                va en la columna de la fecha, y esa marca es por Actividad: `created_at`
+                es de cada renglón, y una Actividad de junio capturada hoy es nueva para
+                el lector aunque comparta fecha con otras viejas. Colgar la marca del
+                día entero mentiría en ese caso, que es justo el que se da al ponerse al
+                corriente con la captura.
 
                 Se agrupa aquí y no en el controlador para que `$actividades` le llegue
                 entera al contador del encabezado: cuenta Actividades, no días.
-
-                Dos pesos de separador, y la diferencia es la que hace leer los días
-                como bloques: línea sólida de ancho completo entre días, punteada entre
-                Actividades del mismo día. En escritorio la punteada además arranca
-                donde arrancan las descripciones, porque cuelga de la segunda columna
-                de la rejilla; abajo de `sm` la rejilla colapsa y la distinción queda
-                solo en el trazo.
             --}}
             <ol class="border-b border-linea">
                 @foreach ($actividades->groupBy(fn ($actividad) => $actividad->fecha->toDateString()) as $dia => $actividadesDelDia)
-                    <li class="grid gap-1.5 border-t border-linea py-4 first:border-t-0 sm:grid-cols-[8.5rem_1fr] sm:gap-6">
-                        <time datetime="{{ $dia }}"
-                              class="cifra text-xs font-semibold uppercase tracking-[0.08em] text-tinta">
-                            {{ $actividadesDelDia->first()->fecha->translatedFormat('j M Y') }}
-                        </time>
-                        <ol>
-                            @foreach ($actividadesDelDia as $actividad)
-                                <li class="mt-3 whitespace-pre-line border-t border-dotted border-linea pt-3 text-sm text-grafito/85 first:mt-0 first:border-t-0 first:pt-0">{{ TextoConLigas::aHtml($actividad->descripcion) }}</li>
-                            @endforeach
-                        </ol>
-                    </li>
+                    @foreach ($actividadesDelDia as $actividad)
+                        @php($abreElDia = $loop->first)
+                        {{--
+                            `[border-left-style:solid]` no es un capricho: el
+                            `border-dotted` del separador entre Actividades del mismo
+                            día es la propiedad de las cuatro orillas, así que sin esto
+                            el listón de novedad sale punteado y deja de leerse como
+                            listón.
+                        --}}
+                        <li @class([
+                                'grid gap-1.5 sm:grid-cols-[8.5rem_1fr] sm:gap-6',
+                                'border-t border-linea pt-4 first:border-t-0' => $abreElDia,
+                                'mt-3 border-t border-dotted border-linea pt-3 sm:mt-0 sm:border-t-0 sm:pt-0' => ! $abreElDia,
+                                'pb-4' => $loop->last,
+                                'border-l-[3px] border-l-menta pl-3 [border-left-style:solid]' => $actividad->esNuevo(),
+                            ])>
+                            <div @class(['sm:mt-3 sm:pt-3' => ! $abreElDia])>
+                                @if ($actividad->esNuevo())
+                                    <x-palette-receipt.marca>Se agregó</x-palette-receipt.marca>
+                                @endif
+
+                                @if ($abreElDia)
+                                    <time datetime="{{ $dia }}"
+                                          class="cifra text-xs font-semibold uppercase tracking-[0.08em] text-tinta">
+                                        {{ $actividad->fecha->translatedFormat('j M Y') }}
+                                    </time>
+                                @endif
+                            </div>
+
+                            <div @class([
+                                    'text-sm text-grafito/85',
+                                    'sm:mt-3 sm:border-t sm:border-dotted sm:border-linea sm:pt-3' => ! $abreElDia,
+                                ])>
+                                <span class="block whitespace-pre-line">{{ TextoConLigas::aHtml($actividad->descripcion) }}</span>
+                            </div>
+                        </li>
+                    @endforeach
                 @endforeach
             </ol>
         @else
@@ -88,10 +116,20 @@
             tercero, y comprometer una fecha que no se controla es prometer de
             más.
         --}}
+        {{--
+            Los que siguen abiertos, aparte de la lista que se pinta. La lista
+            incluye a los cumplidos hace poco —tachados—, pero el conteo y la
+            frase del final hablan solo de lo que falta: un encabezado que diga
+            «6 pendientes» sobre una lista con uno tachado está contando mal, y
+            «el primero es el más importante» apuntando a algo ya cumplido manda
+            a la Asamblea a leer la línea equivocada.
+        --}}
+        @php($abiertos = $pendientes->reject->estaCumplido())
+
         <div class="mt-10 flex items-baseline justify-between gap-4 border-b border-linea pb-2">
             <h3 class="text-lg font-bold tracking-tight">Lo que sigue</h3>
             <span class="cifra text-xs text-grafito/70">
-                {{ trans_choice('{1}:count pendiente|[2,*]:count pendientes', $pendientes->count(), ['count' => $pendientes->count()]) }}
+                {{ trans_choice('{0}ninguno|{1}:count pendiente|[2,*]:count pendientes', $abiertos->count(), ['count' => $abiertos->count()]) }}
             </span>
         </div>
 
@@ -104,9 +142,32 @@
         @if ($pendientes->isNotEmpty())
             <ul class="mt-6 border-b border-linea">
                 @foreach ($pendientes as $pendiente)
-                    <li class="border-t border-linea py-4 first:border-t-0">
-                        <h4 class="font-semibold">{{ $pendiente->titulo }}</h4>
-                        <p class="mt-1 whitespace-pre-line text-sm text-grafito/85">{{ TextoConLigas::aHtml($pendiente->detalle) }}</p>
+                    {{--
+                        Un pendiente cumplido se queda unos días, tachado y en su
+                        lugar de siempre: tachado donde el lector lo recuerda es
+                        lo que le dice «esto se cerró». Un renglón que
+                        simplemente desaparece no distingue entre cumplirse y
+                        abandonarse.
+
+                        El tachado va solo en el título. Un párrafo entero
+                        cruzado por una línea cuesta leerlo, y no hay razón para
+                        cobrarle eso a quien quiere enterarse de qué se hizo.
+                    --}}
+                    <li @class([
+                            'border-t border-linea py-4 first:border-t-0',
+                            'border-l-[3px] border-l-menta pl-3' => $pendiente->esNuevo() || $pendiente->estaCumplido(),
+                        ])>
+                        @if ($pendiente->estaCumplido())
+                            <x-palette-receipt.marca>Se cumplió</x-palette-receipt.marca>
+                        @elseif ($pendiente->esNuevo())
+                            <x-palette-receipt.marca>Se agregó</x-palette-receipt.marca>
+                        @endif
+
+                        <h4 @class(['font-semibold', 'text-grafito/55 line-through' => $pendiente->estaCumplido()])>{{ $pendiente->titulo }}</h4>
+                        <p @class([
+                            'mt-1 whitespace-pre-line text-sm',
+                            $pendiente->estaCumplido() ? 'text-grafito/55' : 'text-grafito/85',
+                        ])>{{ TextoConLigas::aHtml($pendiente->detalle) }}</p>
                     </li>
                 @endforeach
             </ul>
@@ -127,9 +188,14 @@
             lea como una omisión.
         --}}
         <p class="mt-8 text-grafito/85">
-            {{-- Sin lista arriba, la referencia a «el primero» apuntaría a nada. --}}
-            @if ($pendientes->isNotEmpty())
-                De los pendientes de arriba, el primero es el más importante. Por
+            {{--
+                Se nombra en vez de decir «el primero». Desde que un cumplido se
+                queda tachado unos días, el primer renglón de la lista puede ser
+                justamente el que ya se hizo, y la frase mandaría a la Asamblea a
+                leer la línea equivocada. Nombrarlo no depende de la posición.
+            --}}
+            @if ($abiertos->isNotEmpty())
+                De los pendientes de arriba, «{{ $abiertos->first()->titulo }}» es el más importante. Por
                 eso les pedimos que vean nuestra
             @else
                 Les pedimos que vean nuestra

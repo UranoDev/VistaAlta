@@ -35,6 +35,14 @@
 /public/css/filament
 /public/js/filament
 /public/fonts/filament
+
+# Las caras de los cuatro vigilantes (URVA-80). Este repositorio es público, y
+# el historial de git no se puede depurar después: si alguna de las cuatro
+# personas retira su consentimiento, borrar el archivo tiene que bastar. Suben
+# por SFTP al servidor; lo que sí se versiona es la llave `foto` de
+# `config/contenido.php`, que solo dice cómo se llama el archivo.
+/public/img/vigilantes/*
+!/public/img/vigilantes/.gitkeep
 /storage/*.key
 /storage/pail
 /vendor

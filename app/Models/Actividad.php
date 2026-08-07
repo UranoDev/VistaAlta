@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\SeMarcaComoNuevo;
 use Database\Factories\ActividadFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -29,6 +30,7 @@ class Actividad extends Model
 {
     /** @use HasFactory<ActividadFactory> */
     use HasFactory;
+    use SeMarcaComoNuevo;
 
     /** El plural de «actividad» no sale de la convención de Eloquent. */
     protected $table = 'actividades';

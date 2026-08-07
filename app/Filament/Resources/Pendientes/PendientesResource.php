@@ -23,6 +23,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -96,6 +97,16 @@ class PendientesResource extends Resource
                     ->label('Detalle')
                     ->wrap()
                     ->searchable(),
+
+                // Solo aparece en el renglón que ya se cumplió. Se queda a la
+                // vista mientras siga publicándose tachado, que es la ventana
+                // en la que «Deshacer» todavía sirve de algo.
+                TextColumn::make('cumplido_en')
+                    ->label('Estado')
+                    ->badge()
+                    ->color('success')
+                    ->formatStateUsing(fn (): string => 'Ya se hizo')
+                    ->placeholder('—'),
             ])
             // El orden es contenido, no preferencia de quien mira: el primer
             // renglón es el pendiente del que cuelgan los demás, y así sale
@@ -123,21 +134,56 @@ class PendientesResource extends Resource
                             ->rows(4)
                             ->maxLength(2000),
                     ])
+                    ->visible(fn (Pendiente $record): bool => ! $record->estaCumplido())
                     ->action(function (Pendiente $record, array $data): void {
                         // En una transacción: si algo falla, no queremos el
-                        // pendiente retirado sin su Actividad publicada.
+                        // pendiente marcado sin su Actividad publicada.
                         DB::transaction(function () use ($record, $data): void {
                             Actividad::query()->create([
                                 'fecha' => now()->startOfDay(),
                                 'descripcion' => $data['descripcion'],
                             ]);
 
-                            $record->delete();
+                            // Se marca, no se borra. El renglón tiene que seguir
+                            // existiendo para poder publicarse tachado unos días
+                            // —y para que esto se pueda deshacer—; pasada la
+                            // ventana deja de aparecer solo.
+                            $record->forceFill(['cumplido_en' => now()])->save();
                         });
 
                         Notification::make()
                             ->title('Listo')
-                            ->body('Quedó publicada en la Bitácora con la fecha de hoy y salió de «Lo que sigue».')
+                            ->body('Quedó publicada en la Bitácora con la fecha de hoy, y en «Lo que sigue» aparece tachada unos días antes de retirarse.')
+                            ->success()
+                            ->send();
+                    }),
+
+                /*
+                 * La vuelta atrás de «Ya se hizo», que hasta ahora no existía:
+                 * la acción publica en una página pública de un solo clic, y
+                 * equivocarse obligaba a recapturar el pendiente desde cero.
+                 *
+                 * No toca la Actividad publicada. Son dos hechos distintos —que
+                 * el pendiente siga abierto y que se haya publicado algo en la
+                 * Bitácora— y borrar contenido publicado sin que nadie lo pida
+                 * sería peor que dejarlo: la Actividad se retira desde su propia
+                 * pantalla, si es que también estuvo de más.
+                 */
+                Action::make('deshacerCumplido')
+                    ->label('Deshacer')
+                    ->icon(Heroicon::OutlinedArrowUturnLeft)
+                    ->color('gray')
+                    ->visible(fn (Pendiente $record): bool => $record->estaCumplido())
+                    ->requiresConfirmation()
+                    ->modalHeading('Devolver este pendiente a «Lo que sigue»')
+                    ->modalDescription('Deja de aparecer tachado y vuelve a contarse como pendiente. La Actividad que se publicó en la Bitácora no se toca: si también estuvo de más, se retira desde Actividades.')
+                    ->modalSubmitActionLabel('Devolverlo')
+                    ->action(function (Pendiente $record): void {
+                        $record->forceFill(['cumplido_en' => null])->save();
+
+                        Notification::make()
+                            ->title('Listo')
+                            ->body('Vuelve a estar en «Lo que sigue».')
                             ->success()
                             ->send();
                     }),
@@ -153,6 +199,17 @@ class PendientesResource extends Resource
             ])
             ->emptyStateHeading('No hay pendientes')
             ->emptyStateDescription('La página pública lo dice así en vez de dejar el encabezado colgando.');
+    }
+
+    /**
+     * El mismo filtro que la página pública: los abiertos más los cumplidos
+     * hace poco. Un cumplido viejo ya no le sirve a nadie en esta pantalla —no
+     * se publica y no se puede deshacer con provecho—, así que se cae solo de
+     * la lista en vez de acumularse.
+     */
+    public static function getEloquentQuery(): EloquentBuilder
+    {
+        return parent::getEloquentQuery()->vigentes();
     }
 
     public static function getPages(): array

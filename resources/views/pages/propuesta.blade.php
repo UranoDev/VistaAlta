@@ -1,6 +1,8 @@
 {{--
-    La página principal del sitio: el único asunto que la Mesa Directiva somete
-    a consideración de la Asamblea.
+    El único asunto que la Mesa Directiva somete a consideración de la Asamblea.
+    Vive en `/propuesta` desde URVA-95 —antes era la raíz del sitio, que hoy
+    redirige al Reporte financiero—; la página no perdió nada en la mudanza: el
+    formulario de Comentarios, el OTP y la Vía de recepción siguen aquí.
 
     El texto es la Mesa Directiva hablando con sus vecinos. La paleta viene del
     producto de nvavista (docs/adr/0003); el texto no. Nada de aquí vende un

@@ -1,33 +1,49 @@
 <?php
 
 use App\Http\Controllers\ActividadesController;
+use App\Http\Controllers\ConvivenciaController;
 use App\Http\Controllers\PropuestaController;
 use App\Http\Controllers\ReporteFinancieroController;
 use App\Http\Controllers\VigilanciaController;
 use Illuminate\Support\Facades\Route;
 
 /*
+ * La raíz ya no sirve la Propuesta: manda al Reporte financiero (URVA-95). Lo
+ * primero que se le pone enfrente a la Asamblea es la cuenta del mes.
+ *
+ * Va con **301 y no con un alias** que sirva la misma página en las dos
+ * direcciones. La dirección de la raíz anduvo circulando entre los Colonos, así
+ * que quien la tenga guardada tiene que terminar viendo la dirección buena en
+ * la barra —no una copia de la página bajo otra URL—, y los buscadores tienen
+ * que consolidar en `/reporte-financiero` en vez de repartir entre dos
+ * direcciones lo que vale una. El `<link rel="canonical">` del Reporte
+ * financiero resuelve el otro empate, el del mes vigente contra su URL con
+ * fecha; éste no lo necesita, porque la raíz no llega a pintar nada.
+ */
+Route::permanentRedirect('/', '/reporte-financiero');
+
+/*
  * Las páginas públicas del sitio. Todas de lectura y sin autenticación: el
  * único lugar que la pide es el panel de la Mesa Directiva.
  *
- * Las tres primeras son la rendición de cuentas —la Propuesta y lo que la
- * respalda—. La cuarta no respalda nada: pide algo, y por eso va aparte y al
- * final. Es estática, así que no lleva controlador.
- */
-Route::get('/', [PropuestaController::class, 'index'])->name('propuesta');
-Route::get('/actividades', [ActividadesController::class, 'index'])->name('actividades');
-Route::get('/reporte-financiero', [ReporteFinancieroController::class, 'index'])->name('reporte-financiero');
-Route::view('/demanda', 'pages.demanda')->name('demanda');
-
-/*
- * Quién cuida el fraccionamiento (URVA-79). Va antes de Demanda en el menú
- * porque también rinde cuentas —del servicio que se paga con la cuota—, y
- * Demanda se queda al final por lo dicho arriba.
+ * El orden de abajo es el del menú (`encabezado.blade.php`), y ya no es el de
+ * la rendición de cuentas: la Propuesta bajó de primera a penúltima el día que
+ * dejó la raíz. Demanda conserva el final porque no respalda nada —pide algo, y
+ * entrar por ahí dejaría la petición antes que el asunto—; es estática, así que
+ * no lleva controlador.
  *
- * Lleva controlador y no `Route::view` porque no es estática: contesta según el
- * reloj del acceso, y a las 22:00 dice algo distinto que a las 21:59.
+ * Vigilancia sí lo lleva aunque tampoco toque la base: no es estática, contesta
+ * según el reloj del acceso, y a las 22:00 dice algo distinto que a las 21:59.
+ *
+ * Convivencia entró tercera (URVA-97) y es la única de las seis que además
+ * sirve páginas debajo de sí — un post por dirección, más abajo en este archivo.
  */
+Route::get('/reporte-financiero', [ReporteFinancieroController::class, 'index'])->name('reporte-financiero');
+Route::get('/actividades', [ActividadesController::class, 'index'])->name('actividades');
+Route::get('/convivencia', [ConvivenciaController::class, 'index'])->name('convivencia');
 Route::get('/vigilancia', [VigilanciaController::class, 'index'])->name('vigilancia');
+Route::get('/propuesta', [PropuestaController::class, 'index'])->name('propuesta');
+Route::view('/demanda', 'pages.demanda')->name('demanda');
 
 /*
  * Cada mes ya rendido conserva su propia dirección, para que la rendición de
@@ -38,6 +54,25 @@ Route::get('/vigilancia', [VigilanciaController::class, 'index'])->name('vigilan
 Route::get('/reporte-financiero/{mes}', [ReporteFinancieroController::class, 'mes'])
     ->where('mes', '[0-9]{4}-[0-9]{2}')
     ->name('reporte-financiero.mes');
+
+/*
+ * Cada post de Convivencia en su propia dirección, para que se pueda pegar el
+ * enlace de uno solo en el grupo de vecinos. El post se resuelve por `slug` y
+ * no por `id`: la dirección dice de qué se trata antes de abrirla.
+ *
+ * El campo del binding se declara aquí —`{post:slug}`— y no con un
+ * `getRouteKeyName()` en el modelo, que lo volvería la llave también de las
+ * rutas del panel: la pantalla de edición quedaría colgando del campo que esa
+ * pantalla existe para cambiar.
+ *
+ * La restricción del parámetro es del mismo tipo que la de `{mes}` de arriba y
+ * está por lo mismo: sin ella, `{post}` se tragaría cualquier ruta hermana que
+ * se agregue después bajo `/convivencia/`. El patrón es el de un slug —minúsculas,
+ * dígitos y guiones—, que es lo que el panel valida al capturarlo.
+ */
+Route::get('/convivencia/{post:slug}', [ConvivenciaController::class, 'post'])
+    ->where('post', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->name('convivencia.post');
 
 /*
  * Dejar un Comentario sobre la Propuesta: primero el OTP que valida el

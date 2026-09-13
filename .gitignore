@@ -59,3 +59,7 @@ Thumbs.db
 # el archivo de revision se va dentro del commit de release.
 issues-resolved*.json
 CHANGELOG.preview.md
+
+# Andamio de revision de un lote grande antes de commitearlo. Mismo motivo que
+# lo de arriba: release.ps1 hace `git add -A`, y esto no es material del repo.
+REVISION.md

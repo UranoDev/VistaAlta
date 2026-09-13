@@ -83,4 +83,160 @@
         font-weight: 700;
         text-align: right;
     }
+
+    /*
+     * El cuerpo de un post de Convivencia: el HTML que sale del Markdown que la
+     * Mesa Directiva captura en el panel.
+     *
+     * Va como clase y no con utilidades de Tailwind porque estas etiquetas no
+     * existen en ninguna plantilla —las genera CommonMark al renderizar, y
+     * Tailwind solo ve lo que está escrito en el código—. Por lo mismo no se usa
+     * `@tailwindcss/typography`: haría falta instalarlo y luego pelearse con sus
+     * tonos para devolverlo a Palette Receipt, cuando lo que hay que vestir son
+     * ocho etiquetas contadas.
+     *
+     * Es el único lugar del sitio donde el texto capturado sale con formato. El
+     * resto —Actividades, Pendientes, la introducción del índice— es texto plano
+     * con ligas, y esa diferencia está explicada en
+     * `App\Support\Contenido\Markdown`.
+     */
+    .prosa {
+        line-height: 1.7;
+    }
+
+    .prosa > * + * {
+        margin-top: 1rem;
+    }
+
+    .prosa h2,
+    .prosa h3,
+    .prosa h4 {
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--color-tinta);
+    }
+
+    /* Un título abre un tramo nuevo: separa más de lo que viene arriba que de lo que cuelga de él. */
+    .prosa > :is(h2, h3, h4) + * {
+        margin-top: 0.5rem;
+    }
+
+    .prosa > * + :is(h2, h3, h4) {
+        margin-top: 2rem;
+    }
+
+    .prosa h2 {
+        font-size: 1.25rem;
+        border-bottom: 1px solid var(--color-linea);
+        padding-bottom: 0.35rem;
+    }
+
+    .prosa h3 {
+        font-size: 1.0625rem;
+    }
+
+    .prosa h4 {
+        font-size: 1rem;
+    }
+
+    .prosa :is(ul, ol) {
+        padding-left: 1.35rem;
+    }
+
+    .prosa ul {
+        list-style: disc;
+    }
+
+    .prosa ol {
+        list-style: decimal;
+    }
+
+    .prosa li + li {
+        margin-top: 0.35rem;
+    }
+
+    .prosa li::marker {
+        color: var(--color-tinta);
+    }
+
+    .prosa a {
+        font-weight: 500;
+        color: var(--color-tinta);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+
+    .prosa a:hover {
+        color: var(--color-tinta-suave);
+    }
+
+    .prosa strong {
+        font-weight: 700;
+        color: var(--color-grafito);
+    }
+
+    /*
+     * La cita se marca con el filete a la izquierda, el mismo recurso que usa
+     * `x-palette-receipt.nota`: en una hoja de comprobante lo que destaca un
+     * bloque es un filete, no un fondo de color.
+     */
+    .prosa blockquote {
+        border-left: 2px solid var(--color-linea);
+        padding: 0.15rem 0 0.15rem 1rem;
+        color: color-mix(in srgb, var(--color-grafito) 80%, transparent);
+    }
+
+    /*
+     * Las imágenes van dentro del Markdown, subidas desde el editor del panel.
+     * Se limitan al ancho de lectura y se dibujan sobre papel alto con su filete,
+     * para que una foto de acceso no se lea como un recorte pegado encima.
+     */
+    .prosa img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        background-color: var(--color-papel-alto);
+        border: 1px solid var(--color-linea);
+    }
+
+    .prosa :is(code, pre) {
+        font-family: var(--font-mono);
+        font-size: 0.875em;
+    }
+
+    .prosa pre {
+        overflow-x: auto;
+        background-color: var(--color-papel-alto);
+        border: 1px solid var(--color-linea);
+        padding: 0.75rem 1rem;
+    }
+
+    .prosa table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9375rem;
+    }
+
+    .prosa :is(th, td) {
+        border-bottom: 1px dashed var(--color-linea);
+        padding: 0.45rem 0.5rem 0.45rem 0;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    .prosa th {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-tinta);
+    }
+
+    .prosa hr {
+        border: 0;
+        border-top: 1px dashed var(--color-linea);
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
 }

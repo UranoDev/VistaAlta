@@ -1,9 +1,10 @@
 @props([
     'title' => null,
     // Solo para las páginas que se sirven en más de una dirección —hoy el
-    // Reporte financiero vigente, que vive en la raíz y en su URL con fecha—.
-    // Sin esto los buscadores indexan las dos y reparten entre ellas lo que
-    // vale una.
+    // Reporte financiero vigente, que vive en `/reporte-financiero` y en su URL
+    // con fecha—. Sin esto los buscadores indexan las dos y reparten entre
+    // ellas lo que vale una. La raíz del sitio no entra en esta cuenta: no
+    // sirve la página, redirige con 301 (ver `routes/web.php`).
     'canonical' => null,
     // El renglón que WhatsApp muestra debajo del título en la tarjeta, y que
     // los buscadores usan como resumen. Cada página puede dar el suyo; este es

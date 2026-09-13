@@ -18,27 +18,48 @@ composer install
 npm install
 cp .env.example .env && php artisan key:generate
 php artisan migrate
+php artisan storage:link   # las imágenes de los posts de Convivencia se sirven desde ahí
 npm run dev        # y, en otra terminal, php artisan serve
 ```
 
+`storage:link` no es opcional: el editor de Convivencia sube las imágenes al disco
+`public`, y sin el enlace suben bien pero se pintan rotas. Va también en cada
+despliegue con árbol nuevo.
+
 ## Páginas públicas
 
-Hoy son seis, todas de lectura y sin autenticación (`routes/web.php`). **Ese número y
+Hoy son ocho, todas de lectura y sin autenticación (`routes/web.php`). **Ese número y
 esa regla describen este momento, no un principio del sitio**: el control de cuotas
 agrega el portal del Colono, que sí pide sesión (ver «Decidido y todavía no
-construido»). Lo que no cambia es que estas seis siguen leyéndose sin cuenta — la
+construido»). Lo que no cambia es que estas ocho siguen leyéndose sin cuenta — la
 rendición de cuentas no se esconde detrás de un login.
 
-Cuatro están en la navegación de arriba:
+Seis están en la navegación de arriba, en este orden:
 
-- **`/`** — la Propuesta. El único asunto que se somete a la Asamblea.
-- **`/actividades`** y **`/reporte-financiero`** — lo que la respalda. El Reporte
-  financiero se rinde **un mes a la vez** y los meses se acumulan: la raíz publica
-  siempre el más reciente y cada mes anterior conserva su propia dirección
+- **`/reporte-financiero`** — la portada, desde URVA-95: `/` redirige ahí con **301**,
+  para que quien tenga la liga vieja guardada termine viendo la dirección buena en la
+  barra. Se rinde **un mes a la vez** y los meses se acumulan: esta dirección publica
+  siempre el más reciente y cada mes anterior conserva la suya
   (`/reporte-financiero/2026-06`), listada al pie de la página. El vigente vive en las
-  dos direcciones, así que la página declara la raíz como canónica en vez de redirigir
-  — la URL con fecha tiene que seguir sirviendo junio el día que junio deje de ser lo
-  vigente (`docs/adr/0005`).
+  dos, así que la página declara ésta como canónica en vez de redirigir — la URL con
+  fecha tiene que seguir sirviendo junio el día que junio deje de ser lo vigente
+  (`docs/adr/0005`).
+- **`/actividades`** — lo que la Mesa Directiva llevó a cabo durante el Periodo, más
+  «Lo que sigue» con lo que falta. Junto con el Reporte financiero es lo que respalda a
+  la Propuesta.
+- **`/convivencia`** — Convivencia. Lo que la Mesa Directiva publica sobre cómo se
+  vive el fraccionamiento, capturado en el panel. Es la única sección con páginas
+  debajo de sí: cada post vive en `/convivencia/{slug}` para poder compartirse por
+  separado, el `slug` es editable —con el costo asumido de que un enlace ya compartido
+  quede en 404— y el contenido es **Markdown con imágenes dentro del texto**, el único
+  del sitio que se pinta como HTML con formato. No recibe Comentarios: un post se lee,
+  no se vota.
+- **`/vigilancia`** — quién cuida el acceso. Contesta según el reloj del
+  fraccionamiento, y **no publica los horarios**: con ellos se reconstruye el rol de
+  cuatro personas (`config/contenido.php`).
+- **`/propuesta`** — la Propuesta, entera y con su formulario de Comentarios. Sigue
+  siendo el único asunto que se somete a la Asamblea; lo que cambió con URVA-95 es por
+  dónde se entra, no su peso.
 - **`/demanda`** — Demanda. Pide los comprobantes de depósito a la administración
   pasada para documentar cuánto se entregó. La única que **pide** algo en vez de
   rendir cuentas, y por eso va al final de la navegación y **no lleva enlaces de
@@ -59,7 +80,7 @@ Comentarios, donde se recaban los datos:
 ## Panel de la Mesa Directiva
 
 Vive en `/admin` y **hoy es el único lugar del sitio que pide autenticación**: las
-seis páginas públicas no piden nada. Deja de ser el único cuando entre el portal del
+ocho páginas públicas no piden nada. Deja de ser el único cuando entre el portal del
 Colono; lo que no cambia es que la rendición de cuentas se lee sin cuenta. Está
 construido con Filament 4.
 
@@ -79,7 +100,7 @@ borrar.
 > que dar de baja a alguien es borrar su cuenta. Y antes de portar código de nvavista
 > que apunte a `users`, revisar que ninguna llave foránea venga con `cascadeOnDelete`.
 
-Tres pantallas:
+Las pantallas, de arriba abajo en el menú del panel:
 
 - **Comentarios** — **una sola** pantalla para todo lo relativo a Comentarios: la
   lista trae públicos y privados juntos, y el interruptor de Recepción de comentarios
@@ -146,6 +167,15 @@ Tres pantallas:
   contraseña**, y para siempre — son decisiones tomadas (`docs/adr/0004` y
   `docs/adr/0005`), no un pendiente. Las dos advertencias están también dentro de la
   propia pantalla.
+- **Convivencia** — alta, edición y borrado de los posts, más la **introducción del
+  índice** en el encabezado de esa misma pantalla (puede quedar vacía: entonces
+  `/convivencia` arranca directo con las publicaciones). Es el único formulario del
+  panel con editor de formato: el contenido es Markdown y las imágenes se arrastran
+  al editor, que las sube y las inserta en el texto — por eso el despliegue necesita
+  `php artisan storage:link`. El **slug se sugiere del título al crear** y después
+  queda libre; cambiarlo en un post ya publicado deja en 404 cualquier enlace que ya
+  se haya compartido, y el propio campo lo advierte. Como en Actividades, lo que se
+  guarda sale de inmediato en la página pública: no hay borradores.
 
 > **Al entregar el panel, decirlo explícitamente:** la Recepción de comentarios nace
 > abierta y nadie la cierra sola, así que los Comentarios públicos van a seguir

@@ -74,6 +74,28 @@ _Avoid_: Tarea, compromiso (sugiere el plazo que justamente no se da), meta,
 objetivo. **Lo que sigue** es el rótulo de la sección en la página; la entidad se
 llama ActividadPendiente
 
+**Convivencia**:
+La sección donde la Mesa Directiva publica cómo se vive el fraccionamiento —el
+manejo de la basura, el uso de las áreas comunes—. Es la única parte del sitio
+que **no** rinde cuentas ni pide nada: informa. Vive en `/convivencia` y crece
+con `Post`.
+_Avoid_: Blog (le quita el carácter de acuerdo del fraccionamiento y sugiere
+opinión), noticias, avisos, reglamento (un post puede serlo, pero la sección no
+es solo eso)
+
+**Post**:
+Una publicación de `Convivencia`, con su título, su fecha, su dirección propia
+(`/convivencia/manejo-de-la-basura`) y su contenido en Markdown —el único texto
+del sitio que se pinta **con formato**: títulos, listas e imágenes dentro del
+texto. Tiene página propia porque se comparte por enlace en el grupo de vecinos.
+Deliberadamente **no** recibe Comentarios: un post se lee, no se somete a
+consideración de la Asamblea. La dirección sale del `slug`, que es editable — con
+el costo asumido de que un enlace ya compartido quede en 404.
+_Avoid_: Publicación (en nvavista es otra cosa), artículo, entrada, nota.
+**Actividad** — se parecen y no lo son: la Actividad rinde cuentas de algo ya
+hecho durante el `Periodo` y se lee entera en la lista de `/actividades`; un Post
+no rinde cuentas de nada y no cuelga de ningún Periodo
+
 **Reporte financiero**:
 La rendición de cuentas económica de **un mes**: un resumen de cifras que el sitio
 muestra, más el enlace a la hoja de cálculo de Google donde vive el detalle. El

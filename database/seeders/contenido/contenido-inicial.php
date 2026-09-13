@@ -16,9 +16,13 @@ declare(strict_types=1);
 |     php artisan db:seed --class=ContenidoInicialSeeder
 |
 | Correrlo dos veces deja el sitio igual: las Actividades se reconocen por su
-| fecha y su texto, los Pendientes por su título, y el Reporte financiero por el
-| mes que cubre. Lo que se haya editado desde el panel sí se pisa — mientras
-| este archivo tenga contenido, este archivo es la versión buena.
+| fecha y su texto, los Pendientes por su título, los posts de Convivencia por
+| su dirección, y el Reporte financiero por el mes que cubre.
+|
+| Lo que se haya editado desde el panel se conserva, con una excepción: el
+| Reporte financiero se corrige —de sus cifras este archivo es la versión
+| buena—. Los demás no: un renglón ya sembrado se deja como quedó, porque el
+| trabajo de pulirlo se hace en el panel y no aquí.
 |
 | Todo nace vacío a propósito. Una Actividad o una cifra de relleno en un
 | sitio de rendición de cuentas no es un marcador de posición: es una mentira
@@ -198,6 +202,85 @@ return [
          * excedente normal del fraccionamiento, y no lo es.
          */
         'aclaracion' => 'Las Recuperaciones ($33,280.00) son el cobro de adeudos de meses anteriores, no cuotas de este mes. Es un ingreso extraordinario: no forma parte del ingreso regular del fraccionamiento y no hay que esperarlo cada mes. Sin él, el remanente de junio habría sido de $15,990.48.',
+
+    ],
+
+    /*
+     * Los posts de Convivencia: cómo se vive el fraccionamiento, no qué hizo la
+     * Mesa Directiva. Un post **no** es una Actividad —no rinde cuentas de nada
+     * y no cuelga de ningún Periodo— y por eso tiene página propia: es largo y
+     * se pega por enlace en el grupo de vecinos.
+     *
+     * Se siembran desde aquí y no se capturan en el panel para que salgan al
+     * aire con el primer despliegue. De ahí en adelante manda el panel: volver a
+     * correr el seeder **no** pisa lo que se haya editado ahí, a diferencia del
+     * Reporte financiero de arriba.
+     *
+     * Cada renglón:
+     *
+     *     'titulo'       — el encabezado de la página. Lo pinta la vista, así
+     *                      que el contenido no lo repite: adentro los títulos
+     *                      empiezan en `##`.
+     *     'slug'         — la dirección (/convivencia/<slug>). Se normaliza a
+     *                      minúsculas, dígitos y guiones, que es lo único que la
+     *                      ruta acepta. Si se omite, sale del título.
+     *     'publicado_en' — 'AAAA-MM-DD'. Es la fecha que lee el visitante y con
+     *                      la que se ordena el índice.
+     *     'contenido'    — Markdown: títulos, listas, citas, tablas, negritas y
+     *                      ligas. El HTML escrito a mano se tira al pintarlo
+     *                      (ver App\Support\Contenido\Markdown), así que no
+     *                      sirve de nada ponerlo. Las imágenes se suben desde el
+     *                      editor del panel, no desde aquí.
+     */
+    'posts' => [
+
+        /*
+         * El reglamento del manejo de la basura, transcrito del PDF escaneado
+         * que circuló entre los residentes (dos páginas: los lineamientos y una
+         * actualización posterior).
+         *
+         * Se maquetó, no se reescribió. La redacción es la del documento
+         * original, incluido el trato de usted que el resto del sitio no usa:
+         * esto es un acuerdo del fraccionamiento que ya se les hizo llegar a los
+         * residentes, y volverlo a redactar lo pondría a decir algo que nadie de
+         * la Mesa Directiva firmó. Lo que sí se quitó son las marcas de la
+         * transcripción —«Página 1», «Página 2»— que nombran las hojas del
+         * escaneo y no el contenido.
+         *
+         * La fecha es la de su publicación en el sitio. El documento original no
+         * trae ninguna, y ponerle una inventada lo fecharía ante los vecinos con
+         * un día en el que no pasó nada.
+         */
+        [
+            'titulo' => 'Manejo de la basura',
+            'slug' => 'manejo-de-la-basura',
+            'publicado_en' => '2026-08-21',
+            'contenido' => <<<'MARKDOWN'
+                Con la finalidad de mantener condiciones higiénicas y adecuadas en el manejo de la basura de cada propiedad, se cuenta con los siguientes lineamientos. Para una mejor convivencia entre todos los residentes es importante respetarlos.
+
+                ## Lineamientos
+
+                - El cuarto de basura se encuentra a la entrada del fraccionamiento. Es el único lugar en donde se debe depositar la basura generada en cada casa.
+                - La basura solo se debe depositar los días: **Martes, Jueves, Sábado y Domingo**, en horario de **7 am a 10 pm**.
+                - Tenemos contenedores marcados para poder separar la basura correctamente (basura orgánica, inorgánica, vidrio, PET, cartón, heces de animales de compañía); favor de separar desde casa la basura y depositarla en los contenedores correspondientes.
+                - Los restos de pasto, plantas y maleza se deben separar en costales o bolsas plásticas resistentes y colocarse dentro del contenedor de basura orgánica. No se pueden tirar ramas ni troncos: es responsabilidad de cada propietario llevar ese tipo de basura directamente al relleno sanitario.
+                - La basura orgánica debe ir perfectamente cerrada para evitar que se acerque la fauna local.
+                - Asimismo, las botellas de PET deberán desecharse limpias, sin ninguna clase de contenido líquido, ya que de lo contrario también genera que la fauna local se acerque al cuarto de basura.
+                - Los desechos orgánicos de los animales de compañía deberán depositarse en bolsas de plástico cerradas en el contenedor correspondiente, y asegurarse de mantener dicho contenedor cerrado.
+                - Todos los desechos de cartón, independientemente del tamaño, deberán doblarse y comprimirse de tal forma que quepan dentro de los contenedores designados para ello. Si el tamaño excede al contenedor, se deben colocar pegados a la pared, detrás de los botes contenedores, evitando así obstruir el paso dentro del cuarto de basura.
+                - Procurar que los contenedores más alejados de la puerta de acceso sean los primeros en llenarse, ya que eso facilita vaciar el cuarto de basura al camión recolector (que accede desde afuera) y facilita a los vecinos el acceso a tirar su basura, además de mantener orden dentro del área.
+
+                ## Actualización para residentes
+
+                Se les hace llegar nuevamente el reglamento para el manejo de la basura generada en casa.
+
+                - No queremos comenzar a multar a quienes no cumplan con ello, ya que confiamos en que somos adultos responsables y con la educación suficiente como para pensar que cada acción que realizamos o dejamos de hacer impacta en nuestro entorno y en la sana convivencia con nuestros vecinos.
+                - El cuarto de servicio y los contenedores se asean semanalmente. Cualquier anomalía al respecto, favor de notificarla a la administración. Si es posible, documentar con fotos.
+                - Evidentemente, al aumentar el número de residentes la generación de basura es mayor y los contenedores actuales son insuficientes, por lo que se está considerando adquirir nuevos con una mayor capacidad.
+                - Mientras tanto, se apela a la comprensión y sentido común de cada uno de los vecinos para evitar en lo posible dejar basura fuera de los contenedores, ya que en ocasiones el acceso es casi imposible, además de generar condiciones antihigiénicas y de desorden en el área.
+                - Los constructores tienen un reglamento adicional al que tienen los residentes; es decir, sus desechos (cascajo, material de construcción, etc.) tienen un manejo diferente, por lo que también solicitamos de su apoyo si detectan alguna anomalía, como dejar basura orgánica tirada en la obra, o bolsas, costales, etc., sin amarrar o fuera de sus áreas designadas para contenerla.
+                MARKDOWN,
+        ],
 
     ],
 

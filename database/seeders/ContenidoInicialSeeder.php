@@ -6,14 +6,16 @@ namespace Database\Seeders;
 
 use App\Models\Actividad;
 use App\Models\Pendiente;
+use App\Models\Post;
 use App\Models\ReporteFinanciero;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 /**
  * Siembra el contenido con el que el sitio sale al aire: las Actividades del
- * Periodo y el Reporte financiero que las respalda.
+ * Periodo, el Reporte financiero que las respalda y los posts de Convivencia.
  *
  * El material lo manda la Mesa Directiva y se pega en
  * `database/seeders/contenido/contenido-inicial.php`; este seeder solo lo
@@ -21,11 +23,12 @@ use Illuminate\Database\Seeder;
  * tener que leer PHP más allá de una lista, y quien toca este archivo no
  * debería estar editando cifras.
  *
- * Es idempotente. Las Actividades se reconocen por su fecha y su texto y los
- * Pendientes por su título, así que volver a correrlo no duplica ninguno; el
- * Reporte financiero se reconoce por su mes, así que volver a sembrarlo corrige
- * ese mes y nunca deja dos de junio. Lo que esté vacío en el archivo no se toca
- * — sembrar un contenido no borra los otros.
+ * Es idempotente. Las Actividades se reconocen por su fecha y su texto, los
+ * Pendientes por su título y los posts de Convivencia por su dirección, así que
+ * volver a correrlo no duplica ninguno; el Reporte financiero se reconoce por su
+ * mes, así que volver a sembrarlo corrige ese mes y nunca deja dos de junio. Lo
+ * que esté vacío en el archivo no se toca — sembrar un contenido no borra los
+ * otros.
  */
 class ContenidoInicialSeeder extends Seeder
 {
@@ -47,6 +50,7 @@ class ContenidoInicialSeeder extends Seeder
         $this->sembrarActividades($contenido['actividades'] ?? []);
         $this->sembrarPendientes($contenido['pendientes'] ?? []);
         $this->sembrarReporteFinanciero($contenido['reporte_financiero'] ?? []);
+        $this->sembrarPosts($contenido['posts'] ?? []);
     }
 
     /**
@@ -170,6 +174,66 @@ class ContenidoInicialSeeder extends Seeder
         );
 
         $this->aviso('Reporte financiero de '.ReporteFinanciero::nombreDelMes($mes).' sembrado: '.count($cifras).' cifra(s)'.($hojaUrl ? ' y la hoja de cálculo.' : ', sin hoja de cálculo.'));
+    }
+
+    /**
+     * Cada post de Convivencia se identifica por su dirección: es lo que lo hace
+     * ser `/convivencia/manejo-de-la-basura` y no otro, y es la única columna de
+     * la tabla con restricción de unicidad.
+     *
+     * **Sembrar de nuevo no pisa lo que se haya editado desde el panel** —a
+     * diferencia del Reporte financiero, que sí se corrige—. Un post es un texto
+     * largo que la Mesa Directiva sigue puliendo después de publicarlo, y este
+     * archivo existe para que salga al aire desde el primer despliegue, no para
+     * ser su versión buena de aquí en adelante. Corregirlo desde aquí sería
+     * borrar media hora de edición sin avisar.
+     *
+     * El costo asumido es el mismo que el de los Pendientes: si alguien cambia
+     * la dirección desde el panel, volver a sembrar publica el original otra vez
+     * al lado del editado. Se prefiere eso a perder ediciones.
+     *
+     * @param  array<int, array<string, mixed>>  $posts
+     */
+    private function sembrarPosts(array $posts): void
+    {
+        $sembrados = 0;
+
+        foreach ($posts as $post) {
+            $titulo = trim((string) ($post['titulo'] ?? ''));
+            $contenido = trim((string) ($post['contenido'] ?? ''));
+            $publicadoEn = $this->fecha($post['publicado_en'] ?? null);
+
+            // La dirección se normaliza en vez de tomarse tal cual: la ruta solo
+            // acepta minúsculas, dígitos y guiones (ver routes/web.php), así que
+            // un `slug` pegado con acentos o espacios sembraría un post que su
+            // propia dirección no puede servir — publicado y en 404 a la vez.
+            // Sin `slug` se saca del título, que es de donde saldría igual.
+            $slug = Str::slug($this->textoONulo($post['slug'] ?? null) ?? $titulo);
+
+            // Un post a medias no se publica a medias, igual que una Actividad:
+            // se salta y se avisa, para que quien pegó el material lo note antes
+            // que el grupo de vecinos.
+            if ($titulo === '' || $slug === '' || $contenido === '' || $publicadoEn === null) {
+                $this->aviso('Se saltó un Post sin título, sin contenido o con una fecha de publicación que no se entiende.');
+
+                continue;
+            }
+
+            Post::query()->firstOrCreate(
+                ['slug' => $slug],
+                [
+                    'titulo' => $titulo,
+                    'contenido' => $contenido,
+                    'publicado_en' => $publicadoEn,
+                ],
+            );
+
+            $sembrados++;
+        }
+
+        $this->aviso($sembrados > 0
+            ? "Posts de Convivencia sembrados: {$sembrados}."
+            : 'Sin posts en el archivo: el índice de Convivencia lo dice en vez de inventarlos.');
     }
 
     /**

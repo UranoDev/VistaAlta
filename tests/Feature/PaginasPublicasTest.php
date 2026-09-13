@@ -16,6 +16,7 @@ class PaginasPublicasTest extends TestCase
         return [
             'Propuesta' => ['propuesta', 'Propuesta'],
             'Actividades' => ['actividades', 'Actividades'],
+            'Convivencia' => ['convivencia', 'Convivencia'],
             'Reporte financiero' => ['reporte-financiero', 'Reporte financiero'],
             'Vigilancia' => ['vigilancia', 'Quién cuida Vista Alta'],
             'Demanda' => ['demanda', 'Faltan tus comprobantes'],
@@ -37,6 +38,7 @@ class PaginasPublicasTest extends TestCase
 
         $respuesta->assertSee(route('propuesta'));
         $respuesta->assertSee(route('actividades'));
+        $respuesta->assertSee(route('convivencia'));
         $respuesta->assertSee(route('reporte-financiero'));
         $respuesta->assertSee(route('vigilancia'));
         $respuesta->assertSee(route('demanda'));

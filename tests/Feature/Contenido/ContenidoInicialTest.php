@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Contenido;
 
+use App\Models\Post;
 use App\Models\ReporteFinanciero;
 use Database\Seeders\ContenidoInicialSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -229,11 +230,13 @@ class ContenidoInicialTest extends TestCase
         $this->sembrar([
             'actividades' => [],
             'pendientes' => [],
+            'posts' => [],
             'reporte_financiero' => ['mes' => null, 'hoja_url' => null, 'cifras' => []],
         ]);
 
         $this->assertDatabaseCount('actividades', 0);
         $this->assertDatabaseCount('pendientes', 0);
+        $this->assertDatabaseCount('posts', 0);
         $this->assertDatabaseCount('reporte_financiero', 0);
     }
 
@@ -248,12 +251,174 @@ class ContenidoInicialTest extends TestCase
 
         $this->assertIsArray($contenido['actividades']);
         $this->assertIsArray($contenido['pendientes']);
+        $this->assertIsArray($contenido['posts']);
         $this->assertIsArray($contenido['reporte_financiero']['cifras']);
         $this->assertArrayHasKey('mes', $contenido['reporte_financiero']);
         $this->assertArrayHasKey('hoja_url', $contenido['reporte_financiero']);
 
         // Y tiene que poder sembrarse tal como está en el repo.
         (new ContenidoInicialSeeder)->run();
+    }
+
+    public function test_siembra_los_posts_de_convivencia_del_archivo(): void
+    {
+        $this->sembrar([
+            'posts' => [
+                [
+                    'titulo' => 'Manejo de la basura',
+                    'slug' => 'manejo-de-la-basura',
+                    'publicado_en' => '2026-08-21',
+                    'contenido' => "## Lineamientos\n\n- Solo los **Martes**.",
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseCount('posts', 1);
+
+        $this->get(route('convivencia'))->assertSee('Manejo de la basura');
+
+        // El post se pide por su dirección literal y no por `route()`: lo que se
+        // siembra es la liga que se pega en el grupo de vecinos, y un `route()`
+        // resuelve bien aunque el slug haya salido con otra forma.
+        $this->get('/convivencia/manejo-de-la-basura')
+            ->assertOk()
+            ->assertSee('Manejo de la basura')
+            ->assertSee('<strong>Martes</strong>', false);
+    }
+
+    public function test_sembrar_dos_veces_no_duplica_los_posts(): void
+    {
+        $contenido = [
+            'posts' => [
+                [
+                    'titulo' => 'Manejo de la basura',
+                    'slug' => 'manejo-de-la-basura',
+                    'publicado_en' => '2026-08-21',
+                    'contenido' => 'El cuarto de basura está a la entrada.',
+                ],
+            ],
+        ];
+
+        $this->sembrar($contenido);
+        $this->sembrar($contenido);
+
+        $this->assertDatabaseCount('posts', 1);
+    }
+
+    /**
+     * El contrato que separa a los posts del Reporte financiero: aquél se
+     * corrige desde el archivo, éste no. Un post es un texto largo que la Mesa
+     * Directiva sigue puliendo desde el panel después de publicarlo, y el
+     * despliegue siguiente no puede borrarle esa edición.
+     */
+    public function test_sembrar_de_nuevo_no_pisa_lo_que_se_edito_desde_el_panel(): void
+    {
+        $contenido = [
+            'posts' => [
+                [
+                    'titulo' => 'Manejo de la basura',
+                    'slug' => 'manejo-de-la-basura',
+                    'publicado_en' => '2026-08-21',
+                    'contenido' => 'El horario es de 7 am a 10 pm.',
+                ],
+            ],
+        ];
+
+        $this->sembrar($contenido);
+
+        Post::query()->firstOrFail()->update([
+            'titulo' => 'Manejo de la basura (corregido)',
+            'contenido' => 'El horario es de 7 am a 9 pm.',
+        ]);
+
+        $this->sembrar($contenido);
+
+        $this->assertDatabaseCount('posts', 1);
+
+        $post = Post::query()->firstOrFail();
+
+        $this->assertSame('Manejo de la basura (corregido)', $post->titulo);
+        $this->assertSame('El horario es de 7 am a 9 pm.', $post->contenido);
+    }
+
+    public function test_un_post_sin_titulo_sin_contenido_o_sin_fecha_no_se_siembra(): void
+    {
+        $this->sembrar([
+            'posts' => [
+                ['titulo' => '', 'slug' => 'sin-titulo', 'publicado_en' => '2026-08-21', 'contenido' => 'Con texto.'],
+                ['titulo' => 'Sin contenido', 'slug' => 'sin-contenido', 'publicado_en' => '2026-08-21', 'contenido' => ''],
+                ['titulo' => 'Sin fecha', 'slug' => 'sin-fecha', 'contenido' => 'Con texto.'],
+                ['titulo' => 'El único completo', 'slug' => 'el-unico-completo', 'publicado_en' => '2026-08-21', 'contenido' => 'Con texto.'],
+            ],
+        ]);
+
+        $this->assertDatabaseCount('posts', 1);
+        $this->assertDatabaseHas('posts', ['slug' => 'el-unico-completo']);
+    }
+
+    /**
+     * La ruta solo acepta minúsculas, dígitos y guiones. Una dirección pegada
+     * con acentos o espacios sembraría un post publicado y en 404 a la vez, así
+     * que se normaliza antes de guardarla.
+     */
+    public function test_la_direccion_se_normaliza_a_lo_que_la_ruta_acepta(): void
+    {
+        $this->sembrar([
+            'posts' => [
+                [
+                    'titulo' => 'Uso de las áreas comunes',
+                    'slug' => 'Uso de las Áreas Comunes',
+                    'publicado_en' => '2026-08-21',
+                    'contenido' => 'El mirador cierra a las 10 pm.',
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseHas('posts', ['slug' => 'uso-de-las-areas-comunes']);
+
+        $this->get('/convivencia/uso-de-las-areas-comunes')->assertOk();
+    }
+
+    /**
+     * Sin dirección el post no se salta: sale del título, que es de donde
+     * saldría igual. Quien pega el material no tiene por qué saber que hay dos
+     * campos para nombrar lo mismo.
+     */
+    public function test_sin_direccion_la_saca_del_titulo(): void
+    {
+        $this->sembrar([
+            'posts' => [
+                [
+                    'titulo' => 'Manejo de la basura',
+                    'publicado_en' => '2026-08-21',
+                    'contenido' => 'El cuarto de basura está a la entrada.',
+                ],
+            ],
+        ]);
+
+        $this->assertDatabaseHas('posts', ['slug' => 'manejo-de-la-basura']);
+    }
+
+    /**
+     * El primer post del sitio va en el archivo y no capturado a mano, para que
+     * exista desde el primer despliegue. Se afirma sobre el contenido y no solo
+     * sobre el título: el reglamento sirve si dice los días y el horario.
+     */
+    public function test_el_archivo_del_repo_publica_el_reglamento_de_la_basura(): void
+    {
+        (new ContenidoInicialSeeder)->run();
+
+        $this->get('/convivencia/manejo-de-la-basura')
+            ->assertOk()
+            ->assertSee('Manejo de la basura')
+            ->assertSee('Martes, Jueves, Sábado y Domingo', false)
+            ->assertSee('7 am a 10 pm', false)
+            ->assertSee('Lineamientos')
+            ->assertSee('Actualización para residentes', false)
+            // Las marcas de la transcripción nombran las hojas del escaneo, no
+            // el contenido: no se publican.
+            ->assertDontSee('Página 1', false)
+            ->assertDontSee('Adobe Scan', false);
     }
 
     /**

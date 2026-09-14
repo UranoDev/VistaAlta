@@ -309,19 +309,19 @@ return [
 
             [
                 'titulo' => 'Firma del acta constitutiva',
-                'detalle' => 'Ante notario. Esperamos que sea este mes de septiembre.',
+                'detalle' => 'Se deberá hacer ante Notario Público. Esperamos que sea este mes de septiembre.',
                 'estado' => 'sigue',
             ],
 
             [
                 'titulo' => 'RFC de la asociación',
-                'detalle' => 'Se saca una vez firmada el acta.',
+                'detalle' => 'Se tramita una vez firmada el acta',
                 'estado' => 'falta',
             ],
 
             [
                 'titulo' => 'Cuenta bancaria del fraccionamiento',
-                'detalle' => 'Lo último, ya con el RFC.',
+                'detalle' => 'Es el último paso una vez teniendo el RFC',
                 'estado' => 'falta',
             ],
 
@@ -360,14 +360,14 @@ return [
             [
                 'nombre' => 'Gaby Viorney',
                 'cargo' => 'Vocal',
-                'hace' => 'Echa la mano en lo que haga falta y suple a quien no pueda.',
+                'hace' => 'Apoya en las tareas que hagan falta y entra como suplente de algún otro miembro cuando sea necesario.',
                 'foto' => 'gaby.jpeg',
             ],
 
             [
                 'nombre' => 'Urano González',
                 'cargo' => 'Tesorero',
-                'hace' => 'Lleva las cuentas y publica el reporte de cada mes.',
+                'hace' => 'Administra las finanzas y publica los reportes.',
                 'foto' => 'urano.jpeg',
             ],
 

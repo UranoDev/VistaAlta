@@ -110,14 +110,6 @@ class PaginaAdministracionTest extends TestCase
     }
 
     /**
-     * El Comité no tiene cabeza, y eso no es un dato que falte: se dice.
-     */
-    public function test_dice_que_el_comite_no_tiene_coordinador(): void
-    {
-        $this->get(route('administracion'))->assertSee('no tiene coordinador');
-    }
-
-    /**
      * La línea de qué hace cada cargo vive abajo del organigrama, no dentro de
      * la tarjeta: es lo que mantiene las siete tarjetas del mismo alto.
      */

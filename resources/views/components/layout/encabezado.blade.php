@@ -47,13 +47,15 @@
                 financiero. Apunta al destino y no a `/`: la raíz llega igual,
                 pero de rebote, y no hay razón para gastar un salto de
                 redirección en el enlace que más se toca del sitio.
+
+                Debajo del nombre iba el rótulo «Mesa Directiva», y salió en
+                URVA-99. El sitio es del fraccionamiento, no del órgano que lo
+                administra en este periodo, y quién ocupa los cargos ahora se
+                lee en `/administracion`, que es donde se puede mantener al día.
             --}}
             <a href="{{ route('reporte-financiero') }}" class="group flex items-baseline gap-2.5">
                 <span class="text-lg font-bold tracking-tight text-tinta group-hover:text-tinta-suave">
                     Vista Alta
-                </span>
-                <span class="cifra text-[0.6875rem] uppercase tracking-[0.14em] text-grafito/60">
-                    Mesa Directiva
                 </span>
             </a>
 

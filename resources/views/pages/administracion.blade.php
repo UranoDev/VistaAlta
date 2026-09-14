@@ -107,7 +107,7 @@
 
         <div class="mt-8 flex flex-col gap-4 text-grafito/85">
             <p>
-                Parte del trámite es dejar asentado quién gobierna la asociación. En el acta constitutiva se registran
+                Parte del trámite es dejar asentado cómo se gobierna la asociación. En el acta constitutiva se registran
                 dos grupos: el <strong class="font-semibold text-tinta">Comité de Vigilancia</strong>, que supervisa, y
                 la <strong class="font-semibold text-tinta">Administración</strong>, que se encarga del día a día.
             </p>
@@ -137,10 +137,6 @@
                 @endforeach
             </ul>
         </div>
-
-        <x-palette-receipt.nota class="mt-7">
-            Los tres revisan por igual. El Comité no tiene coordinador ni a nadie al frente.
-        </x-palette-receipt.nota>
     </x-palette-receipt.seccion>
 
     {{-- La Administración, con su cabeza un nivel arriba del resto. --}}

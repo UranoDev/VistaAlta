@@ -2,9 +2,37 @@
 
 ## [Unreleased]
 ### Fix / Bugs
+- **URVA-88**: ContenidoInicialSeeder deja la Bitácora entera marcada «Se agregó» _(cerrado 2026-08-12 18:21)_
+- **URVA-85**: La fecha del saldo inicial se captura, se muestra y nunca se consulta _(cerrado 2026-08-12 17:55)_
+- **URVA-84**: Los importes de Egresos y Otros ingresos salen en formato de España _(cerrado 2026-08-12 17:46)_
+- **URVA-83**: Los mensajes de validación salen como claves crudas: «validation.required» _(cerrado 2026-08-12 17:39)_
+- **URVA-81**: La cuenta desactivada recibe «Estas credenciales no coinciden», que es mentira _(cerrado 2026-08-12 17:23)_
+- **URVA-78**: Un día límite de pago fuera de 1–31 devuelve una fecha creíble en vez de reventar _(cerrado 2026-08-04 15:24)_
+- **URVA-76**: «Día límite de pago» reemplaza a «Días de gracia»: con 10, el 11 ya lleva sobrecargo _(cerrado 2026-08-04 14:48)_
+- **URVA-75**: Cortes de caja: las acciones que un rol no puede usar salen deshabilitadas en vez de no salir _(cerrado 2026-08-04 11:52)_
+- **URVA-67**: El clic en «Ver a qué se aplica» se pierde: el blur del importe re-renderiza el formulario antes del submit _(cerrado 2026-08-04 01:10)_
+- **URVA-66**: El primer clic en «Ver a qué se aplica» se pierde: el blur del importe borra la revisión recién hecha _(cerrado 2026-08-03 23:42)_
 - **URVA-47**: La siembra de contenido no debe pisar nada que ya exista en la base _(cerrado 2026-08-02 22:20)_
-- **URVA-58**: El OTP por SMS no llega a celulares de México: Twilio lo rechaza con error 30008 _(cerrado 2026-08-02 20:35)_
 ### Features
+- **URVA-92**: Doble punto en el motivo de cancelación del comprobante público _(cerrado 2026-08-12 18:49)_
+- **URVA-91**: El panel habla de usted y el sitio de tú _(cerrado 2026-08-12 18:44)_
+- **URVA-90**: En el modal de cancelación, «Cancelar» descarta y «Cancelar el recibo» ejecuta _(cerrado 2026-08-12 18:32)_
+- **URVA-89**: El interruptor inhabilitado del Comité de Vigilancia no se ve inhabilitado _(cerrado 2026-08-12 18:27)_
+- **URVA-87**: El modal de «Ya se hizo» precarga el título y publica frases en futuro _(cerrado 2026-08-12 18:12)_
+- **URVA-86**: El 403 es la página de Laravel sin vestir: en inglés y sin salida _(cerrado 2026-08-12 18:07)_
+- **URVA-82**: Reclamar la unidad no abre la sesión, y la pantalla no lo dice _(cerrado 2026-08-12 17:30)_
+- **URVA-80**: Pedir a los cuatro vigilantes su consentimiento, nombre y foto antes de publicarlos _(cerrado 2026-08-12 17:04)_
+- **URVA-77**: Estado de resultados en vivo: el mes que todavía no se rinde, para Mesa Directiva y Vigilancia _(cerrado 2026-08-04 15:01)_
+- **URVA-74**: El Cobrador puede cancelar sus recibos: la acción entra en «De qué cobros es ese dinero» _(cerrado 2026-08-04 10:15)_
+- **URVA-73**: Cortes de caja: ver más allá de los 20 cortes del histórico _(cerrado 2026-08-04 09:48)_
+- **URVA-72**: Cortes de caja: los cancelados se muestran desde el último corte, y la lista deja de recortarse _(cerrado 2026-08-04 09:41)_
+- **URVA-71**: Cortes de caja: afinar el renglón del Recibo — icono alineado al folio, sin la palabra «Cancelado», y Método que cede en celular _(cerrado 2026-08-04 09:28)_
+- **URVA-64**: Pagos adelantados: el colono al corriente puede pagar meses por venir _(cerrado 2026-08-04 09:21)_
+- **URVA-70**: Cortes de caja: los Recibos cancelados también se listan, marcados y sumados aparte _(cerrado 2026-08-04 01:54)_
+- **URVA-69**: Cancelar un Recibo desde el panel: hoy solo se puede por consola _(cerrado 2026-08-04 01:38)_
+- **URVA-68**: Cortes de caja: la lista de cobros que justifican el dinero en tránsito _(cerrado 2026-08-04 01:18)_
+- **URVA-65**: Registro de pago: el detalle dice en qué va la Unidad y hasta cuándo se paga sin sobrecargo _(cerrado 2026-08-03 23:54)_
+- **URVA-63**: Registro de pago: la lista de Unidades dice el estado de cobro antes de entrar _(cerrado 2026-08-03 23:14)_
 - **URVA-56**: Reemitir un mes publicado, dejando constancia de qué cambió _(cerrado 2026-08-03 12:23)_
 - **URVA-55**: Página de detalle pública: movimientos del mes y estado de cobranza _(cerrado 2026-08-03 11:59)_
 - **URVA-54**: Resumen derivado: retirar la captura de cifras y calcularlas _(cerrado 2026-08-03 11:40)_
@@ -21,7 +49,6 @@
 - **URVA-39**: Registro de pago del Cobrador, desde el celular y en el momento _(cerrado 2026-08-03 00:56)_
 - **URVA-38**: Recibo: folio, URL propia, QR y cancelación con motivo _(cerrado 2026-08-03 00:30)_
 - **URVA-62**: Terminar el renombre: las clases CSS siguen llamándose recibo-* _(cerrado 2026-08-03 00:08)_
-- **URVA-59**: El SMS del código no dice de quién viene: identificar a Vista Alta en el cuerpo _(cerrado 2026-08-03 00:04)_
 - **URVA-37**: Carga de adeudos hacia atrás por rango de meses _(cerrado 2026-08-02 23:59)_
 - **URVA-36**: Cuota: generación mensual, periodo de gracia y sobrecargo congelado _(cerrado 2026-08-02 22:14)_
 - **URVA-35**: Vigencias de cuota: historial de monto y sobrecargo por fecha _(cerrado 2026-08-02 22:02)_
@@ -30,6 +57,26 @@
 - **URVA-32**: Roles: spatie/laravel-permission con cuatro roles acumulables _(cerrado 2026-08-02 21:01)_
 - **URVA-30**: ADR: cuotas en urge sin tenancy, y el sistema manda sobre el ingreso por cuotas _(cerrado 2026-08-02 20:38)_
 - **URVA-28**: Legal: declarar en el Aviso y los Términos el tratamiento de datos para control de pagos _(cerrado 2026-08-02 20:29)_
+
+## [2026.09.13] - 2026 sep 13
+### Features
+- **URVA-98**: Sembrar el primer post de Convivencia: manejo de la basura
+- **URVA-97**: Construir Convivencia: modelo, recurso de Filament, índice y página de post
+- **URVA-95**: La portada cambia a Reporte financiero y el menú se reordena
+
+## [2026.08.06.1] - 2026 ago 06
+_Sin issues cerrados en esta ventana_
+
+## [2026.08.06] - 2026 ago 06
+### Features
+- **URVA-79**: Página pública de Vigilancia: quién está de guardia ahora, sin publicar los horarios
+
+## [2026.08.05] - 2026 ago 05
+### Fix / Bugs
+- **URVA-58**: El OTP por SMS no llega a celulares de México: Twilio lo rechaza con error 30008
+### Features
+- **URVA-60**: Trámite ante los carriers para registrar el Alphanumeric Sender ID en México
+- **URVA-59**: El SMS del código no dice de quién viene: identificar a Vista Alta en el cuerpo
 
 ## [2026.08.02] - 2026 ago 02
 ### Features

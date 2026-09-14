@@ -146,12 +146,15 @@ class PaginaConvivenciaTest extends TestCase
      * Convivencia entró al menú en tercer lugar, entre Actividades y Vigilancia
      * (URVA-96). El orden es contenido: primero lo que la Mesa Directiva cuenta,
      * al final lo que pide.
+     *
+     * La quinta dejó de ser Propuesta y es Administración (URVA-99): lo que se
+     * sometía a consideración ya está en trámite, y por dónde va se rinde ahí.
      */
     public function test_convivencia_va_tercera_en_el_menu(): void
     {
         $contenido = $this->get('/convivencia')->getContent();
 
-        $esperado = ['reporte-financiero', 'actividades', 'convivencia', 'vigilancia', 'propuesta', 'demanda'];
+        $esperado = ['reporte-financiero', 'actividades', 'convivencia', 'vigilancia', 'administracion', 'demanda'];
 
         $posiciones = [];
 

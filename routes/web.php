@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActividadesController;
+use App\Http\Controllers\AdministracionController;
 use App\Http\Controllers\ConvivenciaController;
 use App\Http\Controllers\PropuestaController;
 use App\Http\Controllers\ReporteFinancieroController;
@@ -35,6 +36,12 @@ Route::permanentRedirect('/', '/reporte-financiero');
  * Vigilancia sí lo lleva aunque tampoco toque la base: no es estática, contesta
  * según el reloj del acceso, y a las 22:00 dice algo distinto que a las 21:59.
  *
+ * Administración entró después de Vigilancia y hace juego con ella —una dice
+ * quién cuida el acceso y la otra quiénes ocupan los cargos—, así que va a su
+ * lado y no al final. También lleva controlador, por otra razón: no cambia con
+ * el reloj, pero arma los siete integrantes desde `config/contenido.php` y ese
+ * armado no va dentro del blade.
+ *
  * Convivencia entró tercera (URVA-97) y es la única de las seis que además
  * sirve páginas debajo de sí — un post por dirección, más abajo en este archivo.
  */
@@ -42,6 +49,7 @@ Route::get('/reporte-financiero', [ReporteFinancieroController::class, 'index'])
 Route::get('/actividades', [ActividadesController::class, 'index'])->name('actividades');
 Route::get('/convivencia', [ConvivenciaController::class, 'index'])->name('convivencia');
 Route::get('/vigilancia', [VigilanciaController::class, 'index'])->name('vigilancia');
+Route::get('/administracion', [AdministracionController::class, 'index'])->name('administracion');
 Route::get('/propuesta', [PropuestaController::class, 'index'])->name('propuesta');
 Route::view('/demanda', 'pages.demanda')->name('demanda');
 

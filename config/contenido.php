@@ -240,4 +240,133 @@ return [
 
     ],
 
+    /*
+     * La página de Administración (`/administracion`): el trámite con el que se
+     * está registrando la asociación civil, y las siete personas que hoy
+     * ocupan un cargo en los dos órganos.
+     *
+     * ## Por qué vive aquí y no en la base
+     *
+     * Por lo mismo que Vigilancia: son siete personas y cuatro pasos, no un
+     * catálogo que crezca, y no hay pantalla en el panel que los mantenga. El
+     * día que la Asamblea renueve cargos se edita este arreglo. Si algún día
+     * hay que llevar historial de quién ocupó qué y cuándo, esto se muda a la
+     * base y las clases de `App\Support\Administracion` se quedan igual.
+     *
+     * ## Los nombres van completos, y eso es distinto de Vigilancia
+     *
+     * En `vigilancia` el nombre lleva nombre de pila e inicial a propósito: son
+     * trabajadores y el apellido solo los vuelve buscables. Aquí van completos
+     * porque son cargos electos ante la Asamblea y el acta constitutiva los va
+     * a asentar así. **Las siete personas tienen que saber que su nombre y su
+     * foto se publican**, y quien no quiera su foto no la pone: la tarjeta se
+     * dibuja con el monograma y se ve igual de completa.
+     *
+     * ## Cómo se llena
+     *
+     * - `razon_social` — el nombre autorizado, tal como lo dio el trámite.
+     * - `tramite`      — los pasos en orden. `estado` es `listo`, `sigue` o
+     *                    `falta`; `sigue` marca el que está en curso y no
+     *                    debería haber más de uno.
+     * - `comite`       — los integrantes del Comité de Vigilancia. Son pares:
+     *                    no hay coordinador ni nadie al frente, y por eso el
+     *                    arreglo no tiene `cabeza`.
+     * - `cabeza`       — quien encabeza la Administración. Va aparte porque en
+     *                    el organigrama cuelga un nivel arriba de los demás.
+     * - `integrantes`  — el resto de la Administración, en el orden en que se
+     *                    dibujan de izquierda a derecha.
+     * - `foto`         — archivo dentro de `public/img/administracion/`, o
+     *                    `null` para el monograma. Las fotos **no se versionan**
+     *                    (ver `.gitignore`): este repositorio es público y el
+     *                    historial de git no se depura, así que si alguien
+     *                    retira su consentimiento borrar el archivo del
+     *                    servidor tiene que bastar.
+     * - `hace`         — una línea de qué hace ese cargo, que se lee abajo del
+     *                    organigrama. El Comité no la lleva: los tres hacen lo
+     *                    mismo y el párrafo de la sección ya lo dice.
+     */
+    'administracion' => [
+
+        'razon_social' => 'Fraccionamiento Vista Alta',
+
+        /*
+         * El trámite de constitución, en orden. La página lo publica tal cual,
+         * así que mientras el paso 2 diga `sigue` el sitio está afirmando que
+         * la firma todavía no ocurre: al firmarse hay que mover el estado aquí,
+         * o la página empieza a mentir.
+         *
+         * El detalle del paso 2 nombra un mes. Es deliberado —es lo que se le
+         * dijo a la Asamblea— y es lo primero que se echa a perder: cuando pase
+         * septiembre, este renglón se cambia.
+         */
+        'tramite' => [
+
+            [
+                'titulo' => 'Autorización del nombre',
+                'detalle' => 'Nos lo dieron como Fraccionamiento Vista Alta.',
+                'estado' => 'listo',
+            ],
+
+            [
+                'titulo' => 'Firma del acta constitutiva',
+                'detalle' => 'Ante notario. Esperamos que sea este mes de septiembre.',
+                'estado' => 'sigue',
+            ],
+
+            [
+                'titulo' => 'RFC de la asociación',
+                'detalle' => 'Se saca una vez firmada el acta.',
+                'estado' => 'falta',
+            ],
+
+            [
+                'titulo' => 'Cuenta bancaria del fraccionamiento',
+                'detalle' => 'Lo último, ya con el RFC.',
+                'estado' => 'falta',
+            ],
+
+        ],
+
+        'comite' => [
+
+            ['nombre' => 'Claudia Arriola', 'cargo' => 'Integrante', 'hace' => null, 'foto' => null],
+            ['nombre' => 'Fernando López', 'cargo' => 'Integrante', 'hace' => null, 'foto' => null],
+            ['nombre' => 'Rafael Rojas', 'cargo' => 'Integrante', 'hace' => null, 'foto' => null],
+
+        ],
+
+        'cabeza' => [
+            'nombre' => 'Lourdes Ríos',
+            'cargo' => 'Administradora',
+            'hace' => 'Coordina la operación del fraccionamiento y encabeza a la Administración.',
+            'foto' => null,
+        ],
+
+        'integrantes' => [
+
+            [
+                'nombre' => 'Hilda Contreras',
+                'cargo' => 'Secretaria',
+                'hace' => 'Levanta las actas de la Asamblea y resguarda los papeles.',
+                'foto' => null,
+            ],
+
+            [
+                'nombre' => 'Gaby Viorney',
+                'cargo' => 'Vocal',
+                'hace' => 'Echa la mano en lo que haga falta y suple a quien no pueda.',
+                'foto' => null,
+            ],
+
+            [
+                'nombre' => 'Urano González',
+                'cargo' => 'Tesorero',
+                'hace' => 'Lleva las cuentas y publica el reporte de cada mes.',
+                'foto' => null,
+            ],
+
+        ],
+
+    ],
+
 ];

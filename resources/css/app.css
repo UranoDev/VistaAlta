@@ -85,6 +85,143 @@
     }
 
     /*
+     * Organigrama de /administracion: la Asamblea arriba, el órgano debajo y
+     * los integrantes al pie.
+     *
+     * El conector es el mismo filete punteado del recibo, que es lo que lo
+     * amarra al sistema visual en vez de parecer un diagrama pegado encima.
+     *
+     * Va como clase y no con utilidades porque las líneas son `::before` y
+     * `::after`: la barra horizontal se arma con media barra por hijo, no con
+     * un travesaño de ancho fijo. Es lo que la mantiene pegada al centro de
+     * cada tarjeta con cualquier número de columnas — un travesaño en
+     * porcentajes se desalinea en cuanto cambia el ancho.
+     *
+     * Por lo mismo la fila **no lleva `gap`**: un hueco entre hermanos parte la
+     * barra en dos. La separación se pone con `padding` dentro de cada `li`.
+     */
+    .organigrama {
+        --organigrama-tramo: 26px;
+    }
+
+    .organigrama-nivel {
+        display: flex;
+        justify-content: center;
+    }
+
+    .organigrama-bajada {
+        width: 0;
+        height: var(--organigrama-tramo);
+        margin: 0 auto;
+        border-left: 1px dashed var(--color-linea);
+    }
+
+    .organigrama-fila {
+        display: flex;
+        justify-content: center;
+    }
+
+    .organigrama-fila > li {
+        position: relative;
+        flex: 1 1 0;
+        min-width: 0;
+        padding: var(--organigrama-tramo) 0.3rem 0;
+        text-align: center;
+    }
+
+    .organigrama-fila > li::before,
+    .organigrama-fila > li::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 50%;
+        width: 50%;
+        height: var(--organigrama-tramo);
+        border-top: 1px dashed var(--color-linea);
+    }
+
+    /* La mitad derecha trae además el bajante, que cae al centro de la tarjeta. */
+    .organigrama-fila > li::after {
+        right: auto;
+        left: 50%;
+        border-left: 1px dashed var(--color-linea);
+    }
+
+    .organigrama-fila > li:first-child::before {
+        border: 0 none;
+    }
+
+    .organigrama-fila > li:last-child::after {
+        border: 0 none;
+    }
+
+    /* Al último le toca sostener su propio bajante: su `::after` ya no dibuja. */
+    .organigrama-fila > li:last-child::before {
+        border-right: 1px dashed var(--color-linea);
+    }
+
+    /*
+     * Un nodo solo —la Administradora— mide exactamente lo que una columna de
+     * tres, para que su tarjeta calce con las de abajo a cualquier ancho. Sin
+     * barra horizontal: no tiene hermanos con quién emparejarse.
+     */
+    .organigrama-fila > li:only-child {
+        flex: 0 0 33.3333%;
+    }
+
+    .organigrama-fila > li:only-child::before {
+        border-top: 0 none;
+        border-right: 0 none;
+    }
+
+    .organigrama-fila > li:only-child::after {
+        border-top: 0 none;
+    }
+
+    /*
+     * En el celular el árbol se endereza: una columna con riel a la izquierda y
+     * una pleca por tarjeta. Tres columnas de 120 px no son un organigrama, son
+     * tres nombres partidos a la mitad.
+     */
+    @media (width < 40rem) {
+        .organigrama-nivel {
+            justify-content: flex-start;
+        }
+
+        .organigrama-bajada {
+            margin: 0 0 0 1.25rem;
+        }
+
+        .organigrama-fila {
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-left: 1.25rem;
+            padding-left: 1.25rem;
+            border-left: 1px dashed var(--color-linea);
+        }
+
+        .organigrama-fila > li,
+        .organigrama-fila > li:only-child {
+            flex: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .organigrama-fila > li::after {
+            border: 0 none;
+        }
+
+        .organigrama-fila > li::before {
+            top: 2.2rem;
+            left: -1.25rem;
+            width: 1.25rem;
+            height: 0;
+            border-top: 1px dashed var(--color-linea);
+            border-right: 0 none;
+        }
+    }
+
+    /*
      * El cuerpo de un post de Convivencia: el HTML que sale del Markdown que la
      * Mesa Directiva captura en el panel.
      *

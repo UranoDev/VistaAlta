@@ -89,12 +89,15 @@ class PortadaTest extends TestCase
      *
      * Convivencia entró tercera después (URVA-97), entre Actividades y
      * Vigilancia: se lee, no se pide.
+     *
+     * Y en la quinta posición Administración tomó el lugar de Propuesta
+     * (URVA-99), que salió del menú sin salir del sitio.
      */
     public function test_el_menu_lleva_el_orden_nuevo(): void
     {
         $contenido = $this->get('/propuesta')->getContent();
 
-        $esperado = ['reporte-financiero', 'actividades', 'convivencia', 'vigilancia', 'propuesta', 'demanda'];
+        $esperado = ['reporte-financiero', 'actividades', 'convivencia', 'vigilancia', 'administracion', 'demanda'];
 
         $posiciones = [];
 

@@ -1,31 +1,40 @@
 @php
     // Las páginas del sitio, en el orden en que se abren. Primero la cuenta del
     // mes —la portada, desde que `/` redirige ahí (URVA-95)—, luego lo que se
-    // hizo y quién cuida. La Propuesta bajó de primera a penúltima: sigue
-    // entera, con su formulario de Comentarios, pero ya no es por donde se
-    // entra. Demanda conserva el final porque no respalda a la Propuesta —pide
-    // algo distinto, y entrar por ahí dejaría la petición antes que el asunto
-    // que se somete a la Asamblea.
+    // hizo, quién cuida y quiénes sirven. Demanda conserva el final porque es la
+    // única que pide algo en vez de contar algo, y entrar por ahí dejaría la
+    // petición antes que las cuentas.
     //
     // La etiqueta se mantiene corta a propósito: con seis entradas el menú ya
     // se aprieta en móvil, y aquí lo que salva el renglón es el largo de cada
     // una, no el `flex-wrap`.
     //
-    // Convivencia entró tercera, entre Actividades y Vigilancia (URVA-97): es la
-    // sexta entrada, una más de las cinco que ya apretaban, y es una decisión
-    // tomada a sabiendas. Va ahí y no al final porque se lee, no se pide: las
-    // tres primeras son lo que la Mesa Directiva le cuenta al Colono, y las dos
-    // últimas son lo que le pide.
+    // Convivencia entró tercera, entre Actividades y Vigilancia (URVA-97). Va
+    // ahí y no al final porque se lee, no se pide: las primeras son lo que la
+    // Mesa Directiva le cuenta al Colono, y la última es lo que le pide.
     //
     // La entrada queda marcada como activa también dentro de un post, no solo en
     // el índice: `routeIs` se pregunta con comodín para que `/convivencia/loquesea`
     // siga señalando de qué sección es la página que se está leyendo.
+    //
+    // Administración entró junto a Vigilancia (URVA-99) porque hacen juego:
+    // quién cuida el acceso y quiénes ocupan los cargos. La etiqueta es la más
+    // larga de las seis y no se acorta a «Cargos» ni a «Mesa Directiva» —
+    // «Administración» es como se llama el órgano en el acta constitutiva.
+    //
+    // **Propuesta salió del menú** en el mismo cambio, y por eso el menú sigue
+    // teniendo seis entradas. Lo que sometía a consideración de la Asamblea ya
+    // está en trámite —el nombre de la asociación quedó autorizado— y por dónde
+    // va se rinde en Administración. La página sigue publicada y sigue
+    // recibiendo Comentarios; se entra por la liga que le deja «Lo que sigue»
+    // en `/actividades`, que es donde tiene sentido buscarla ahora. Si la
+    // Asamblea vuelve a someter algo a consideración, la entrada regresa.
     $navegacion = [
         ['ruta' => 'reporte-financiero', 'etiqueta' => 'Reporte financiero'],
         ['ruta' => 'actividades', 'etiqueta' => 'Actividades'],
         ['ruta' => 'convivencia', 'etiqueta' => 'Convivencia'],
         ['ruta' => 'vigilancia', 'etiqueta' => 'Vigilancia'],
-        ['ruta' => 'propuesta', 'etiqueta' => 'Propuesta'],
+        ['ruta' => 'administracion', 'etiqueta' => 'Administración'],
         ['ruta' => 'demanda', 'etiqueta' => 'Demanda'],
     ];
 @endphp

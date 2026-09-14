@@ -43,6 +43,14 @@
 # `config/contenido.php`, que solo dice cómo se llama el archivo.
 /public/img/vigilantes/*
 !/public/img/vigilantes/.gitkeep
+
+# Las caras de las siete personas que ocupan un cargo (URVA-99). Misma razón que
+# arriba, y más fuerte: aquí el nombre va completo, así que la foto queda ligada
+# a una persona identificable. Suben por SFTP al servidor; lo que sí se versiona
+# es la llave `foto` de `config/contenido.php`, que solo dice cómo se llama el
+# archivo. Si alguien retira su consentimiento, borrarlo del servidor basta.
+/public/img/administracion/*
+!/public/img/administracion/.gitkeep
 /storage/*.key
 /storage/pail
 /vendor

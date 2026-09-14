@@ -25,7 +25,22 @@ quien redacta todo lo que se publica y quien decide qué se cobra; ya no es el �
 rol que se autentica —el Colono también entra a ver lo suyo, y el Cobrador a
 capturar—, pero sigue siendo el único que publica.
 _Avoid_: Comité (además se presta a confusión con el `Comité de Vigilancia`, que es
-otro órgano y otro rol), administración, board
+otro órgano y otro rol), board. **Administración** ya no está prohibido y tampoco es
+un sinónimo libre: es el nombre con el que este mismo órgano se presenta en
+`/administracion` y en el acta constitutiva — ver su propia entrada, y sobre todo la
+advertencia de «la administración pasada»
+
+**Administración**:
+El nombre con el que la `Mesa Directiva` se presenta en `/administracion` y con el que
+la va a asentar el acta constitutiva, repartida en cuatro cargos: Administradora,
+Secretaria, Tesorero y Vocal. **Es el mismo órgano**, no un segundo cuerpo — hoy el
+sitio usa los dos nombres, «Mesa Directiva» en el encabezado, el panel y el código, y
+«Administración» en esa página, en el menú y en el acta. Unificarlos —o dejar por
+escrito por qué conviven— está pendiente (URVA-99).
+_Avoid_: **La administración pasada** — es la confusión que hay que cuidar y no es un
+matiz: eso es a quien `/demanda` le pide los `Comprobantes de depósito`, es anterior a
+esta Mesa Directiva y no tiene nada que ver con los cuatro cargos de arriba. Al
+escribir, decir cuál de las dos
 
 **Colono**:
 Propietario o residente de una Unidad en Vista Alta. En las páginas de rendición de
@@ -50,8 +65,13 @@ porta** — al portar el código hay que renombrarlo
 **Propuesta**:
 El planteamiento que la Mesa Directiva somete a consideración de la Asamblea:
 **formalizar** el fraccionamiento como figura legal. Es un único asunto, no una lista
-de obras, y es el eje del sitio — las Actividades y el Reporte financiero existen para
-darle respaldo, y los Comentarios se hacen sobre ella.
+de obras, y los Comentarios se hacen sobre ella.
+Dejó de ser el eje del sitio: el asunto ya está en trámite —el nombre de la asociación
+quedó autorizado en agosto de 2026— y por dónde va se rinde en `/administracion`. Por
+eso salió del menú en URVA-99. **La página no se retiró**: sigue publicada, sigue
+recibiendo Comentarios, y se llega a ella por la liga que le deja «Lo que sigue» en
+`/actividades`. Su texto y sus preguntas frecuentes todavía plantean a futuro lo que ya
+empezó, y eso está pendiente de actualizar.
 _Avoid_: Plan, iniciativa, proyecto, propuestas (en plural — aquí solo hay una)
 
 **Actividad**:
@@ -274,7 +294,14 @@ que ya podía hacer. `Mesa Directiva`, `Cobrador` y `Colono` están definidos ar
 donde se explica qué hace cada uno; aquí va el que no aparece en ninguna otra parte.
 
 **Comité de Vigilancia**:
-Rol que ve todo y **no modifica nada**. Existe para poder revisar sin poder tocar —
+El órgano que supervisa a la `Administración`, y el rol con el que lo hace dentro del
+sistema. Como órgano son tres colonos que elige la Asamblea —pares, sin coordinador ni
+nadie al frente— y se publican en `/administracion`; también se le dice Comité de
+Supervisión. **No es el equipo de la caseta**: los cuatro que cubren el acceso viven en
+`/vigilancia`, son trabajadores y no tienen nada que ver con este órgano — las dos
+páginas se llaman parecido y es la confusión fácil.
+
+Como rol: ve todo y **no modifica nada**. Existe para poder revisar sin poder tocar —
 padrón, cuotas, recibos y cortes de caja se le abren completos, y ninguna acción de
 escritura. Que el rol se acumule no lo contradice: no restringe a nadie, solo abre
 lectura.

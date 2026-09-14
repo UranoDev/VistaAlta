@@ -303,7 +303,7 @@ return [
 
             [
                 'titulo' => 'Autorización del nombre',
-                'detalle' => 'Nos lo dieron como Fraccionamiento Vista Alta.',
+                'detalle' => 'La Asociación quedará registrada como Fraccionamiento Vista Alta.',
                 'estado' => 'listo',
             ],
 

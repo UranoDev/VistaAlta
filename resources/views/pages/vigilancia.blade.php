@@ -31,7 +31,7 @@
     {{-- Lo único que cambia con el reloj, y lo único por lo que alguien vuelve. --}}
     <x-palette-receipt.seccion rotulo="Vigilancia" titulo="Quién cuida Vista Alta">
         <p class="text-grafito/85">
-            El acceso está cubierto las 24 horas, los siete días de la semana. Estas son las cuatro personas que hacen
+            El acceso está cuidado las 24 horas, los siete días de la semana. Estas son las cuatro personas que hacen
             la vigilancia del fraccionamiento, y quién está de guardia en este momento.
         </p>
 

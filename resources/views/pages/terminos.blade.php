@@ -31,7 +31,7 @@
                 <p>
                     El presente documento (&ldquo;Términos de Servicio&rdquo;) regula el acceso y uso del sitio
                     vistaaltatx.com (en adelante, el &ldquo;sitio&rdquo;), operado por la Mesa Directiva del
-                    Fraccionamiento Vista Alta Residencial (en adelante, la &ldquo;Mesa Directiva&rdquo;), con
+                    Fraccionamiento Vista Alta (en adelante, la &ldquo;Mesa Directiva&rdquo;), con
                     domicilio en Paseo del Girasol 81, Barrio de San Juan, Tequisquiapan, Querétaro, CP 76755, México.
                 </p>
                 <p>

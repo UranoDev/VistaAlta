@@ -81,7 +81,7 @@
                     cifra, el lugar es la hoja, no esta página.
                 --}}
                 <x-palette-receipt.nota class="mt-4">
-                    Estas son cifras de resumen, capturadas a mano por la Mesa Directiva. Si quieres saber de dónde
+                    Estas son cifras de resumen, capturadas a mano por la Administración. Si quieres saber de dónde
                     sale alguna, el lugar no es esta página: es la hoja de cálculo, donde está cada movimiento con su
                     fecha y su concepto.
                 </x-palette-receipt.nota>

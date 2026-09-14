@@ -4,7 +4,7 @@
             Fraccionamiento Vista Alta
         </p>
         <p class="mt-2 max-w-prose text-sm text-grafito/75">
-            Transparencia y Rendición de cuentas de la Mesa Directiva ante los Colonos.
+            Transparencia y Rendición de cuentas de la Administración ante los Colonos.
         </p>
 
         {{--

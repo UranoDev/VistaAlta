@@ -34,7 +34,7 @@
 
             <x-legal.seccion numero="1" titulo="Identidad y domicilio del responsable">
                 <p>
-                    Fraccionamiento Vista Alta Residencial, con domicilio en Paseo del Girasol 81, Barrio de San Juan,
+                    Fraccionamiento Vista Alta, con domicilio en Paseo del Girasol 81, Barrio de San Juan,
                     Tequisquiapan, Querétaro, CP 76755, México (en adelante, el &ldquo;Responsable&rdquo;), es
                     responsable del tratamiento de sus datos personales conforme al presente Aviso de Privacidad, en
                     cumplimiento de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares

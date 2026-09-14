@@ -373,21 +373,31 @@ como `vistaaltatx_vistaalta`. Cópialos del panel, no los escribas de memoria.
 
 ### Contenido inicial
 
-Las 21 Actividades del Periodo y el Reporte financiero viven en
+Este paso es del primer montaje de un entorno. Las Actividades del Periodo, el
+Reporte financiero y los posts de Convivencia viven en
 `database/seeders/contenido/contenido-inicial.php` y se siembran con:
 
 ```bash
 php artisan db:seed --class=ContenidoInicialSeeder --force
 ```
 
-Es idempotente: correrlo dos veces deja el sitio igual. Las Actividades se
-reconocen por fecha + texto exacto, así que **si editas una descripción en el
-seeder después de sembrar, la próxima siembra crea un duplicado en vez de
-actualizar**. El Reporte financiero se reconoce por el mes que cubre (`mes`), así
-que resembrarlo corrige ese mes; **cambiar el `mes` en el archivo agrega un
-reporte nuevo al histórico en vez de reemplazar al que ya estaba**
-(`docs/adr/0005`). Cuando el sitio ya esté al aire, las Actividades y los meses
-nuevos se capturan desde `/admin`, no aquí.
+**Contra producción ya no se corre.** Desde que el sitio está al aire, el
+contenido se captura y se corrige en `/admin`, y el archivo se quedó con la
+redacción del día en que se sembró. Las Actividades se reconocen por fecha +
+texto exacto, así que una que alguien haya editado en el panel ya no coincide
+con el archivo y la siembra la inserta de nuevo. Pasó el 2026-09-13 con la
+Actividad del turno de vigilancia: el renglón duplicado entra con `created_at`
+de hoy, así que la página de Actividades lo anuncia «Se agregó» durante siete
+días. Si alguna vez hace falta correrlo aquí —material nuevo que llega en
+bloque—, cuenta los renglones antes y después (`Actividad::count()`,
+`Pendiente::count()`, `Post::count()`) y borra el duplicado que aparezca,
+conservando el del panel.
+
+Lo demás del reconocimiento, para cuando siembres un entorno nuevo: es
+idempotente, los Pendientes se reconocen por su título, los posts por su
+dirección, y el Reporte financiero por el mes que cubre, así que resembrarlo
+corrige ese mes; **cambiar el `mes` en el archivo agrega un reporte nuevo al
+histórico en vez de reemplazar al que ya estaba** (`docs/adr/0005`).
 
 ### La cuenta del panel
 Proceso interactivo
@@ -479,8 +489,12 @@ git pull
 composer install --no-dev --optimize-autoloader
 npm ci && npm run build          # solo si cambió el front
 php artisan migrate --force
+php artisan storage:link         # solo si el árbol es nuevo: el enlace no está en git
 php artisan optimize             # limpia y rehace config/route/view cache
+php artisan queue:restart        # el worker viejo sigue en memoria con el código viejo
 ```
+
+La siembra de contenido no va aquí: ver «Contenido inicial» en la sección 6.
 
 **Nunca** corras `git clean -fdx` en el servidor: se lleva `.env`, `public/build`
 y el `.node-version`, que son justamente lo que no está en git.

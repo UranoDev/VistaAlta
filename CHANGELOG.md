@@ -58,6 +58,10 @@
 - **URVA-30**: ADR: cuotas en urge sin tenancy, y el sistema manda sobre el ingreso por cuotas _(cerrado 2026-08-02 20:38)_
 - **URVA-28**: Legal: declarar en el Aviso y los Términos el tratamiento de datos para control de pagos _(cerrado 2026-08-02 20:29)_
 
+## [2026.09.13.1] - 2026 sep 13
+### Features
+- **URVA-99**: La página de Administración presenta a los dos órganos y el trámite de la asociación civil
+
 ## [2026.09.13] - 2026 sep 13
 ### Features
 - **URVA-98**: Sembrar el primer post de Convivencia: manejo de la basura

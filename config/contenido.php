@@ -328,16 +328,16 @@ return [
         ],
 
         /*
-         * Los tres del Comité todavía no mandan foto, así que salen con su
-         * monograma. No es un pendiente de maquetado: la tarjeta está hecha
-         * para verse igual de completa con foto o sin ella, y quien decida no
-         * publicar la suya se queda así.
+         * Claudia todavía no manda foto, así que sale con su monograma. No es un
+         * pendiente de maquetado: la tarjeta está hecha para verse igual de
+         * completa con foto o sin ella, y quien decida no publicar la suya se
+         * queda así — el monograma es la forma definitiva, no un hueco.
          */
         'comite' => [
 
             ['nombre' => 'Claudia Arriola', 'cargo' => 'Integrante', 'hace' => null, 'foto' => null],
-            ['nombre' => 'Fernando López', 'cargo' => 'Integrante', 'hace' => null, 'foto' => null],
-            ['nombre' => 'Rafael Rojas', 'cargo' => 'Integrante', 'hace' => null, 'foto' => null],
+            ['nombre' => 'Fernando López', 'cargo' => 'Integrante', 'hace' => null, 'foto' => 'fernando.jpeg'],
+            ['nombre' => 'Rafael Rojas', 'cargo' => 'Integrante', 'hace' => null, 'foto' => 'rafael.jpeg'],
 
         ],
 

@@ -327,6 +327,12 @@ return [
 
         ],
 
+        /*
+         * Los tres del Comité todavía no mandan foto, así que salen con su
+         * monograma. No es un pendiente de maquetado: la tarjeta está hecha
+         * para verse igual de completa con foto o sin ella, y quien decida no
+         * publicar la suya se queda así.
+         */
         'comite' => [
 
             ['nombre' => 'Claudia Arriola', 'cargo' => 'Integrante', 'hace' => null, 'foto' => null],
@@ -339,7 +345,7 @@ return [
             'nombre' => 'Lourdes Ríos',
             'cargo' => 'Administradora',
             'hace' => 'Coordina la operación del fraccionamiento y encabeza a la Administración.',
-            'foto' => null,
+            'foto' => 'lourdes.jpeg',
         ],
 
         'integrantes' => [
@@ -348,21 +354,21 @@ return [
                 'nombre' => 'Hilda Contreras',
                 'cargo' => 'Secretaria',
                 'hace' => 'Levanta las actas de la Asamblea y resguarda los papeles.',
-                'foto' => null,
+                'foto' => 'hilda.jpeg',
             ],
 
             [
                 'nombre' => 'Gaby Viorney',
                 'cargo' => 'Vocal',
                 'hace' => 'Echa la mano en lo que haga falta y suple a quien no pueda.',
-                'foto' => null,
+                'foto' => 'gaby.jpeg',
             ],
 
             [
                 'nombre' => 'Urano González',
                 'cargo' => 'Tesorero',
                 'hace' => 'Lleva las cuentas y publica el reporte de cada mes.',
-                'foto' => null,
+                'foto' => 'urano.jpeg',
             ],
 
         ],

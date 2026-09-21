@@ -117,7 +117,7 @@ return [
     ],
 
     /*
-     * Las cuatro personas que hacen la vigilancia, y el rol con el que la
+     * Las cinco personas que hacen la vigilancia, y el rol con el que la
      * página calcula quién está de guardia (URVA-79).
      *
      * ## Lo que la página publica y lo que no
@@ -126,8 +126,8 @@ return [
      * el acceso, pero **la página no los imprime en ningún lado**. Lo que se lee
      * en cada tarjeta es `etiqueta`, un rótulo escrito a mano. Publicar el
      * horario —o la hora del relevo— equivale a publicar el rol completo: quien
-     * consulte cuatro veces lo reconstruye, y son cuatro personas cubriendo un
-     * acceso. Hay una prueba que revisa que las horas no se cuelen al HTML.
+     * consulte unas cuantas veces lo reconstruye, y son cinco personas cubriendo
+     * un acceso. Hay una prueba que revisa que las horas no se cuelen al HTML.
      *
      * Por lo mismo `nombre` lleva nombre de pila e inicial y nunca el apellido
      * completo: lo que le sirve al colono para reconocer a quien está en el
@@ -149,9 +149,10 @@ return [
      *                domingo), no de salida. `sale` menor o igual que `entra`
      *                cruza la medianoche; iguales son 24 horas corridas.
      *
-     * Los cuatro turnos de abajo cubren la semana completa sin hueco y sin
+     * Los cinco turnos de abajo cubren la semana completa sin hueco y sin
      * traslape. Las costuras que hay que respetar al editarlos son sábado 22:00
-     * → domingo 06:00 y domingo 06:00 → lunes 06:00.
+     * → domingo 06:00, domingo 18:00 y domingo 18:00 → lunes 06:00. El domingo
+     * se parte en dos desde que entró Alberto H.: Eduardo lo cubría corrido.
      */
     'vigilancia' => [
 
@@ -198,13 +199,26 @@ return [
 
             [
                 'nombre' => 'Eduardo',
-                'etiqueta' => 'Turno de domingo',
+                'etiqueta' => 'Domingo de día',
                 'foto' => 'eduardo.jpeg',
                 'desde' => '2026-08-02',
-                // 24 horas corridas: entra el domingo a las 06:00 y entrega el
-                // lunes a la misma hora. `sale` igual que `entra` es eso.
+                // Entrega a las 18:00. Hasta que entró Alberto H. cubría el
+                // domingo corrido, de 06:00 a 06:00 del lunes.
                 'turnos' => [
-                    ['dias' => [7], 'entra' => '06:00', 'sale' => '06:00'],
+                    ['dias' => [7], 'entra' => '06:00', 'sale' => '18:00'],
+                ],
+            ],
+
+            [
+                'nombre' => 'Alberto H.',
+                'etiqueta' => 'Domingo de noche',
+                'foto' => 'alberto.jpeg',
+                'desde' => '2026-09-20',
+                // Entra el domingo y entrega el lunes a las 06:00, cuando llega
+                // el turno de mañana. Cruza la medianoche, por eso `sale` es
+                // menor que `entra`.
+                'turnos' => [
+                    ['dias' => [7], 'entra' => '18:00', 'sale' => '06:00'],
                 ],
             ],
 

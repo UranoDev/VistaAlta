@@ -74,8 +74,8 @@ class RolDeVigilanciaTest extends TestCase
      * abierto por la derecha, así que a las 14:00 en punto ya entró el de la
      * tarde. Las costuras del fin de semana son las que más fácil se rompen al
      * editar la configuración: el domingo a la 01:00 quien está es el del sábado
-     * por la noche, y el lunes a las 05:59 sigue siendo el del domingo, que
-     * entró 24 horas antes.
+     * por la noche, y el lunes a las 05:59 sigue siendo el que entró el domingo
+     * a las 18:00.
      */
     #[DataProvider('momentos')]
     public function test_quien_esta_de_guardia_en_cada_borde(string $momento, string $etiquetaEsperada): void
@@ -109,11 +109,13 @@ class RolDeVigilanciaTest extends TestCase
             'domingo 01:00' => ['2026-08-09 01:00', 'Turno de noche'],
             'domingo 05:59' => ['2026-08-09 05:59', 'Turno de noche'],
 
-            // Las 24 horas corridas del domingo, y la entrega del lunes.
-            'domingo 06:00' => ['2026-08-09 06:00', 'Turno de domingo'],
-            'domingo 23:00' => ['2026-08-09 23:00', 'Turno de domingo'],
-            'lunes 03:00' => ['2026-08-10 03:00', 'Turno de domingo'],
-            'lunes 05:59' => ['2026-08-10 05:59', 'Turno de domingo'],
+            // El domingo partido en dos, y la entrega del lunes.
+            'domingo 06:00' => ['2026-08-09 06:00', 'Domingo de día'],
+            'domingo 17:59' => ['2026-08-09 17:59', 'Domingo de día'],
+            'domingo 18:00' => ['2026-08-09 18:00', 'Domingo de noche'],
+            'domingo 23:00' => ['2026-08-09 23:00', 'Domingo de noche'],
+            'lunes 03:00' => ['2026-08-10 03:00', 'Domingo de noche'],
+            'lunes 05:59' => ['2026-08-10 05:59', 'Domingo de noche'],
             'lunes 06:00' => ['2026-08-10 06:00', 'Turno de mañana'],
         ];
     }

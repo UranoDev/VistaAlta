@@ -2,15 +2,15 @@
     Quién cuida el fraccionamiento (URVA-79).
 
     Es la única página del sitio que publica datos personales de terceros
-    —nombre y cara de cuatro trabajadores—, y de ahí salen casi todas sus reglas
+    —el nombre y la cara de quienes cuidan el acceso—, y de ahí salen casi todas sus reglas
     de redacción. Las tres que no se pueden deshacer sin volver a decidirlas:
 
     1. **No se imprime ningún horario.** Las horas están en la configuración
        porque sin ellas no se puede calcular quién está de guardia, pero no
-       aparecen aquí, y tampoco la hora del relevo. Quien consulte cuatro veces
-       una página que dice «hasta las 06:00» ya reconstruyó el rol completo, y
-       son cuatro personas cubriendo un acceso. Lo que se lee es el rótulo del
-       turno.
+       aparecen aquí, y tampoco la hora del relevo. Quien consulte unas cuantas
+       veces una página que dice «hasta las 06:00» ya reconstruyó el rol completo,
+       y es un puñado de personas cubriendo un acceso. Lo que se lee es el rótulo
+       del turno.
 
     2. **No se publica la liga del grupo de WhatsApp.** Una liga de invitación
        es una credencial al portador: quien la tenga entra, desde donde sea y
@@ -31,7 +31,7 @@
     {{-- Lo único que cambia con el reloj, y lo único por lo que alguien vuelve. --}}
     <x-palette-receipt.seccion rotulo="Vigilancia" titulo="Quién cuida Vista Alta">
         <p class="text-grafito/85">
-            El acceso está cuidado las 24 horas, los siete días de la semana. Estas son las cuatro personas que hacen
+            El acceso está cuidado las 24 horas, los siete días de la semana. Estas son las personas que hacen
             la vigilancia del fraccionamiento, y quién está de guardia en este momento.
         </p>
 
@@ -53,7 +53,7 @@
                 </div>
             @else
                 {{--
-                    Hoy no puede pasar —los cuatro turnos cubren la semana entera
+                    Hoy no puede pasar —los turnos cubren la semana entera
                     y hay una prueba que lo exige—, pero la configuración se llena
                     a mano. El día que alguien recorte un horario, la página dice
                     que no sabe en vez de inventar a alguien.
@@ -76,9 +76,9 @@
         </x-palette-receipt.tarjeta>
     </x-palette-receipt.seccion>
 
-    <x-palette-receipt.seccion rotulo="Los cuatro vigilantes" titulo="Quiénes están y cuándo les toca" :lectura="false">
+    <x-palette-receipt.seccion rotulo="Los vigilantes" titulo="Quiénes están y cuándo les toca" :lectura="false">
         <p class="max-w-(--container-lectura) text-grafito/85">
-            Entre las cuatro se cubre la semana completa, sin horas descubiertas.
+            Entre todos se cubre la semana completa, sin horas descubiertas.
         </p>
 
         <ul class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">

@@ -76,13 +76,24 @@ return [
     | by Laravel's translation / localization methods. This option can be
     | set to any locale for which you plan to have translation strings.
     |
+    | ESTE SITIO ESTÁ EN ESPAÑOL Y NO LO DECIDE EL SERVIDOR (URVA-108). El
+    | idioma iba en el `.env`, que es como viene Laravel de fábrica porque el
+    | esqueleto no sabe para qué se va a usar. Aquí sí se sabe: el sitio está
+    | escrito en español y sus fechas también, en cualquier máquina. Con el
+    | valor en el entorno, un `.env` llenado a mano —el de producción lo
+    | estaba— cae en inglés sin que falle nada, y la página publica «Sunday 20
+    | de September de 2026» hasta que alguien lo nota.
+    |
+    | Si algún día hace falta otro idioma en una petición, se pide con
+    | `App::setLocale()` donde toque, que es donde se decide por petición.
+    |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => 'es',
 
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => 'es',
 
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale' => env('APP_FAKER_LOCALE', 'es_MX'),
 
     /*
     |--------------------------------------------------------------------------

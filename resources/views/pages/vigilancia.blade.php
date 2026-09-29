@@ -99,9 +99,15 @@
             @endforeach
         </ul>
 
-        <x-palette-receipt.nota variante="exito" class="mt-6 max-w-(--container-lectura)">
-            Con el turno de domingo quedó cerrado el último hueco de cobertura. Era uno de los pendientes publicados en
-            <a href="{{ route('actividades') }}" class="font-medium underline underline-offset-2">«Lo que sigue»</a>.
+        {{--
+            Quien se va se nombra una vez y sin motivo. Al colono le sirve saber
+            que si ve a Eduardo en el acceso no está de guardia; por qué dejó de
+            estar es su situación laboral, y eso no se publica en el sitio de su
+            lugar de trabajo (ver `config/contenido.php`). Este renglón se retira
+            cuando deje de ser noticia.
+        --}}
+        <x-palette-receipt.nota class="mt-6 max-w-(--container-lectura)">
+            Eduardo ya no forma parte del equipo de vigilancia. El turno de domingo lo cubre Alberto H.
         </x-palette-receipt.nota>
     </x-palette-receipt.seccion>
 

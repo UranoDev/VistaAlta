@@ -144,15 +144,21 @@ return [
      *                cara no tiene por qué.
      * - `desde`    — `AAAA-MM-DD`, opcional. Solo la fecha de incorporación: la
      *                situación laboral de una persona identificada no se publica
-     *                en el sitio de su lugar de trabajo.
+     *                en el sitio de su lugar de trabajo. Quien deja el servicio
+     *                se retira de este arreglo **y su foto se borra del
+     *                servidor**, que es lo que vuelve real el consentimiento
+     *                revocable prometido en `.gitignore`.
      * - `turnos`   — `dias` son días de **entrada** en ISO-8601 (1 lunes … 7
      *                domingo), no de salida. `sale` menor o igual que `entra`
      *                cruza la medianoche; iguales son 24 horas corridas.
      *
-     * Los cinco turnos de abajo cubren la semana completa sin hueco y sin
-     * traslape. Las costuras que hay que respetar al editarlos son sábado 22:00
-     * → domingo 06:00, domingo 18:00 y domingo 18:00 → lunes 06:00. El domingo
-     * se parte en dos desde que entró Alberto H.: Eduardo lo cubría corrido.
+     * Las cuatro personas de abajo cubren la semana completa sin hueco y sin
+     * traslape, con cinco turnos entre todas. Las costuras que hay que respetar
+     * al editarlos son sábado 22:00 → domingo 06:00, domingo 06:00 → lunes
+     * 06:00, y el martes por la noche, que es el descanso de Hugo y lo cubre
+     * Alberto H. — ahí `dias` de los dos tiene que cuadrar o la noche del
+     * martes queda descubierta o con dos personas. El domingo es una sola
+     * pieza: estuvo partido en dos mientras hubo dos personas cubriéndolo.
      */
     'vigilancia' => [
 
@@ -190,35 +196,27 @@ return [
                 'etiqueta' => 'Turno de noche',
                 'foto' => 'hugo.jpeg',
                 'desde' => null,
-                // Entra de lunes a sábado y sale al día siguiente. El domingo a
-                // la 01:00 quien está es el que entró el sábado.
+                // Entra de lunes a sábado menos el martes, que descansa, y sale
+                // al día siguiente. El domingo a la 01:00 quien está es el que
+                // entró el sábado.
                 'turnos' => [
-                    ['dias' => [1, 2, 3, 4, 5, 6], 'entra' => '22:00', 'sale' => '06:00'],
-                ],
-            ],
-
-            [
-                'nombre' => 'Eduardo',
-                'etiqueta' => 'Domingo de día',
-                'foto' => 'eduardo.jpeg',
-                'desde' => '2026-08-02',
-                // Entrega a las 18:00. Hasta que entró Alberto H. cubría el
-                // domingo corrido, de 06:00 a 06:00 del lunes.
-                'turnos' => [
-                    ['dias' => [7], 'entra' => '06:00', 'sale' => '18:00'],
+                    ['dias' => [1, 3, 4, 5, 6], 'entra' => '22:00', 'sale' => '06:00'],
                 ],
             ],
 
             [
                 'nombre' => 'Alberto H.',
-                'etiqueta' => 'Domingo de noche',
+                'etiqueta' => 'Domingo y noche del martes',
                 'foto' => 'alberto.jpeg',
                 'desde' => '2026-09-20',
-                // Entra el domingo y entrega el lunes a las 06:00, cuando llega
-                // el turno de mañana. Cruza la medianoche, por eso `sale` es
-                // menor que `entra`.
+                // Dos turnos, y por eso la etiqueta nombra los dos días. El
+                // domingo corrido: entra a las 06:00 y entrega el lunes a la
+                // misma hora, cuando llega el turno de mañana —`entra` y `sale`
+                // iguales son 24 horas seguidas—. Y la noche del martes, que es
+                // el descanso de Hugo.
                 'turnos' => [
-                    ['dias' => [7], 'entra' => '18:00', 'sale' => '06:00'],
+                    ['dias' => [7], 'entra' => '06:00', 'sale' => '06:00'],
+                    ['dias' => [2], 'entra' => '22:00', 'sale' => '06:00'],
                 ],
             ],
 

@@ -75,7 +75,9 @@ class RolDeVigilanciaTest extends TestCase
      * tarde. Las costuras del fin de semana son las que más fácil se rompen al
      * editar la configuración: el domingo a la 01:00 quien está es el del sábado
      * por la noche, y el lunes a las 05:59 sigue siendo el que entró el domingo
-     * a las 18:00.
+     * a las 06:00 —el domingo es un turno corrido de 24 horas—. La otra es el
+     * martes por la noche, que Hugo descansa y cubre Alberto H.: ahí el
+     * miércoles a las 05:59 sigue siendo Alberto, no el turno de noche.
      */
     #[DataProvider('momentos')]
     public function test_quien_esta_de_guardia_en_cada_borde(string $momento, string $etiquetaEsperada): void
@@ -96,12 +98,19 @@ class RolDeVigilanciaTest extends TestCase
     {
         return [
             // Un miércoles cualquiera, los tres relevos.
-            'miércoles 05:59' => ['2026-08-05 05:59', 'Turno de noche'],
+            'miércoles 05:59' => ['2026-08-05 05:59', 'Domingo y noche del martes'],
             'miércoles 06:00' => ['2026-08-05 06:00', 'Turno de mañana'],
             'miércoles 13:59' => ['2026-08-05 13:59', 'Turno de mañana'],
             'miércoles 14:00' => ['2026-08-05 14:00', 'Turno de tarde'],
             'miércoles 21:59' => ['2026-08-05 21:59', 'Turno de tarde'],
             'miércoles 22:00' => ['2026-08-05 22:00', 'Turno de noche'],
+
+            // El descanso de Hugo: el martes por la noche entra Alberto H., y
+            // entrega el miércoles a las 06:00 como cualquier otra noche. Es la
+            // costura que se rompe si `dias` de los dos deja de cuadrar.
+            'martes 21:59' => ['2026-08-04 21:59', 'Turno de tarde'],
+            'martes 22:00' => ['2026-08-04 22:00', 'Domingo y noche del martes'],
+            'martes 23:30' => ['2026-08-04 23:30', 'Domingo y noche del martes'],
 
             // La costura del sábado a domingo: el turno de noche entra el sábado
             // y sale el domingo, antes de que empiece el de domingo.
@@ -109,13 +118,16 @@ class RolDeVigilanciaTest extends TestCase
             'domingo 01:00' => ['2026-08-09 01:00', 'Turno de noche'],
             'domingo 05:59' => ['2026-08-09 05:59', 'Turno de noche'],
 
-            // El domingo partido en dos, y la entrega del lunes.
-            'domingo 06:00' => ['2026-08-09 06:00', 'Domingo de día'],
-            'domingo 17:59' => ['2026-08-09 17:59', 'Domingo de día'],
-            'domingo 18:00' => ['2026-08-09 18:00', 'Domingo de noche'],
-            'domingo 23:00' => ['2026-08-09 23:00', 'Domingo de noche'],
-            'lunes 03:00' => ['2026-08-10 03:00', 'Domingo de noche'],
-            'lunes 05:59' => ['2026-08-10 05:59', 'Domingo de noche'],
+            // El domingo corrido, y la entrega del lunes. Las 18:00 se quedan
+            // como caso aunque ya no haya relevo ahí: fue una costura real
+            // mientras dos personas se repartían el domingo, y es el minuto que
+            // se rompería primero si alguien vuelve a partirlo.
+            'domingo 06:00' => ['2026-08-09 06:00', 'Domingo y noche del martes'],
+            'domingo 17:59' => ['2026-08-09 17:59', 'Domingo y noche del martes'],
+            'domingo 18:00' => ['2026-08-09 18:00', 'Domingo y noche del martes'],
+            'domingo 23:00' => ['2026-08-09 23:00', 'Domingo y noche del martes'],
+            'lunes 03:00' => ['2026-08-10 03:00', 'Domingo y noche del martes'],
+            'lunes 05:59' => ['2026-08-10 05:59', 'Domingo y noche del martes'],
             'lunes 06:00' => ['2026-08-10 06:00', 'Turno de mañana'],
         ];
     }

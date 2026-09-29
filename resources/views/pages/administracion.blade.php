@@ -42,6 +42,10 @@
         'falta' => 'border border-dashed border-linea text-grafito/55',
     ];
 
+    // El rótulo por omisión de cada estado. Un paso puede traer el suyo en
+    // `rotulo` y entonces ese manda: sirve para que el que está en curso diga
+    // el mes en que se espera en vez de un «Sigue» que no compromete a nada.
+    // El color lo sigue poniendo el estado, no el rótulo.
     $rotulos = ['listo' => 'Listo', 'sigue' => 'Sigue', 'falta' => 'Falta'];
 @endphp
 
@@ -56,8 +60,8 @@
                 autorizaron el nombre, y quedó como <strong class="font-semibold text-tinta">{{ $razonSocial }}</strong>.
             </p>
             <p>
-                Lo que sigue es firmar ante notario el acta constitutiva (esperamos que sea este mes de septiembre) y
-                sacar el RFC. Con eso en la mano abrimos la cuenta bancaria, y de ahí en adelante el dinero del
+                Lo que sigue es firmar ante notario el acta constitutiva (tenemos cita en notaría para octubre) y
+                sacar el RFC (estamos en espera de que nos asignen fecha). Con eso en la mano abrimos la cuenta bancaria, y de ahí en adelante el dinero del
                 fraccionamiento va a estar a nombre de la asociación.
             </p>
         </div>
@@ -98,7 +102,7 @@
                         </span>
 
                         <span class="cifra flex-none px-2 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] {{ $chips[$paso['estado']] ?? $chips['falta'] }}">
-                            {{ $rotulos[$paso['estado']] ?? $paso['estado'] }}
+                            {{ $paso['rotulo'] ?? $rotulos[$paso['estado']] ?? $paso['estado'] }}
                         </span>
                     </li>
                 @endforeach

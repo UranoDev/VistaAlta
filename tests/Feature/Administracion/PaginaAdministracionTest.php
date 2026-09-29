@@ -85,6 +85,23 @@ class PaginaAdministracionTest extends TestCase
     }
 
     /**
+     * Un paso puede rotular su chip con algo propio sin dejar de llevar el
+     * color de su estado. Es lo que deja que el paso en curso diga el mes en
+     * que se espera —que compromete— en vez de un «Sigue» que no dice nada.
+     */
+    public function test_un_paso_puede_traer_su_propio_rotulo(): void
+    {
+        config(['contenido.administracion.tramite' => [
+            ['titulo' => 'Firma del acta', 'detalle' => 'Ante notario.', 'estado' => 'sigue', 'rotulo' => 'Octubre'],
+            ['titulo' => 'RFC', 'detalle' => 'Después.', 'estado' => 'sigue'],
+        ]]);
+
+        $this->get(route('administracion'))
+            ->assertSee('Octubre')
+            ->assertSee('Sigue');
+    }
+
+    /**
      * El Comité va antes que la Administración: el contrapeso se lee antes que
      * a quien supervisa.
      */

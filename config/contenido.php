@@ -281,7 +281,10 @@ return [
      * - `razon_social` — el nombre autorizado, tal como lo dio el trámite.
      * - `tramite`      — los pasos en orden. `estado` es `listo`, `sigue` o
      *                    `falta`; `sigue` marca el que está en curso y no
-     *                    debería haber más de uno.
+     *                    debería haber más de uno. `rotulo` es opcional y
+     *                    cambia lo que dice el chip sin cambiar su color: el
+     *                    paso en curso lo usa para decir el mes en que se
+     *                    espera, que compromete más que un «Sigue».
      * - `comite`       — los integrantes del Comité de Vigilancia. Son pares:
      *                    no hay coordinador ni nadie al frente, y por eso el
      *                    arreglo no tiene `cabeza`.
@@ -309,9 +312,10 @@ return [
          * la firma todavía no ocurre: al firmarse hay que mover el estado aquí,
          * o la página empieza a mentir.
          *
-         * El detalle del paso 2 nombra un mes. Es deliberado —es lo que se le
-         * dijo a la Asamblea— y es lo primero que se echa a perder: cuando pase
-         * septiembre, este renglón se cambia.
+         * El detalle del paso 2 nombra un mes. Es deliberado —es la cita que ya
+         * está agendada— y es lo primero que se echa a perder: cuando pase
+         * octubre, este renglón se cambia, y si para entonces ya se firmó, lo
+         * que se mueve es el `estado`.
          */
         'tramite' => [
 
@@ -323,13 +327,14 @@ return [
 
             [
                 'titulo' => 'Firma del acta constitutiva',
-                'detalle' => 'Se deberá hacer ante Notario Público. Esperamos que sea este mes de septiembre.',
+                'detalle' => 'Se deberá hacer ante Notario Público. Tenemos cita en notaría para octubre.',
                 'estado' => 'sigue',
+                'rotulo' => 'Octubre',
             ],
 
             [
                 'titulo' => 'RFC de la asociación',
-                'detalle' => 'Se tramita una vez firmada el acta',
+                'detalle' => 'Se tramita una vez firmada el acta. Estamos en espera de que nos asignen fecha',
                 'estado' => 'falta',
             ],
 

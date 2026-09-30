@@ -121,12 +121,13 @@ class PaginaReporteFinancieroTest extends TestCase
     }
 
     /**
-     * El PDF va **primero** y es el botón principal, porque es por donde la
-     * mayoría va a querer entrar; la hoja pasa a secundario, sin peso de color.
-     * Y la página sigue diciendo cuál de los dos vale: el PDF es una copia que
-     * alguien generó en una fecha, y si la hoja cambió después se queda atrás.
+     * El PDF va **primero**, porque es por donde la mayoría va a querer entrar,
+     * pero los dos botones son **iguales**: son dos formas de ver lo mismo y no
+     * una acción principal y otra secundaria. Cuál de los dos vale lo dice el
+     * párrafo, no el estilo: el PDF es una copia que alguien generó en una fecha,
+     * y si la hoja cambió después se queda atrás.
      */
-    public function test_con_pdf_y_hoja_salen_los_dos_el_pdf_primero_y_la_hoja_vale(): void
+    public function test_con_pdf_y_hoja_salen_los_dos_iguales_el_pdf_primero_y_la_hoja_vale(): void
     {
         $this->sembrar([
             'hoja_url' => 'https://docs.google.com/spreadsheets/d/abc123/edit',
@@ -140,10 +141,11 @@ class PaginaReporteFinancieroTest extends TestCase
         $respuesta->assertDontSee('la que vale es el PDF');
         $respuesta->assertSee('Se abren en una pestaña nueva, fuera de este sitio (drive.google.com y docs.google.com)');
 
-        // La principal es la de tinta; la de la hoja baja a contorno.
+        // Los dos llevan relleno de tinta; ninguno baja a contorno.
         $contenido = $respuesta->getContent();
         $this->assertMatchesRegularExpression('/bg-tinta[^"]*"[^>]*>\s*Ver el desglose en PDF/s', $contenido);
-        $this->assertMatchesRegularExpression('/border border-tinta[^"]*"[^>]*>\s*Ver el desglose en la hoja/s', $contenido);
+        $this->assertMatchesRegularExpression('/bg-tinta[^"]*"[^>]*>\s*Ver el desglose en la hoja/s', $contenido);
+        $this->assertStringNotContainsString('border border-tinta', $contenido);
     }
 
     /**

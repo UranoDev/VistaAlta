@@ -109,10 +109,11 @@
         @if ($reporte->tieneDesglose())
             {{--
                 Dos enlaces al mismo contenido: el PDF, que se lee mejor en el
-                celular, y la hoja, que es la fuente de verdad. El PDF va primero
-                y es el botón principal porque es por donde la mayoría va a
-                querer entrar; la hoja pasa a ser el secundario. Con uno solo,
-                ese es el principal.
+                celular, y la hoja, que es la fuente de verdad. Son dos formas de
+                ver lo mismo y no una acción principal y otra secundaria, así que
+                los dos llevan relleno y pesan igual; el PDF va primero porque es
+                por donde la mayoría va a querer entrar. Cuál de los dos vale lo
+                dice el párrafo de arriba, no el estilo del botón.
 
                 Se asignan con la directiva de una línea y no con un bloque de
                 varias, porque este archivo ya trae una de una línea arriba y
@@ -157,7 +158,6 @@
 
                     @if ($reporte->tieneHoja())
                         <x-palette-receipt.boton :href="$reporte->hoja_url"
-                                        :variante="$conPdfYHoja ? 'contorno' : 'tinta'"
                                         target="_blank"
                                         rel="noopener noreferrer">
                             Ver el desglose en la hoja de cálculo

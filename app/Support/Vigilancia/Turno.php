@@ -52,7 +52,21 @@ final readonly class Turno
         );
     }
 
+    public function cubre(CarbonInterface $momento): bool
+    {
+        return $this->entrada($momento) !== null;
+    }
+
     /**
+     * El instante en que entró el tramo que cubre `$momento`, o `null` si
+     * ninguno lo cubre.
+     *
+     * Existe para que una suplencia pueda preguntar **de qué día es** el turno
+     * que está corriendo: a las 03:00 del jueves quien está entró el miércoles,
+     * y es el miércoles —el día de entrada— el que decide si ese turno se cubre.
+     * Con solo «cubre o no cubre» la madrugada se contaría como del día en que
+     * amanece.
+     *
      * Se mira el día del momento y también el anterior: un tramo que cruza la
      * medianoche empezó ayer, y preguntando solo por hoy la madrugada saldría
      * descubierta. Con un día de atraso basta porque ninguno pasa de 24 horas.
@@ -62,7 +76,7 @@ final readonly class Turno
      * minuto del relevo habría dos de guardia —o, con el criterio al revés,
      * ninguno—, y es justo el instante que la prueba de cobertura revisa.
      */
-    public function cubre(CarbonInterface $momento): bool
+    public function entrada(CarbonInterface $momento): ?CarbonInterface
     {
         foreach ([0, 1] as $diasAtras) {
             $dia = $momento->avoidMutation()->subDays($diasAtras)->startOfDay();
@@ -79,10 +93,10 @@ final readonly class Turno
             }
 
             if ($momento >= $inicio && $momento < $fin) {
-                return true;
+                return $inicio;
             }
         }
 
-        return false;
+        return null;
     }
 }

@@ -59,13 +59,36 @@ final readonly class Vigilante
 
     public function estaDeGuardia(CarbonInterface $momento): bool
     {
+        return $this->entradaDelTurno($momento) !== null;
+    }
+
+    /**
+     * Cuándo entró el tramo con el que esta persona cubre `$momento`, o `null`
+     * si a esa hora no está de guardia. Ver `Turno::entrada()` para por qué el
+     * día de entrada es el que importa.
+     */
+    public function entradaDelTurno(CarbonInterface $momento): ?CarbonInterface
+    {
         foreach ($this->turnos as $turno) {
-            if ($turno->cubre($momento)) {
-                return true;
+            $entrada = $turno->entrada($momento);
+
+            if ($entrada !== null) {
+                return $entrada;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    /**
+     * La misma persona con otro rótulo de turno. Es lo que se anuncia cuando
+     * alguien cubre el turno de otro: la tarjeta dice quién está y **qué turno
+     * cubre**, y el rótulo de quien suple —«Domingo y noche del martes»— no
+     * describe la madrugada de un jueves.
+     */
+    public function conEtiqueta(string $etiqueta): self
+    {
+        return new self($this->nombre, $etiqueta, $this->foto, $this->desde, $this->turnos);
     }
 
     public function tieneFoto(): bool

@@ -169,6 +169,52 @@ return [
          */
         'zona_horaria' => 'America/Mexico_City',
 
+        /*
+         * Descansos, vacaciones, incapacidades: quién cubre los turnos de quien
+         * falta unos días.
+         *
+         * ## Va en el `.env` y no aquí, a propósito
+         *
+         * Este archivo está en un repositorio público cuyo historial no se puede
+         * depurar. Unas fechas de ausencia son la situación laboral de una
+         * persona identificada, y saber cuándo el acceso queda con otra persona
+         * es parte del rol que la página se niega a imprimir. Por eso lo único
+         * que se versiona es esta lectura y la plantilla de `.env.example`, y el
+         * dato vive en el `.env` de cada máquina, igual que las fotos viven en
+         * el servidor y no en git.
+         *
+         * Como no se versiona, cambiarlo en producción no pide un despliegue:
+         * se edita el `.env` del servidor y se corre `php artisan optimize`.
+         *
+         * ## Cómo se llena
+         *
+         * Una lista JSON en una sola línea, con comillas simples por fuera. Vacío
+         * o ausente significa que nadie falta.
+         *
+         *     VIGILANCIA_SUPLENCIAS='[{"ausente":"Ernesto S.","cubre":"Luis M.","desde":"2026-03-02","dias":14}]'
+         *
+         * (Los nombres y las fechas de ese ejemplo están inventados a propósito:
+         * poner aquí una ausencia de verdad la dejaría en el historial público.)
+         *
+         * - `ausente` — el nombre tal como está en `vigilantes`.
+         * - `cubre`   — quien lo suple, también tal como está en `vigilantes`. Si
+         *               no existe, la página dice que no sabe quién está de
+         *               guardia en vez de anunciar a alguien que no está.
+         * - `desde`   — `AAAA-MM-DD`. Ese día cuenta como el primero.
+         * - `dias`    — cuántos días dura, contando el primero. Son días de
+         *               **entrada**, igual que en `turnos`: el turno que entra el
+         *               último día se cubre entero, hasta que sale a la mañana
+         *               siguiente.
+         *
+         * Se pueden poner varias, una por cada descanso. La página no dice que
+         * alguien descansa ni cuándo; lo único que cambia es «En este momento»,
+         * que anuncia al suplente con el rótulo del turno que cubre.
+         *
+         * Una vencida no hace nada, pero conviene quitarla: es configuración que
+         * ya no dice nada cierto.
+         */
+        'suplencias' => env('VIGILANCIA_SUPLENCIAS'),
+
         'vigilantes' => [
 
             [

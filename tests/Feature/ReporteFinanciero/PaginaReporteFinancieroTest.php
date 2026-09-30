@@ -96,6 +96,143 @@ class PaginaReporteFinancieroTest extends TestCase
         $respuesta->assertSee('Se abre en una pestaña nueva, fuera de este sitio');
         // El dominio a la vista: se sabe a dónde lleva antes de tocarlo.
         $respuesta->assertSee('docs.google.com');
+
+        // Sin PDF capturado no hay botón de PDF, y con una sola liga el aviso va en singular.
+        $respuesta->assertDontSee('en PDF');
+        $respuesta->assertDontSee('Se abren en una pestaña nueva');
+    }
+
+    public function test_el_enlace_al_pdf_abre_en_pestana_nueva_y_dice_que_sale_del_sitio(): void
+    {
+        $this->sembrar(['pdf_url' => 'https://drive.google.com/file/d/pdf123/view']);
+
+        $respuesta = $this->get(route('reporte-financiero'));
+
+        $respuesta->assertSee('https://drive.google.com/file/d/pdf123/view', escape: false);
+        $respuesta->assertSee('Ver el desglose en PDF');
+        $respuesta->assertSee('target="_blank"', escape: false);
+        $respuesta->assertSee('rel="noopener noreferrer"', escape: false);
+        $respuesta->assertSee('Se abre en una pestaña nueva, fuera de este sitio');
+        $respuesta->assertSee('drive.google.com');
+
+        // Sin hoja capturada no hay botón de hoja, y sin ella el PDF es lo que vale.
+        $respuesta->assertDontSee('Ver el desglose en la hoja de cálculo');
+        $respuesta->assertSee('la que vale es el PDF');
+    }
+
+    /**
+     * El PDF va **primero** y es el botón principal, porque es por donde la
+     * mayoría va a querer entrar; la hoja pasa a secundario, sin peso de color.
+     * Y la página sigue diciendo cuál de los dos vale: el PDF es una copia que
+     * alguien generó en una fecha, y si la hoja cambió después se queda atrás.
+     */
+    public function test_con_pdf_y_hoja_salen_los_dos_el_pdf_primero_y_la_hoja_vale(): void
+    {
+        $this->sembrar([
+            'hoja_url' => 'https://docs.google.com/spreadsheets/d/abc123/edit',
+            'pdf_url' => 'https://drive.google.com/file/d/pdf123/view',
+        ]);
+
+        $respuesta = $this->get(route('reporte-financiero'));
+
+        $respuesta->assertSeeInOrder(['Ver el desglose en PDF', 'Ver el desglose en la hoja de cálculo']);
+        $respuesta->assertSee('la que vale es la hoja');
+        $respuesta->assertDontSee('la que vale es el PDF');
+        $respuesta->assertSee('Se abren en una pestaña nueva, fuera de este sitio (drive.google.com y docs.google.com)');
+
+        // La principal es la de tinta; la de la hoja baja a contorno.
+        $contenido = $respuesta->getContent();
+        $this->assertMatchesRegularExpression('/bg-tinta[^"]*"[^>]*>\s*Ver el desglose en PDF/s', $contenido);
+        $this->assertMatchesRegularExpression('/border border-tinta[^"]*"[^>]*>\s*Ver el desglose en la hoja/s', $contenido);
+    }
+
+    /**
+     * El PDF es de **todos** los meses y opcional en cada uno: no es cosa del
+     * vigente. Un mes que ya cascadeó al histórico lo sigue mostrando en su
+     * propia dirección, y el que no lo trae no muestra ningún botón.
+     */
+    public function test_el_pdf_tambien_sale_en_un_mes_del_historico_y_es_opcional_en_cada_uno(): void
+    {
+        $this->sembrar(['mes' => '2026-06', 'pdf_url' => 'https://drive.google.com/file/d/pdf123/view']);
+        $this->sembrar(['mes' => '2026-07', 'cifras' => [['concepto' => 'Cuotas de julio', 'monto' => 1]]]);
+
+        $this->get(route('reporte-financiero.mes', ['mes' => '2026-06']))
+            ->assertOk()
+            ->assertSee('Ver el desglose en PDF')
+            ->assertSee('https://drive.google.com/file/d/pdf123/view', escape: false);
+
+        // El vigente, sin PDF, no muestra el botón ni la palabra.
+        $this->get(route('reporte-financiero'))
+            ->assertOk()
+            ->assertDontSee('Ver el desglose en PDF');
+    }
+
+    /**
+     * La nota de cómo se cuentan los pagos es **común**: sale en todos los meses,
+     * con el nombre del que se está leyendo, y no depende de que alguien la
+     * capture. Va justo antes de la nota de «cifras de resumen», y no dentro de la
+     * aclaración, que es lo que un mes tiene de distinto.
+     */
+    public function test_todos_los_meses_dicen_como_se_cuentan_los_pagos_con_su_propio_mes(): void
+    {
+        $this->sembrar(['mes' => '2026-06', 'cifras' => [['concepto' => 'Cuotas', 'monto' => 1]]]);
+        $this->sembrar(['mes' => '2026-08', 'cifras' => [['concepto' => 'Cuotas', 'monto' => 1]]]);
+
+        // La plantilla parte la frase en líneas; lo que lee la persona es el texto corrido.
+        $texto = fn (string $url): string => preg_replace('/\s+/', ' ', $this->get($url)->getContent());
+
+        $vigente = $texto(route('reporte-financiero'));
+        $this->assertStringContainsString('Los pagos que se reflejan aquí son los que se recibieron en agosto.', $vigente);
+        $this->assertStringContainsString('Si alguien pagó por adelantado antes de agosto, ese pago quedó registrado en el mes en que se recibió el dinero.', $vigente);
+        $this->assertStringNotContainsString('recibieron en junio', $vigente);
+
+        $historico = $texto(route('reporte-financiero.mes', ['mes' => '2026-06']));
+        $this->assertStringContainsString('Los pagos que se reflejan aquí son los que se recibieron en junio.', $historico);
+        $this->assertStringContainsString('adelantado antes de junio, ese pago quedó registrado', $historico);
+        $this->assertStringNotContainsString('recibieron en agosto', $historico);
+    }
+
+    public function test_la_nota_de_los_pagos_va_antes_de_la_de_cifras_de_resumen_y_no_es_un_aviso(): void
+    {
+        $this->sembrar(['mes' => '2026-08', 'cifras' => [['concepto' => 'Cuotas', 'monto' => 1]]]);
+
+        $respuesta = $this->get(route('reporte-financiero'));
+
+        $respuesta->assertSeeInOrder([
+            'Los pagos que se reflejan aquí son los que se recibieron en agosto.',
+            'Estas son cifras de resumen, capturadas a mano por la Administración.',
+        ]);
+
+        // Sin aclaración capturada no hay ninguna nota de aviso: esta es común, no una alerta.
+        $respuesta->assertDontSee('role="alert"', escape: false);
+    }
+
+    /**
+     * La nota habla de las cifras, así que sale con ellas: un reporte que solo
+     * trae el enlace al desglose no tiene resumen del cual explicar cómo se
+     * cuenta.
+     */
+    public function test_sin_resumen_no_hay_nota_de_los_pagos(): void
+    {
+        $this->sembrar(['mes' => '2026-08', 'hoja_url' => 'https://docs.google.com/spreadsheets/d/abc123/edit']);
+
+        $this->get(route('reporte-financiero'))->assertDontSee('Los pagos que se reflejan aquí');
+    }
+
+    /**
+     * Un reporte que solo trae PDF no es un reporte vacío: el PDF es lo que
+     * sostiene la rendición de cuentas, igual que la hoja.
+     */
+    public function test_un_reporte_solo_con_pdf_no_se_lee_como_vacio(): void
+    {
+        $reporte = $this->sembrar(['pdf_url' => 'https://drive.google.com/file/d/pdf123/view']);
+
+        $this->assertFalse($reporte->estaVacio());
+
+        $this->get(route('reporte-financiero'))
+            ->assertOk()
+            ->assertSee('Desglose completo')
+            ->assertDontSee('El reporte financiero de este periodo se publica aquí.');
     }
 
     public function test_sin_hoja_capturada_no_hay_enlace_roto(): void
@@ -175,6 +312,7 @@ class PaginaReporteFinancieroTest extends TestCase
         $this->sembrar([
             'cifras' => [['concepto' => 'Saldo final', 'monto' => 1]],
             'hoja_url' => 'https://docs.google.com/spreadsheets/d/abc123/edit',
+            'pdf_url' => 'https://drive.google.com/file/d/pdf123/view',
         ]);
 
         $this->get(route('reporte-financiero'))->assertOk();

@@ -173,6 +173,42 @@ class ReporteFinancieroTest extends TestCase
             ->assertHasFormErrors(['hoja_url' => 'url']);
     }
 
+    public function test_el_enlace_al_pdf_tambien_tiene_que_ser_una_url(): void
+    {
+        Livewire::test(CreateReporteFinanciero::class)
+            ->fillForm(['mes' => '2026-06-01', 'pdf_url' => 'el pdf de siempre'])
+            ->call('create')
+            ->assertHasFormErrors(['pdf_url' => 'url']);
+    }
+
+    /**
+     * El PDF es opcional: la mayoría de los meses puede salir sin él, y un campo
+     * que no se puede dejar vacío se termina llenando con cualquier cosa.
+     */
+    public function test_el_pdf_es_opcional_y_lo_capturado_sale_en_el_sitio(): void
+    {
+        Livewire::test(CreateReporteFinanciero::class)
+            ->fillForm([
+                'mes' => '2026-06-01',
+                'hoja_url' => 'https://docs.google.com/spreadsheets/d/abc123/edit',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertNull(ReporteFinanciero::delMes('2026-06')?->pdf_url);
+
+        Livewire::test(EditReporteFinanciero::class, ['record' => ReporteFinanciero::delMes('2026-06')->getKey()])
+            ->fillForm(['pdf_url' => 'https://drive.google.com/file/d/pdf123/view'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        auth()->logout();
+
+        $this->get(route('reporte-financiero'))
+            ->assertSee('Ver el desglose en PDF')
+            ->assertSee('https://drive.google.com/file/d/pdf123/view', escape: false);
+    }
+
     public function test_cada_cifra_necesita_concepto_y_monto(): void
     {
         Livewire::test(CreateReporteFinanciero::class)

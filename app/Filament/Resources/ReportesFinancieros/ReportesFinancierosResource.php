@@ -134,6 +134,17 @@ class ReportesFinancierosResource extends Resource
                         ->columnSpanFull(),
                 ]),
 
+            Section::make('PDF del reporte')
+                ->description('Opcional. Lo mismo que trae la hoja, en un formato que se ve y se revisa mejor desde el celular.')
+                ->schema([
+                    TextInput::make('pdf_url')
+                        ->label('Enlace al PDF')
+                        ->helperText('Pega aquí la URL de «Compartir» del PDF, con «Cualquier persona con el enlace: puede ver». Es una copia de la hoja: si la hoja cambia, hay que generar el PDF otra vez y actualizar este enlace, porque la que vale es la hoja. En la página pública abre en una pestaña nueva y sale primero.')
+                        ->url()
+                        ->maxLength(2048)
+                        ->columnSpanFull(),
+                ]),
+
             Callout::make('Esto queda público, sin contraseña')
                 ->warning()
                 ->description('La página del Reporte financiero no pide nada para leerse y los buscadores pueden indexarla. Es una decisión tomada por la Mesa Directiva (docs/adr/0004), no un pendiente: la hoja se comparte por enlace, así que una contraseña en la página no habría protegido la hoja. Y queda público para siempre: los meses anteriores no se retiran, se archivan (docs/adr/0005). No captures aquí nada que no deba ser público.'),
@@ -171,6 +182,11 @@ class ReportesFinancierosResource extends Resource
                     ->label('Hoja')
                     ->boolean()
                     ->getStateUsing(fn (Reporte $record): bool => $record->tieneHoja()),
+
+                IconColumn::make('pdf_url')
+                    ->label('PDF')
+                    ->boolean()
+                    ->getStateUsing(fn (Reporte $record): bool => $record->tienePdf()),
             ])
             // El más reciente arriba: es el que está publicado en la raíz del
             // sitio y el que más se toca.

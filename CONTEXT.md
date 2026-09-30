@@ -118,8 +118,10 @@ no rinde cuentas de nada y no cuelga de ningún Periodo
 
 **Reporte financiero**:
 La rendición de cuentas económica de **un mes**: un resumen de cifras que el sitio
-muestra, más el enlace a la hoja de cálculo de Google donde vive el detalle. El
-resumen existe para ser mostrado; la hoja es la fuente de verdad y no se copia aquí.
+muestra, más el enlace a la hoja de cálculo de Google donde vive el detalle y, si lo
+hay, el de un PDF con lo mismo, que es más cómodo de revisar desde el celular. El
+resumen existe para ser mostrado; la hoja es la fuente de verdad y no se copia aquí,
+y el PDF es una copia de ella: si difieren, la que vale es la hoja.
 Un mes, siempre — de ahí salen su título y su dirección, y de ahí que no se retire
 nunca: cada mes rendido se queda publicado (ver `Histórico`).
 _Avoid_: Balance. **Estado de cuenta** — sí existe, y es otra cosa: es lo que una

@@ -38,7 +38,7 @@ use Illuminate\Support\Collection;
  *
  * @property-read string|null $periodo
  */
-#[Fillable(['mes', 'cifras', 'aclaracion', 'hoja_url'])]
+#[Fillable(['mes', 'cifras', 'aclaracion', 'hoja_url', 'pdf_url'])]
 class ReporteFinanciero extends Model
 {
     protected $table = 'reporte_financiero';
@@ -107,6 +107,17 @@ class ReporteFinanciero extends Model
         return Attribute::get(fn (): ?string => $this->mes === null
             ? null
             : ucfirst(self::nombreDelMes($this->mes)));
+    }
+
+    /**
+     * El nombre del mes solo, en minúsculas —«agosto»—, para armar frases
+     * que hablan del mes que se rinde. Sale de la misma tabla que el título, así
+     * que la nota y el encabezado no pueden discrepar. `null` si el reporte no
+     * cubre ningún mes todavía.
+     */
+    public function mesEnPalabras(): ?string
+    {
+        return $this->mes === null ? null : self::MESES[(int) $this->mes->month];
     }
 
     public static function nombreDelMes(CarbonInterface $mes): string
@@ -239,6 +250,24 @@ class ReporteFinanciero extends Model
     }
 
     /**
+     * Si el reporte trae un PDF con lo mismo que la hoja. Es una copia y no la
+     * fuente: lo generó alguien en una fecha, y si la hoja cambió después el PDF
+     * se queda como estaba. Por eso la página dice que la que vale es la hoja.
+     */
+    public function tienePdf(): bool
+    {
+        return filled($this->pdf_url);
+    }
+
+    /**
+     * Si hay algo a dónde mandar a quien quiera ver movimiento por movimiento.
+     */
+    public function tieneDesglose(): bool
+    {
+        return $this->tieneHoja() || $this->tienePdf();
+    }
+
+    /**
      * La aclaración del Periodo: lo que las cifras no dicen solas. Un mes con un
      * ingreso extraordinario infla el remanente, y quien lea el resumen sin ese
      * contexto concluye que ese excedente es lo normal.
@@ -253,7 +282,7 @@ class ReporteFinanciero extends Model
 
     public function estaVacio(): bool
     {
-        return ! $this->tieneResumen() && ! $this->tieneHoja();
+        return ! $this->tieneResumen() && ! $this->tieneDesglose();
     }
 
     /**
@@ -268,5 +297,18 @@ class ReporteFinanciero extends Model
         }
 
         return parse_url((string) $this->hoja_url, PHP_URL_HOST) ?: null;
+    }
+
+    /**
+     * Lo mismo que `dominioDeLaHoja()`, para el PDF: el enlace dice a dónde lleva
+     * antes de que alguien lo toque.
+     */
+    public function dominioDelPdf(): ?string
+    {
+        if (! $this->tienePdf()) {
+            return null;
+        }
+
+        return parse_url((string) $this->pdf_url, PHP_URL_HOST) ?: null;
     }
 }

@@ -80,6 +80,24 @@
                     El resumen es un resumen: si alguien busca de dónde sale una
                     cifra, el lugar es la hoja, no esta página.
                 --}}
+                {{--
+                    Cómo se cuentan los pagos. Es una nota **común**: sale igual en
+                    todos los meses, con el nombre del que se está leyendo, y no se
+                    captura. Va aquí y no en la aclaración porque la aclaración es
+                    lo que un mes puntual tiene de distinto, y esto no lo es: es el
+                    criterio con el que se arma cualquier mes. Dicho en la página
+                    evita que un pago adelantado se busque en el mes al que
+                    corresponde y no en el que llegó el dinero.
+                --}}
+                @php($mesQueSeRinde = $reporte->mesEnPalabras())
+                @if ($mesQueSeRinde)
+                    <x-palette-receipt.nota class="mt-4">
+                        Los pagos que se reflejan aquí son los que se recibieron en {{ $mesQueSeRinde }}. Si alguien pagó
+                        por adelantado antes de {{ $mesQueSeRinde }}, ese pago quedó registrado en el mes en que se
+                        recibió el dinero.
+                    </x-palette-receipt.nota>
+                @endif
+
                 <x-palette-receipt.nota class="mt-4">
                     Estas son cifras de resumen, capturadas a mano por la Administración. Si quieres saber de dónde
                     sale alguna, el lugar no es esta página: es la hoja de cálculo, donde está cada movimiento con su
@@ -88,29 +106,68 @@
             </div>
         @endif
 
-        @if ($reporte->tieneHoja())
+        @if ($reporte->tieneDesglose())
+            {{--
+                Dos enlaces al mismo contenido: el PDF, que se lee mejor en el
+                celular, y la hoja, que es la fuente de verdad. El PDF va primero
+                y es el botón principal porque es por donde la mayoría va a
+                querer entrar; la hoja pasa a ser el secundario. Con uno solo,
+                ese es el principal.
+
+                Se asignan con la directiva de una línea y no con un bloque de
+                varias, porque este archivo ya trae una de una línea arriba y
+                Blade empareja el primer inicio de bloque con el primer cierre:
+                el bloque se tragaba todo lo que hay en medio como PHP crudo. Ojo
+                también con escribir aquí, en un comentario, el nombre de esas
+                directivas con su arroba: Blade las busca antes de quitar los
+                comentarios y se confunde igual.
+            --}}
+            @php($conPdfYHoja = $reporte->tienePdf() && $reporte->tieneHoja())
+            @php($dominios = collect([$reporte->dominioDelPdf(), $reporte->dominioDeLaHoja()])->filter()->unique()->values())
+
             <div class="mt-10 border-t border-linea pt-8">
                 <h3 class="text-lg font-bold tracking-tight">Desglose completo</h3>
                 <p class="mt-2 text-sm text-grafito/80">
-                    Cada ingreso y cada gasto del periodo. La hoja de cálculo es la fuente
-                    de verdad de este reporte: si una cifra de arriba y la hoja no coinciden, la que vale es la hoja.
+                    @if ($conPdfYHoja)
+                        Cada ingreso y cada gasto del periodo, en dos formatos con la misma información: un PDF, más
+                        cómodo de revisar, y la hoja de cálculo. La hoja es la fuente de verdad de este reporte: si una
+                        cifra de arriba y el PDF no coinciden con la hoja, la que vale es la hoja.
+                    @elseif ($reporte->tienePdf())
+                        Cada ingreso y cada gasto del periodo, en un PDF. Si una cifra de arriba y el PDF no coinciden,
+                        la que vale es el PDF.
+                    @else
+                        Cada ingreso y cada gasto del periodo. La hoja de cálculo es la fuente
+                        de verdad de este reporte: si una cifra de arriba y la hoja no coinciden, la que vale es la hoja.
+                    @endif
                 </p>
 
                 {{--
-                    Sale del sitio: abre en pestaña nueva y lo dice antes de que
-                    alguien lo toque, con el dominio a la vista.
+                    Salen del sitio: abren en pestaña nueva y lo dicen antes de
+                    que alguien los toque, con el dominio a la vista.
                 --}}
-                <x-palette-receipt.boton :href="$reporte->hoja_url"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="mt-4">
-                    Ver el desglose en la hoja de cálculo
-                    <span aria-hidden="true">&nearr;</span>
-                </x-palette-receipt.boton>
+                <div class="mt-4 flex flex-wrap gap-3">
+                    @if ($reporte->tienePdf())
+                        <x-palette-receipt.boton :href="$reporte->pdf_url"
+                                        target="_blank"
+                                        rel="noopener noreferrer">
+                            Ver el desglose en PDF
+                            <span aria-hidden="true">&nearr;</span>
+                        </x-palette-receipt.boton>
+                    @endif
 
-                @php($dominio = $reporte->dominioDeLaHoja())
+                    @if ($reporte->tieneHoja())
+                        <x-palette-receipt.boton :href="$reporte->hoja_url"
+                                        :variante="$conPdfYHoja ? 'contorno' : 'tinta'"
+                                        target="_blank"
+                                        rel="noopener noreferrer">
+                            Ver el desglose en la hoja de cálculo
+                            <span aria-hidden="true">&nearr;</span>
+                        </x-palette-receipt.boton>
+                    @endif
+                </div>
+
                 <p class="mt-3 text-xs text-grafito/70">
-                    Se abre en una pestaña nueva, fuera de este sitio{{ $dominio ? " ($dominio)" : '' }}.
+                    {{ $conPdfYHoja ? 'Se abren' : 'Se abre' }} en una pestaña nueva, fuera de este sitio{{ $dominios->isNotEmpty() ? ' ('.$dominios->join(', ', ' y ').')' : '' }}.
                 </p>
             </div>
         @endif

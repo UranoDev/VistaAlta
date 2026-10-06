@@ -89,6 +89,26 @@ return [
         ],
     ],
 
+    /*
+     * WhatsApp (API en la nube de Meta), para mandar el código con el que se
+     * confirma un registro. `channel`: 'log' deja el código en el log (default y
+     * desarrollo), 'array' es para pruebas, 'cloud' manda el mensaje de verdad.
+     *
+     * Con 'cloud' hacen falta el token de un usuario del sistema, el ID del número
+     * de teléfono y una plantilla de categoría Autenticación ya aprobada en Meta.
+     * `pais_lada` va sin el `+`, y en México es `52`: a diferencia de Twilio, la
+     * API de WhatsApp no pide el `1` de móvil.
+     */
+    'whatsapp' => [
+        'channel' => env('WHATSAPP_CHANNEL', 'log'),
+        'token' => env('WHATSAPP_TOKEN'),
+        'phone_number_id' => env('WHATSAPP_PHONE_NUMBER_ID'),
+        'plantilla' => env('WHATSAPP_PLANTILLA_OTP', 'codigo_verificacion'),
+        'idioma' => env('WHATSAPP_IDIOMA', 'es_MX'),
+        'version' => env('WHATSAPP_API_VERSION', 'v23.0'),
+        'pais_lada' => env('WHATSAPP_PAIS_LADA', '52'),
+    ],
+
     'twilio' => [
         'sid' => env('TWILIO_SID'),
         'token' => env('TWILIO_AUTH_TOKEN'),

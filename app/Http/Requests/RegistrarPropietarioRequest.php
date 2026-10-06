@@ -1,0 +1,175 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Requests;
+
+use App\Enums\Calle;
+use App\Enums\SituacionDelLote;
+use App\Support\Telefono;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+/**
+ * El formulario de `/registro`. Todo el texto que ve quien se equivoca vive en
+ * `messages()` y `attributes()`: el sitio no trae archivos de idioma, y un error
+ * como «validation.required» en la pantalla de un propietario sería peor que
+ * dejarlo sin validar.
+ *
+ * Los teléfonos se normalizan antes de validar (puros dígitos, sin lada de país)
+ * para que «55 1234-5678» y «5512345678» sean el mismo número en el panel.
+ */
+class RegistrarPropietarioRequest extends FormRequest
+{
+    private const CAMPOS_DE_TELEFONO = ['telefono', 'emergencia_telefono'];
+
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $datos = $this->all();
+
+        foreach (self::CAMPOS_DE_TELEFONO as $campo) {
+            if (isset($datos[$campo]) && is_string($datos[$campo])) {
+                $datos[$campo] = Telefono::aDiezDigitos($datos[$campo]);
+            }
+        }
+
+        foreach (['lotes', 'contactos'] as $lista) {
+            if (! isset($datos[$lista]) || ! is_array($datos[$lista])) {
+                continue;
+            }
+
+            foreach ($datos[$lista] as $i => $renglon) {
+                if (is_array($renglon) && isset($renglon['telefono']) && is_string($renglon['telefono'])) {
+                    $datos[$lista][$i]['telefono'] = Telefono::aDiezDigitos($renglon['telefono']);
+                }
+            }
+        }
+
+        $this->replace($datos);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function rules(): array
+    {
+        $telefono = ['nullable', 'regex:/^\d{10}$/'];
+
+        return [
+            'nombre' => ['required', 'string', 'max:255'],
+            'telefono' => [...$telefono, 'required_without:correo'],
+            'correo' => ['nullable', 'email:rfc', 'max:255', 'required_without:telefono'],
+
+            'lotes' => ['required', 'array', 'min:1', 'max:20'],
+            'lotes.*.calle' => ['required', Rule::enum(Calle::class)],
+            'lotes.*.numero_oficial' => ['required', 'string', 'max:20'],
+            'lotes.*.manzana' => ['required', 'string', 'max:20'],
+            'lotes.*.lote' => ['required', 'string', 'max:20'],
+            'lotes.*.situacion' => ['required', Rule::enum(SituacionDelLote::class)],
+
+            'contactos' => ['nullable', 'array', 'max:10'],
+            'contactos.*.nombre' => ['required', 'string', 'max:255'],
+            'contactos.*.telefono' => [...$telefono, 'required_without:contactos.*.correo'],
+            'contactos.*.correo' => ['nullable', 'email:rfc', 'max:255', 'required_without:contactos.*.telefono'],
+
+            'emergencia_nombre' => ['nullable', 'string', 'max:255', 'required_with:emergencia_telefono'],
+            'emergencia_telefono' => [...$telefono, 'required_with:emergencia_nombre'],
+            'residentes' => ['nullable', 'integer', 'min:0', 'max:99'],
+
+            'acepto_aviso' => ['accepted'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'required' => 'Falta este dato.',
+            'required_without' => 'Indica un teléfono o un correo. Con uno basta.',
+            'required_with' => 'Falta este dato.',
+            'max' => 'Es demasiado largo.',
+            'email' => 'Escribe un correo válido, como nombre@correo.com.',
+            'telefono.regex' => 'Escribe el teléfono a 10 dígitos.',
+            'contactos.*.telefono.regex' => 'Escribe el teléfono a 10 dígitos.',
+            'emergencia_telefono.regex' => 'Escribe el teléfono a 10 dígitos.',
+            'residentes.integer' => 'Escribe un número.',
+            'residentes.min' => 'Escribe un número de 0 a 99.',
+            'residentes.max' => 'Escribe un número de 0 a 99.',
+            'lotes.required' => 'Registra al menos un lote.',
+            'lotes.min' => 'Registra al menos un lote.',
+            'lotes.max' => 'Son demasiados lotes para un solo registro. Escríbenos y lo vemos.',
+            'contactos.max' => 'Son demasiados contactos. Deja los más importantes.',
+            'lotes.*.calle.enum' => 'Elige una de las calles.',
+            'lotes.*.situacion.enum' => 'Elige cómo está el lote.',
+            'acepto_aviso.accepted' => 'Marca esta casilla para poder enviar tu registro.',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'nombre' => 'nombre',
+            'telefono' => 'teléfono',
+            'correo' => 'correo',
+            'lotes' => 'lotes',
+            'contactos' => 'contactos',
+        ];
+    }
+
+    /**
+     * Lo que se guarda del propietario, ya normalizado.
+     *
+     * @return array<string, mixed>
+     */
+    public function datosDelPropietario(): array
+    {
+        $datos = $this->validated();
+
+        return [
+            'nombre' => trim($datos['nombre']),
+            'telefono' => $datos['telefono'] ?? null,
+            'correo' => filled($datos['correo'] ?? null) ? mb_strtolower(trim($datos['correo'])) : null,
+            'emergencia_nombre' => filled($datos['emergencia_nombre'] ?? null) ? trim($datos['emergencia_nombre']) : null,
+            'emergencia_telefono' => $datos['emergencia_telefono'] ?? null,
+            'residentes' => isset($datos['residentes']) && $datos['residentes'] !== '' ? (int) $datos['residentes'] : null,
+            'aceptado_en' => now(),
+            'aviso_version' => (string) config('contenido.legal.actualizado_en'),
+        ];
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function lotes(): array
+    {
+        return array_values(array_map(fn (array $lote): array => [
+            'calle' => $lote['calle'],
+            'numero_oficial' => trim($lote['numero_oficial']),
+            'manzana' => trim($lote['manzana']),
+            'lote' => trim($lote['lote']),
+            'situacion' => $lote['situacion'],
+        ], $this->validated()['lotes']));
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function contactos(): array
+    {
+        return array_values(array_map(fn (array $contacto): array => [
+            'nombre' => trim($contacto['nombre']),
+            'telefono' => $contacto['telefono'] ?? null,
+            'correo' => filled($contacto['correo'] ?? null) ? mb_strtolower(trim($contacto['correo'])) : null,
+        ], $this->validated()['contactos'] ?? []));
+    }
+}

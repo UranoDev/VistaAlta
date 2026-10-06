@@ -28,6 +28,7 @@
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="OTP_CHANNEL" value="array"/>
+        <env name="WHATSAPP_CHANNEL" value="array"/>
         <env name="VIGILANCIA_SUPLENCIAS" value=""/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

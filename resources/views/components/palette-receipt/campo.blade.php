@@ -27,7 +27,7 @@
            @if ($descrito) aria-describedby="{{ $descrito }}" @endif
            @if ($error) aria-invalid="true" @endif
            {{ $attributes->except('class')->class([
-               'block w-full border bg-papel-alto px-3 py-2 text-base',
+               'block w-full border bg-papel-alto px-3 py-2.5 text-base',
                'placeholder:text-grafito/40',
                $error ? 'border-sello' : 'border-linea',
            ]) }}>

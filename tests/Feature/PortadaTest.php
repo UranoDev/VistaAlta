@@ -92,12 +92,15 @@ class PortadaTest extends TestCase
      *
      * Y en la quinta posición Administración tomó el lugar de Propuesta
      * (URVA-99), que salió del menú sin salir del sitio.
+     *
+     * Registro entró después, segundo, junto a la cuenta del mes; y Demanda
+     * salió del menú sin salir del sitio.
      */
     public function test_el_menu_lleva_el_orden_nuevo(): void
     {
         $contenido = $this->get('/propuesta')->getContent();
 
-        $esperado = ['reporte-financiero', 'actividades', 'convivencia', 'vigilancia', 'administracion', 'demanda'];
+        $esperado = ['reporte-financiero', 'registro', 'actividades', 'convivencia', 'vigilancia', 'administracion'];
 
         $posiciones = [];
 
@@ -115,7 +118,7 @@ class PortadaTest extends TestCase
         $this->assertSame(
             array_keys($posiciones),
             array_keys($ordenado),
-            'El menú debe ir: Reporte financiero, Actividades, Convivencia, Vigilancia, Propuesta, Demanda.',
+            'El menú debe ir: Reporte financiero, Registro, Actividades, Convivencia, Vigilancia, Administración.',
         );
     }
 

@@ -65,33 +65,22 @@ class DemandaTest extends TestCase
             ->assertDontSee('institucional@ejemplo.test');
     }
 
-    public function test_el_enlace_aparece_en_la_navegacion_y_se_marca_al_estar_en_ella(): void
+    public function test_ya_no_esta_en_la_navegacion_pero_la_pagina_sigue_publicada(): void
     {
         $this->get(route('demanda'))
-            ->assertSee(route('demanda'))
-            ->assertSee('aria-current="page"', escape: false);
+            ->assertOk()
+            ->assertDontSee('<a href="'.route('demanda').'"', escape: false);
     }
 
     /**
-     * La página se llama «Demanda» en los tres lugares donde se identifica:
-     * navegación, `<title>` y rótulo de la sección. Antes cada uno decía algo
-     * distinto y nada lo protegía, así que el nombre podía volver a divergir
-     * sin que tronara ninguna prueba.
+     * La página se llama «Demanda» en `<title>` y en el rótulo de la sección. Antes
+     * también lo decía la navegación y cada lugar decía algo distinto; nada lo
+     * protegía, así que el nombre podía volver a divergir sin que tronara ninguna
+     * prueba.
      *
      * El titular no entra aquí: «Faltan tus comprobantes» es el que hace el
      * trabajo y se queda.
      */
-    public function test_la_navegacion_nombra_la_pagina_demanda(): void
-    {
-        $contenido = $this->get(route('propuesta'))->getContent();
-
-        $this->assertMatchesRegularExpression(
-            '/<a href="'.preg_quote(route('demanda'), '/').'"[^>]*>\s*Demanda\s*</',
-            $contenido,
-            'La navegación debe rotular la página como «Demanda».',
-        );
-    }
-
     public function test_el_titulo_y_el_rotulo_dicen_demanda_y_el_titular_no_cambia(): void
     {
         $respuesta = $this->get(route('demanda'));

@@ -20,6 +20,7 @@ class PaginasPublicasTest extends TestCase
             'Reporte financiero' => ['reporte-financiero', 'Reporte financiero'],
             'Vigilancia' => ['vigilancia', 'Quién cuida Vista Alta'],
             'Administración' => ['administracion', 'Quiénes servimos a Vista Alta'],
+            'Registro' => ['registro', 'Registra tus lotes'],
             'Demanda' => ['demanda', 'Faltan tus comprobantes'],
         ];
     }
@@ -49,7 +50,16 @@ class PaginasPublicasTest extends TestCase
         $respuesta->assertSee(route('reporte-financiero'));
         $respuesta->assertSee(route('vigilancia'));
         $respuesta->assertSee(route('administracion'));
-        $respuesta->assertSee(route('demanda'));
+        $respuesta->assertSee(route('registro'));
+    }
+
+    /**
+     * Demanda salió del menú: la página sigue publicada en su dirección, pero el
+     * encabezado ya no la ofrece.
+     */
+    public function test_demanda_ya_no_esta_en_el_menu(): void
+    {
+        $this->get(route('convivencia'))->assertDontSee('<a href="'.route('demanda').'"', escape: false);
     }
 
     /**

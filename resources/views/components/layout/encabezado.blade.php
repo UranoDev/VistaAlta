@@ -22,6 +22,11 @@
     // larga de las seis y no se acorta a «Cargos» ni a «Mesa Directiva» —
     // «Administración» es como se llama el órgano en el acta constitutiva.
     //
+    // **Registro entró segundo**, justo después del Reporte financiero, y
+    // **Demanda salió del menú**: sigue publicada en `/demanda`, pero ya no se
+    // ofrece desde aquí. El registro es lo que hoy se le pide al Colono, así que
+    // va junto a la cuenta del mes y no al final.
+    //
     // **Propuesta salió del menú** en el mismo cambio, y por eso el menú sigue
     // teniendo seis entradas. Lo que sometía a consideración de la Asamblea ya
     // está en trámite —el nombre de la asociación quedó autorizado— y por dónde
@@ -31,11 +36,11 @@
     // Asamblea vuelve a someter algo a consideración, la entrada regresa.
     $navegacion = [
         ['ruta' => 'reporte-financiero', 'etiqueta' => 'Reporte financiero'],
+        ['ruta' => 'registro', 'etiqueta' => 'Registro'],
         ['ruta' => 'actividades', 'etiqueta' => 'Actividades'],
         ['ruta' => 'convivencia', 'etiqueta' => 'Convivencia'],
         ['ruta' => 'vigilancia', 'etiqueta' => 'Vigilancia'],
         ['ruta' => 'administracion', 'etiqueta' => 'Administración'],
-        ['ruta' => 'demanda', 'etiqueta' => 'Demanda'],
     ];
 @endphp
 

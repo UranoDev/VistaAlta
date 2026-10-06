@@ -5,6 +5,7 @@ use App\Http\Controllers\AdministracionController;
 use App\Http\Controllers\ConvivenciaController;
 use App\Http\Controllers\InternetController;
 use App\Http\Controllers\PropuestaController;
+use App\Http\Controllers\RegistroDePropietariosController;
 use App\Http\Controllers\ReporteFinancieroController;
 use App\Http\Controllers\VigilanciaController;
 use Illuminate\Support\Facades\Route;
@@ -105,6 +106,44 @@ Route::get('/internet', [InternetController::class, 'create'])->name('internet')
 Route::post('/internet', [InternetController::class, 'store'])
     ->middleware('throttle:20,60')
     ->name('internet.store');
+
+/*
+ * El registro de propietarios para el sistema automatizado de pagos. Se comparte como
+ * enlace y no está en el menú: es para quien lo recibe, no para quien navega el
+ * sitio. El POST lleva tope por IP —10 por hora— porque es público y escribe en
+ * la base; el límite es holgado a propósito, porque en una misma red del
+ * fraccionamiento varias familias pueden registrarse desde el mismo celular.
+ */
+Route::get('/registro', [RegistroDePropietariosController::class, 'create'])->name('registro');
+Route::post('/registro', [RegistroDePropietariosController::class, 'store'])
+    ->middleware('throttle:10,60')
+    ->name('registro.store');
+
+/*
+ * La confirmación del registro: el código que llega por correo y por WhatsApp, y
+ * el enlace del correo. El código se escribe en `/registro/confirmar`, que
+ * recuerda el registro por la sesión; el enlace lleva el registro y su token en
+ * la dirección y funciona desde cualquier aparato.
+ *
+ * El enlace tiene dos rutas a propósito: el GET solo muestra un botón y el POST
+ * confirma. Un GET que confirmara lo activarían los antivirus que abren los
+ * enlaces del correo. Los topes cubren a quien adivina códigos (solo hay un
+ * millón) y a quien usa el reenvío para mandar correos y WhatsApp a otros.
+ */
+Route::get('/registro/confirmar', [RegistroDePropietariosController::class, 'confirmar'])->name('registro.confirmar');
+Route::post('/registro/confirmar', [RegistroDePropietariosController::class, 'validarCodigo'])
+    ->middleware('throttle:20,10')
+    ->name('registro.codigo');
+Route::post('/registro/confirmar/reenviar', [RegistroDePropietariosController::class, 'reenviar'])
+    ->middleware('throttle:5,10')
+    ->name('registro.reenviar');
+Route::get('/registro/confirmar/{registro}/{token}', [RegistroDePropietariosController::class, 'enlace'])
+    ->where(['registro' => '[0-9]+', 'token' => '[A-Za-z0-9]{40}'])
+    ->name('registro.enlace');
+Route::post('/registro/confirmar/{registro}/{token}', [RegistroDePropietariosController::class, 'confirmarEnlace'])
+    ->where(['registro' => '[0-9]+', 'token' => '[A-Za-z0-9]{40}'])
+    ->middleware('throttle:20,10')
+    ->name('registro.enlace.confirmar');
 
 /*
  * Las dos páginas legales. Estáticas, así que tampoco llevan controlador.

@@ -150,11 +150,11 @@ class PaginaConvivenciaTest extends TestCase
      * La quinta dejó de ser Propuesta y es Administración (URVA-99): lo que se
      * sometía a consideración ya está en trámite, y por dónde va se rinde ahí.
      */
-    public function test_convivencia_va_tercera_en_el_menu(): void
+    public function test_convivencia_va_cuarta_en_el_menu(): void
     {
         $contenido = $this->get('/convivencia')->getContent();
 
-        $esperado = ['reporte-financiero', 'actividades', 'convivencia', 'vigilancia', 'administracion', 'demanda'];
+        $esperado = ['reporte-financiero', 'registro', 'actividades', 'convivencia', 'vigilancia', 'administracion'];
 
         $posiciones = [];
 
@@ -172,7 +172,7 @@ class PaginaConvivenciaTest extends TestCase
         $this->assertSame(
             array_keys($posiciones),
             array_keys($ordenado),
-            'El menú debe ir: Reporte financiero, Actividades, Convivencia, Vigilancia, Propuesta, Demanda.',
+            'El menú debe ir: Reporte financiero, Registro, Actividades, Convivencia, Vigilancia, Administración.',
         );
     }
 }

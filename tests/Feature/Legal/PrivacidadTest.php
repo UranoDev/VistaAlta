@@ -153,7 +153,7 @@ class PrivacidadTest extends TestCase
         $respuesta->assertSee(route('terminos'));
 
         // El menú de arriba no cambia por estar en una página legal.
-        foreach (['reporte-financiero', 'actividades', 'vigilancia', 'administracion', 'demanda'] as $ruta) {
+        foreach (['reporte-financiero', 'registro', 'actividades', 'vigilancia', 'administracion'] as $ruta) {
             $respuesta->assertSee(route($ruta));
         }
     }

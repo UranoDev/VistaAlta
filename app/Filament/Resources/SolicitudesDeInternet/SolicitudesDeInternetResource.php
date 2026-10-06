@@ -42,6 +42,12 @@ class SolicitudesDeInternetResource extends Resource
 
     protected static ?int $navigationSort = 65;
 
+    /** El rastro de migas usa el plural con mayúsculas en cada palabra («Solicitudes De Internet»). */
+    public static function getBreadcrumb(): string
+    {
+        return 'Internet';
+    }
+
     public static function canCreate(): bool
     {
         return false;

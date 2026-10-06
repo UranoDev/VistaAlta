@@ -78,6 +78,15 @@ class AdminPanelProvider extends PanelProvider
             ->font('IBM Plex Sans', provider: LocalFontProvider::class)
             ->monoFont('IBM Plex Mono', provider: LocalFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_START, fn (): View => view('filament.fuentes'))
+            /*
+             * La versión desplegada, a un lado del nombre. Va en los dos lugares
+             * donde Filament pinta el logo, y en cada ancho solo se ve uno: en
+             * escritorio el nombre vive en la barra superior, y en el celular
+             * dentro del menú lateral que se abre con la hamburguesa. Quitar uno
+             * de los dos la deja sin versión en ese tamaño.
+             */
+            ->renderHook(PanelsRenderHook::TOPBAR_LOGO_AFTER, fn (): View => view('filament.version'))
+            ->renderHook(PanelsRenderHook::SIDEBAR_LOGO_AFTER, fn (): View => view('filament.version'))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')

@@ -1,5 +1,8 @@
 # Changelog
 
+## [2026.09.29.1] - 2026 sep 29
+_Sin issues cerrados en esta ventana_
+
 ## [2026.09.29] - 2026 sep 29
 ### Fix / Bugs
 - **URVA-108**: En producción las fechas salen en inglés: «Sunday 20 de September de 2026»

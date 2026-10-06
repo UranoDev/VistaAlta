@@ -17,35 +17,37 @@ class VersionEnElPanelTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function changelog(string $contenido): string
+    private function archivo(string $contenido): string
     {
-        $ruta = tempnam(sys_get_temp_dir(), 'changelog');
+        $ruta = tempnam(sys_get_temp_dir(), 'version');
         file_put_contents($ruta, $contenido);
 
         return $ruta;
     }
 
-    public function test_lee_el_encabezado_mas_reciente(): void
+    public function test_lee_la_version_del_archivo(): void
     {
-        $ruta = $this->changelog("# Changelog\n\n## [2026.10.06] - 2026 oct 06\n### Features\n\n## [2026.09.29.1] - 2026 sep 29\n");
-
-        $this->assertSame('2026.10.06', Version::actual($ruta));
+        $this->assertSame('2026.10.06', Version::actual($this->archivo('2026.10.06
+')));
+        $this->assertSame('2026.10.06.1', Version::actual($this->archivo('  2026.10.06.1  
+')));
     }
 
-    public function test_lo_que_sigue_sin_cortar_no_es_una_version(): void
+    public function test_lo_que_no_es_una_version_no_se_muestra(): void
     {
-        $ruta = $this->changelog("# Changelog\n\n## [Unreleased]\n- algo\n\n## [2026.09.29] - 2026 sep 29\n");
-
-        $this->assertNull(Version::actual($ruta));
+        $this->assertNull(Version::actual($this->archivo('Unreleased
+')));
+        $this->assertNull(Version::actual($this->archivo('2026.10.06 <script>
+')));
+        $this->assertNull(Version::actual($this->archivo('')));
     }
 
-    public function test_sin_changelog_o_sin_encabezados_no_hay_version(): void
+    public function test_sin_archivo_no_hay_version(): void
     {
-        $this->assertNull(Version::actual(sys_get_temp_dir().'/no-existe-'.uniqid().'.md'));
-        $this->assertNull(Version::actual($this->changelog("# Changelog\n")));
+        $this->assertNull(Version::actual(sys_get_temp_dir().'/no-existe-'.uniqid()));
     }
 
-    public function test_el_changelog_del_proyecto_trae_una_version_valida(): void
+    public function test_el_proyecto_trae_su_archivo_de_version(): void
     {
         $this->assertMatchesRegularExpression('/^\d{4}\.\d{2}\.\d{2}(\.\d+)?$/', (string) Version::actual());
     }

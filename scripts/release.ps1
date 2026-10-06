@@ -90,7 +90,13 @@ if ($DryRun) {
     exit 0
 }
 
-# 2. Stage everything (code + CHANGELOG.md) into one commit.
+# 1b. VERSION: el numero que el panel muestra junto al nombre. Se escribe aqui y no
+# se deduce del CHANGELOG porque ese solo trae encabezado para una version que
+# tuvo issues cerrados; un corte sin ellos (p. ej. 2026.10.06) no deja rastro ahi.
+# Sin BOM y con salto de linea final, para que `git diff` y `cat` lo lean limpio.
+[System.IO.File]::WriteAllText((Join-Path $RepoRoot 'VERSION'), "$effVersion`n", (New-Object System.Text.UTF8Encoding($false)))
+
+# 2. Stage everything (code + CHANGELOG.md + VERSION) into one commit.
 git add -A
 
 # 3. Commit if there is anything staged; otherwise just tag the current HEAD.

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActividadesController;
 use App\Http\Controllers\AdministracionController;
 use App\Http\Controllers\ConvivenciaController;
+use App\Http\Controllers\InternetController;
 use App\Http\Controllers\PropuestaController;
 use App\Http\Controllers\ReporteFinancieroController;
 use App\Http\Controllers\VigilanciaController;
@@ -93,6 +94,17 @@ Route::post('/comentarios/codigo', [PropuestaController::class, 'enviarOtp'])->n
 Route::post('/comentarios/validar', [PropuestaController::class, 'verificarOtp'])->name('comentarios.validar');
 Route::post('/comentarios/cambiar-telefono', [PropuestaController::class, 'cambiarTelefono'])->name('comentarios.cambiar-telefono');
 Route::post('/comentarios', [PropuestaController::class, 'store'])->name('comentarios.store');
+
+/*
+ * La lista de espera para la instalación de internet. Se comparte como enlace y
+ * no está en el menú. El POST lleva tope por IP —20 por hora— porque es público y
+ * escribe en la base; es holgado a propósito: quien tiene varias propiedades las
+ * anota una por una desde el mismo celular.
+ */
+Route::get('/internet', [InternetController::class, 'create'])->name('internet');
+Route::post('/internet', [InternetController::class, 'store'])
+    ->middleware('throttle:20,60')
+    ->name('internet.store');
 
 /*
  * Las dos páginas legales. Estáticas, así que tampoco llevan controlador.

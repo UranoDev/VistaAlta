@@ -86,7 +86,7 @@ return [
      * afirmación, no un dato de bitácora.
      */
     'legal' => [
-        'actualizado_en' => '13 de septiembre de 2026',
+        'actualizado_en' => '6 de octubre de 2026',
     ],
 
     /*

@@ -134,7 +134,7 @@
 
                         <x-palette-receipt.campo nombre="celular"
                                                  etiqueta="Celular *"
-                                                 ayuda="A 10 dígitos. Es para avisarte de tu instalación."
+                                                 ayuda="A 10 dígitos. Es para seguimiento de la instalación."
                                                  tipo="tel"
                                                  inputmode="tel"
                                                  autocomplete="tel-national"
@@ -145,6 +145,17 @@
                 </x-palette-receipt.tarjeta>
 
                 <x-palette-receipt.boton type="submit" class="w-full min-h-14 text-base">Anotarme en la lista</x-palette-receipt.boton>
+
+                {{--
+                    El Aviso tiene que estar donde se recaban los datos. Sin casilla
+                    que marcar: es el consentimiento tácito de la sección 9 del
+                    Aviso, como en los comentarios. La lista no se entrega a nadie;
+                    quien se anota se pone en contacto con Alinet por su cuenta.
+                --}}
+                <p class="text-xs text-grafito/70">
+                    Al anotarte aceptas el
+                    <a href="{{ route('privacidad') }}" class="font-medium text-tinta underline underline-offset-2 hover:text-tinta-suave">Aviso de Privacidad</a>.
+                </p>
             </form>
         @endif
     </x-palette-receipt.seccion>

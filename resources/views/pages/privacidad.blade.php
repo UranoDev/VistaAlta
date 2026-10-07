@@ -14,9 +14,11 @@
        /demanda; dos franjas rojas más lo volverían decoración.
 
     3. Solo describe datos que el sitio sí recaba —teléfono, nombre y el texto
-       del comentario, más la IP y la cookie de la Ventana de validación—. Un
-       aviso que enumera datos que nadie pide es tan falso como uno que calla
-       los que sí.
+       del comentario; el celular y el domicilio de la lista de espera de
+       internet; y la IP y la cookie de la Ventana de validación—. Un aviso que
+       enumera datos que nadie pide es tan falso como uno que calla los que sí.
+       Cuando el registro de propietarios (`/registro`) salga a producción, este
+       documento y los Términos tienen que cambiar en el mismo despliegue.
 
     La fecha y el correo salen de `config/contenido.php`, que los comparte con
     los Términos de Servicio y con la página de Comprobantes.
@@ -44,13 +46,22 @@
 
             <x-legal.seccion numero="2" titulo="Datos personales que recabamos">
                 <p>
-                    Este sitio recaba datos personales en un solo lugar: cuando usted deja un comentario sobre la
-                    Propuesta. Los datos que se recaban son:
+                    Este sitio recaba datos personales en dos lugares: cuando usted deja un comentario sobre la
+                    Propuesta y cuando anota una propiedad en la lista de espera para la instalación de internet.
                 </p>
+                <p>Al dejar un comentario, los datos que se recaban son:</p>
                 <ul class="list-disc space-y-1 pl-5">
                     <li>Su número de teléfono celular.</li>
                     <li>El nombre con el que decide firmar su comentario.</li>
                     <li>El texto del comentario que escribe.</li>
+                </ul>
+                <p>Al anotar una propiedad en la lista de espera de internet, los datos que se recaban son:</p>
+                <ul class="list-disc space-y-1 pl-5">
+                    <li>Su número de teléfono celular.</li>
+                    <li>
+                        El domicilio de la propiedad: la calle y el número oficial, o bien la manzana y el lote. No se
+                        le pide su nombre.
+                    </li>
                 </ul>
                 <p>
                     No recabamos datos personales sensibles (por ejemplo, origen étnico o racial, estado de salud,
@@ -58,16 +69,16 @@
                     políticas o preferencia sexual).
                 </p>
                 <p>
-                    Además, para validar su teléfono y evitar el uso abusivo del envío de mensajes, el sitio utiliza su
-                    dirección IP y guarda temporalmente su número en una cookie cifrada de su navegador.
+                    Además, la dirección IP se usa para limitar el abuso de los formularios.
                 </p>
             </x-legal.seccion>
 
             <x-legal.seccion numero="3" titulo="Finalidades del tratamiento">
                 <p>
                     Sus datos personales serán utilizados única y exclusivamente para las siguientes finalidades,
-                    necesarias para que usted pueda comentar la Propuesta:
+                    necesarias para el servicio que usted pidió.
                 </p>
+                <p>Si deja un comentario sobre la Propuesta:</p>
                 <ul class="list-disc space-y-1 pl-5">
                     <li>
                         Validar, mediante un código enviado por SMS, que del otro lado hay una persona a la que se le
@@ -80,6 +91,18 @@
                     <li>
                         Permitir que la Mesa Directiva lea su comentario y le conteste por el mismo número que validó.
                     </li>
+                </ul>
+                <p>Si anota una propiedad en la lista de espera de internet:</p>
+                <ul class="list-disc space-y-1 pl-5">
+                    <li>
+                        Registrar la propiedad en la lista y asignarle un folio consecutivo, con el que se identifica
+                        su lugar.
+                    </li>
+                    <li>Evitar que una misma propiedad se anote dos veces.</li>
+                    <li>Darle seguimiento a la instalación, por su celular.</li>
+                </ul>
+                <p>En ambos casos:</p>
+                <ul class="list-disc space-y-1 pl-5">
                     <li>Cumplir con obligaciones legales aplicables.</li>
                 </ul>
                 <p>
@@ -98,9 +121,9 @@
                 </p>
                 <ul class="list-disc space-y-1 pl-5">
                     <li>
-                        Twilio, el proveedor a través del cual se envía el mensaje SMS con su código de validación, que
-                        para ese fin recibe su número de teléfono y lo trata únicamente por cuenta y siguiendo las
-                        instrucciones del Responsable.
+                        Twilio, el proveedor a través del cual se envía el mensaje SMS con el código de validación de
+                        los comentarios, que para ese fin recibe su número de teléfono y lo trata únicamente por cuenta
+                        y siguiendo las instrucciones del Responsable.
                     </li>
                     <li>
                         Proveedores de servicios tecnológicos que nos apoyan en el alojamiento (hosting) o
@@ -145,8 +168,10 @@
 
             <x-legal.seccion numero="6" titulo="Limitación de uso y divulgación">
                 <p>
-                    Su número de teléfono no se publica en ninguna parte del sitio: se utiliza únicamente para validar
-                    que del otro lado hay una persona a la que se puede responder.
+                    Su número de teléfono no se publica en ninguna parte del sitio. En los comentarios se utiliza
+                    únicamente para validar que del otro lado hay una persona a la que se puede responder; en la lista
+                    de espera de internet, para el seguimiento de la instalación. El domicilio que anota en esa lista
+                    tampoco se publica.
                 </p>
                 <p>
                     Si usted elige que su comentario sea privado, lo lee únicamente la Mesa Directiva y no puede
@@ -164,7 +189,8 @@
                 <ul class="list-disc space-y-1 pl-5">
                     <li>
                         La cookie de sesión que la plataforma necesita para el funcionamiento básico del sitio y para
-                        proteger los formularios.
+                        proteger los formularios. En la sesión se recuerda el celular que acaba de anotar en la lista de
+                        espera de internet, para no pedirle que lo escriba otra vez si anota otra propiedad.
                     </li>
                     <li>
                         Una cookie cifrada y firmada que guarda su número de teléfono durante
@@ -175,7 +201,8 @@
                 <p>
                     El sitio no utiliza herramientas de analítica, publicidad, perfilamiento ni rastreo de terceros, ni
                     web beacons. Si usted borra las cookies de su navegador, lo único que ocurre es que se le pedirá un
-                    código nuevo para volver a comentar.
+                    código nuevo para volver a comentar y que el formulario de internet ya no traerá su celular
+                    escrito.
                 </p>
             </x-legal.seccion>
 
@@ -192,9 +219,9 @@
 
             <x-legal.seccion numero="9" titulo="Consentimiento">
                 <p>
-                    Al validar su teléfono y dejar un comentario en este sitio, usted manifiesta su consentimiento para
-                    el tratamiento de sus datos personales conforme a los términos establecidos en el presente Aviso de
-                    Privacidad.
+                    Al validar su teléfono y dejar un comentario en este sitio, o al anotar una propiedad en la lista de
+                    espera de internet, usted manifiesta su consentimiento para el tratamiento de sus datos personales
+                    conforme a los términos establecidos en el presente Aviso de Privacidad.
                 </p>
             </x-legal.seccion>
 

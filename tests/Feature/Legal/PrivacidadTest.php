@@ -90,6 +90,61 @@ class PrivacidadTest extends TestCase
         $this->assertStringNotContainsString('pendiente de revisión legal', $contenido);
     }
 
+    /**
+     * El Aviso no puede quedarse atrás del sitio: la lista de espera de internet
+     * recaba el celular y el domicilio, y entrega la lista a Alinet. Un aviso que
+     * calla datos que sí se piden es tan falso como uno que inventa los que no.
+     */
+    public function test_cubre_la_lista_de_espera_de_internet(): void
+    {
+        $texto = $this->textoDelAviso();
+
+        $this->assertStringContainsString('lista de espera para la instalación de internet', $texto);
+        $this->assertStringContainsString('El domicilio de la propiedad', $texto);
+        $this->assertStringContainsString('No se le pide su nombre', $texto);
+        $this->assertStringContainsString('folio consecutivo', $texto);
+        $this->assertStringContainsString('El domicilio que anota en esa lista tampoco se publica', $texto);
+    }
+
+    /**
+     * La lista no se entrega a nadie: quien se anota se pone en contacto con
+     * Alinet por su cuenta. Si el Aviso, los Términos o el formulario volvieran a
+     * decir que se le comparte algo a Alinet, estarían prometiendo una
+     * transferencia que no existe.
+     */
+    public function test_no_dice_que_se_entregue_nada_a_alinet(): void
+    {
+        $this->assertStringNotContainsString('Alinet', $this->textoDelAviso());
+        $this->assertStringNotContainsString('Alinet', strip_tags($this->get(route('terminos'))->getContent()));
+        $this->assertStringNotContainsString('se le entregan', strip_tags($this->get(route('internet'))->getContent()));
+        $this->assertStringNotContainsString('requiere su consentimiento, que usted otorga', $this->textoDelAviso());
+    }
+
+    /**
+     * El texto de la página sin etiquetas y con los espacios colapsados: las
+     * frases largas caen partidas entre renglones del archivo, y lo que se
+     * protege aquí es lo que dicen, no dónde se cortan.
+     */
+    private function textoDelAviso(): string
+    {
+        $texto = html_entity_decode(strip_tags($this->get(route('privacidad'))->getContent()), ENT_QUOTES | ENT_HTML5);
+
+        return trim((string) preg_replace('/\s+/u', ' ', $texto));
+    }
+
+    public function test_el_formulario_de_internet_enlaza_el_aviso(): void
+    {
+        $this->get(route('internet'))
+            ->assertSee('href="'.route('privacidad').'"', escape: false)
+            ->assertSee('Al anotarte aceptas el', escape: false);
+    }
+
+    public function test_los_terminos_incluyen_la_lista_de_espera_entre_lo_que_hace_el_sitio(): void
+    {
+        $this->get(route('terminos'))
+            ->assertSee('lista de espera para la instalación de internet', escape: false);
+    }
+
     public function test_el_pie_enlaza_a_las_dos_paginas_legales_y_la_navegacion_no_cambia(): void
     {
         $respuesta = $this->get(route('privacidad'));

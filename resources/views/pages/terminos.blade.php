@@ -52,6 +52,10 @@
                         las actividades realizadas durante el periodo y el reporte financiero que las respalda.
                     </li>
                     <li>Recibir comentarios y preguntas de quien quiera dejarlos sobre esa Propuesta.</li>
+                    <li>
+                        Llevar la lista de espera para la instalación de internet: cada propiedad que la pide se anota
+                        con su domicilio y su celular, y recibe un folio.
+                    </li>
                 </ul>
                 <p>
                     El sitio no administra el fraccionamiento: no cobra ni procesa pagos, no lleva estados de cuenta,

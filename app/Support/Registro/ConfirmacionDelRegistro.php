@@ -67,24 +67,42 @@ class ConfirmacionDelRegistro
 
         $canales = [];
 
-        if (filled($registro->correo) && $this->intentar(function () use ($registro, $codigo, $token): void {
-            Mail::to($registro->correo)->send(new ConfirmacionDeRegistro(
-                $registro->nombre,
-                $codigo,
-                route('registro.enlace', ['registro' => $registro->id, 'token' => $token]),
-                self::VIGENCIA_HORAS,
-            ));
-        })) {
-            $canales[] = 'correo';
+        if (filled($registro->correo)) {
+            $salio = $this->intentar(function () use ($registro, $codigo, $token): void {
+                Mail::to($registro->correo)->send(new ConfirmacionDeRegistro(
+                    $registro->nombre,
+                    $codigo,
+                    route('registro.enlace', ['registro' => $registro->id, 'token' => $token]),
+                    self::VIGENCIA_HORAS,
+                ));
+            });
+
+            if ($salio && $this->llegaDeVerdad(config('mail.default'))) {
+                $canales[] = 'correo';
+            }
         }
 
-        if (filled($registro->telefono) && $this->intentar(
-            fn () => $this->whatsapp->send($registro->telefono, $codigo),
-        )) {
-            $canales[] = 'whatsapp';
+        if (filled($registro->telefono)) {
+            $salio = $this->intentar(fn () => $this->whatsapp->send($registro->telefono, $codigo));
+
+            if ($salio && $this->llegaDeVerdad(config('services.whatsapp.channel'))) {
+                $canales[] = 'whatsapp';
+            }
         }
 
         return $canales;
+    }
+
+    /**
+     * Si un envío por ese medio llega a alguien. En producción un correo o un
+     * WhatsApp configurados en `log` o `array` no fallan —solo dejan el código
+     * en el log del servidor—, y decirle a la persona «te lo mandamos» sería
+     * falso. En desarrollo no se pregunta: ahí `log` es como se prueba, y la
+     * pantalla se comporta igual que con un medio real.
+     */
+    private function llegaDeVerdad(mixed $medio): bool
+    {
+        return ! app()->isProduction() || ! in_array($medio, ['log', 'array'], true);
     }
 
     public function confirmarConCodigo(RegistroDePropietario $registro, string $codigo): bool

@@ -82,8 +82,8 @@ class RegistrosDePropietariosResource extends Resource
                             TextEntry::make('calle')->label('Calle y número')
                                 ->state(fn (LoteRegistrado $lote): string => $lote->etiqueta())
                                 ->weight('bold'),
-                            TextEntry::make('manzana')->label('Manzana'),
-                            TextEntry::make('lote')->label('Lote'),
+                            TextEntry::make('manzana')->label('Manzana')->placeholder('—'),
+                            TextEntry::make('lote')->label('Lote')->placeholder('—'),
                             TextEntry::make('situacion')->label('Situación')
                                 ->state(fn (LoteRegistrado $lote): string => $lote->situacion->etiqueta()),
                         ]),
@@ -144,7 +144,7 @@ class RegistrosDePropietariosResource extends Resource
                 TextColumn::make('lotes')
                     ->label('Lotes')
                     ->state(fn (RegistroDePropietario $registro): array => $registro->lotes
-                        ->map(fn (LoteRegistrado $lote): string => $lote->etiqueta().' · Mz '.$lote->manzana.', lote '.$lote->lote)
+                        ->map(fn (LoteRegistrado $lote): string => implode(' · ', array_filter([$lote->etiqueta(), $lote->ubicacion()])))
                         ->all())
                     ->listWithLineBreaks()
                     // Buscar «Margarita 128» o solo «128»: la búsqueda entra por la

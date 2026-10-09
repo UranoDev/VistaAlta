@@ -111,12 +111,19 @@ class RegistroDePropietariosTest extends TestCase
         $this->assertNull(RegistroDePropietario::query()->sole()->telefono);
     }
 
-    public function test_sin_telefono_ni_correo_no_se_guarda(): void
+    public function test_sin_correo_no_se_guarda_aunque_haya_telefono(): void
     {
-        $this->post(route('registro.store'), $this->envio(['telefono' => '', 'correo' => '']))
-            ->assertSessionHasErrors(['telefono', 'correo']);
+        $this->post(route('registro.store'), $this->envio(['correo' => '']))
+            ->assertSessionHasErrors(['correo' => 'Escribe tu correo. Ahí te mandamos el código para confirmar tu registro.']);
 
         $this->assertDatabaseCount('registros_de_propietarios', 0);
+    }
+
+    public function test_el_telefono_es_opcional(): void
+    {
+        $this->post(route('registro.store'), $this->envio(['telefono' => '']))->assertSessionHasNoErrors();
+
+        $this->assertDatabaseCount('registros_de_propietarios', 1);
     }
 
     public function test_un_contacto_adicional_tambien_necesita_telefono_o_correo(): void
@@ -143,11 +150,63 @@ class RegistroDePropietariosTest extends TestCase
         ]))->assertSessionHasErrors(['lotes.0.calle', 'lotes.0.situacion']);
     }
 
-    public function test_cada_dato_del_lote_es_obligatorio(): void
+    public function test_un_lote_sin_ninguna_forma_de_ubicarlo_se_rechaza(): void
     {
         $this->post(route('registro.store'), $this->envio([
             'lotes' => [0 => ['numero_oficial' => '', 'manzana' => '', 'lote' => '']],
-        ]))->assertSessionHasErrors(['lotes.0.numero_oficial', 'lotes.0.manzana', 'lotes.0.lote']);
+        ]))->assertSessionHasErrors([
+            'lotes.0.numero_oficial' => 'Escribe el número oficial, o bien la manzana y el lote.',
+        ]);
+
+        $this->assertDatabaseCount('registros_de_propietarios', 0);
+    }
+
+    public function test_con_numero_oficial_el_lote_no_pide_manzana_ni_lote(): void
+    {
+        $this->post(route('registro.store'), $this->envio([
+            'lotes' => [0 => ['numero_oficial' => '128', 'manzana' => '', 'lote' => '']],
+        ]))->assertSessionHasNoErrors();
+
+        $lote = LoteRegistrado::query()->sole();
+
+        $this->assertSame('128', $lote->numero_oficial);
+        $this->assertSame('', $lote->manzana);
+        $this->assertSame('Margarita 128', $lote->etiqueta());
+        $this->assertSame('', $lote->ubicacion());
+    }
+
+    public function test_con_manzana_y_lote_no_pide_numero_oficial(): void
+    {
+        $this->post(route('registro.store'), $this->envio([
+            'lotes' => [0 => ['numero_oficial' => '']],
+        ]))->assertSessionHasNoErrors();
+
+        $lote = LoteRegistrado::query()->sole();
+
+        $this->assertSame('', $lote->numero_oficial);
+        $this->assertSame('Margarita', $lote->etiqueta());
+        $this->assertSame('Mz 4, lote 12', $lote->ubicacion());
+    }
+
+    public function test_sin_numero_oficial_la_manzana_y_el_lote_van_juntos(): void
+    {
+        $this->post(route('registro.store'), $this->envio([
+            'lotes' => [0 => ['numero_oficial' => '', 'lote' => '']],
+        ]))->assertSessionHasErrors(['lotes.0.lote' => 'Falta el lote. Si no lo tienes, escribe el número oficial.']);
+
+        $this->post(route('registro.store'), $this->envio([
+            'lotes' => [0 => ['numero_oficial' => '', 'manzana' => '']],
+        ]))->assertSessionHasErrors(['lotes.0.manzana' => 'Falta la manzana. Si no la tienes, escribe el número oficial.']);
+    }
+
+    public function test_cada_lote_se_evalua_por_separado(): void
+    {
+        $this->post(route('registro.store'), $this->envio([
+            'lotes' => [
+                0 => ['numero_oficial' => '128', 'manzana' => '', 'lote' => ''],
+                1 => ['calle' => 'Nube', 'numero_oficial' => '', 'manzana' => '', 'lote' => '', 'situacion' => 'terreno'],
+            ],
+        ]))->assertSessionHasErrors(['lotes.1.numero_oficial'])->assertSessionDoesntHaveErrors(['lotes.0.manzana', 'lotes.0.lote']);
     }
 
     public function test_sin_aceptar_el_aviso_no_se_guarda(): void

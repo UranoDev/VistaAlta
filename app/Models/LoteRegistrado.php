@@ -39,10 +39,22 @@ class LoteRegistrado extends Model
     }
 
     /**
-     * Cómo se nombra el lote en listas y búsquedas: «Margarita 128».
+     * Cómo se nombra el lote en listas y búsquedas: «Margarita 128», o solo
+     * «Margarita» si se ubicó por manzana y lote.
      */
     public function etiqueta(): string
     {
-        return $this->calle->value.' '.$this->numero_oficial;
+        return trim($this->calle->value.' '.$this->numero_oficial);
+    }
+
+    /**
+     * La manzana y el lote, como «Mz 4, lote 12»; vacío si no se dieron.
+     */
+    public function ubicacion(): string
+    {
+        return implode(', ', array_filter([
+            $this->manzana !== '' ? 'Mz '.$this->manzana : null,
+            $this->lote !== '' ? 'lote '.$this->lote : null,
+        ]));
     }
 }

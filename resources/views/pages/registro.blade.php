@@ -10,8 +10,10 @@
     1. **Los lotes se eligen, no se escriben.** La calle es una lista cerrada
        (`App\Enums\Calle`), igual que la situación del lote: de texto libre,
        el filtro del panel tendría tres «Margarita».
-    2. **Con teléfono o correo basta.** Pedir los dos deja fuera a quien solo
-       tiene uno, y a esa persona sí hay que poder localizarla.
+    2. **El correo es obligatorio y el teléfono no.** El código y el enlace que
+       confirman el registro salen por correo; WhatsApp es un canal extra que
+       quizá no esté configurado, y sin correo el registro no se podría confirmar.
+       El lote se ubica por número oficial, o por manzana y lote.
     3. **Sin OTP.** No publica nada: lo que se captura solo lo lee quien entra
        al panel. Lo cuida un tope por IP en la ruta y un campo trampa.
     4. **Fuera de los buscadores y del menú.** Se comparte como enlace; no es
@@ -102,7 +104,8 @@
                                                  required />
 
                         <x-palette-receipt.nota variante="neutra">
-                            Indica al menos un medio de contacto: teléfono o correo. Con uno basta.
+                            El correo es obligatorio: ahí te mandamos el código para confirmar tu registro.
+                            El teléfono es opcional.
                         </x-palette-receipt.nota>
 
                         <x-palette-receipt.campo nombre="telefono"
@@ -114,12 +117,12 @@
                                                  placeholder="10 dígitos" />
 
                         <x-palette-receipt.campo nombre="correo"
-                                                 etiqueta="Correo electrónico"
+                                                 etiqueta="Correo electrónico *"
                                                  tipo="email"
                                                  inputmode="email"
                                                  autocomplete="email"
                                                  :value="old('correo')"
-                                                 placeholder="nombre@correo.com" />
+                                                 placeholder="nombre@correo.com" required />
 
                         <div data-repetible
                              data-minimo="0"

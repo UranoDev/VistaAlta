@@ -62,14 +62,18 @@ class RegistrarPropietarioRequest extends FormRequest
 
         return [
             'nombre' => ['required', 'string', 'max:255'],
-            'telefono' => [...$telefono, 'required_without:correo'],
-            'correo' => ['nullable', 'email:rfc', 'max:255', 'required_without:telefono'],
+            // El correo es obligatorio: ahí llega el código y el enlace que
+            // confirman el registro. El teléfono es opcional.
+            'telefono' => $telefono,
+            'correo' => ['required', 'email:rfc', 'max:255'],
 
             'lotes' => ['required', 'array', 'min:1', 'max:20'],
             'lotes.*.calle' => ['required', Rule::enum(Calle::class)],
-            'lotes.*.numero_oficial' => ['required', 'string', 'max:20'],
-            'lotes.*.manzana' => ['required', 'string', 'max:20'],
-            'lotes.*.lote' => ['required', 'string', 'max:20'],
+            // El lote se ubica por número oficial, o por manzana y lote; con una de
+            // las dos formas basta, igual que en la lista de espera de internet.
+            'lotes.*.numero_oficial' => ['nullable', 'string', 'max:20', 'required_without_all:lotes.*.manzana,lotes.*.lote'],
+            'lotes.*.manzana' => ['nullable', 'string', 'max:20', 'required_without:lotes.*.numero_oficial'],
+            'lotes.*.lote' => ['nullable', 'string', 'max:20', 'required_without:lotes.*.numero_oficial'],
             'lotes.*.situacion' => ['required', Rule::enum(SituacionDelLote::class)],
 
             'contactos' => ['nullable', 'array', 'max:10'],
@@ -106,7 +110,11 @@ class RegistrarPropietarioRequest extends FormRequest
             'lotes.min' => 'Registra al menos un lote.',
             'lotes.max' => 'Son demasiados lotes para un solo registro. Escríbenos y lo vemos.',
             'contactos.max' => 'Son demasiados contactos. Deja los más importantes.',
+            'correo.required' => 'Escribe tu correo. Ahí te mandamos el código para confirmar tu registro.',
             'lotes.*.calle.enum' => 'Elige una de las calles.',
+            'lotes.*.numero_oficial.required_without_all' => 'Escribe el número oficial, o bien la manzana y el lote.',
+            'lotes.*.manzana.required_without' => 'Falta la manzana. Si no la tienes, escribe el número oficial.',
+            'lotes.*.lote.required_without' => 'Falta el lote. Si no lo tienes, escribe el número oficial.',
             'lotes.*.situacion.enum' => 'Elige cómo está el lote.',
             'acepto_aviso.accepted' => 'Marca esta casilla para poder enviar tu registro.',
         ];
@@ -138,7 +146,7 @@ class RegistrarPropietarioRequest extends FormRequest
         return [
             'nombre' => trim($datos['nombre']),
             'telefono' => $datos['telefono'] ?? null,
-            'correo' => filled($datos['correo'] ?? null) ? mb_strtolower(trim($datos['correo'])) : null,
+            'correo' => mb_strtolower(trim($datos['correo'])),
             'emergencia_nombre' => filled($datos['emergencia_nombre'] ?? null) ? trim($datos['emergencia_nombre']) : null,
             'emergencia_telefono' => $datos['emergencia_telefono'] ?? null,
             'residentes' => isset($datos['residentes']) && $datos['residentes'] !== '' ? (int) $datos['residentes'] : null,
@@ -154,9 +162,10 @@ class RegistrarPropietarioRequest extends FormRequest
     {
         return array_values(array_map(fn (array $lote): array => [
             'calle' => $lote['calle'],
-            'numero_oficial' => trim($lote['numero_oficial']),
-            'manzana' => trim($lote['manzana']),
-            'lote' => trim($lote['lote']),
+            // Lo que no se dio queda vacío, no nulo: las columnas no aceptan NULL.
+            'numero_oficial' => trim($lote['numero_oficial'] ?? ''),
+            'manzana' => trim($lote['manzana'] ?? ''),
+            'lote' => trim($lote['lote'] ?? ''),
             'situacion' => $lote['situacion'],
         ], $this->validated()['lotes']));
     }

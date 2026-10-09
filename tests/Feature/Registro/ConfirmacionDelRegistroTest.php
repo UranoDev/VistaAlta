@@ -10,6 +10,7 @@ use App\Models\RegistroDePropietario;
 use App\Support\Otp\ArrayWhatsAppOtpSender;
 use App\Support\Otp\CloudApiWhatsAppOtpSender;
 use App\Support\Registro\ConfirmacionDelRegistro;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -232,12 +233,45 @@ class ConfirmacionDelRegistroTest extends TestCase
         $this->get(route('registro.confirmar'))->assertSee('a tu correo');
     }
 
-    public function test_sin_correo_el_codigo_sale_solo_por_whatsapp(): void
+    public function test_sin_correo_no_hay_registro_porque_el_correo_es_el_camino_para_confirmar(): void
     {
-        $this->post(route('registro.store'), [...$this->envio(), 'correo' => ''])->assertRedirect(route('registro.confirmar'));
+        $this->post(route('registro.store'), [...$this->envio(), 'correo' => ''])->assertSessionHasErrors('correo');
 
         Mail::assertNothingSent();
-        $this->assertNotNull(ArrayWhatsAppOtpSender::ultimoCodigoPara('5512345678'));
+        $this->assertDatabaseCount('registros_de_propietarios', 0);
+    }
+
+    /**
+     * En producción un correo o un WhatsApp configurados en `log` o `array` no
+     * fallan: dejan el código en el log del servidor y nadie lo recibe. La
+     * pantalla no puede decir «te mandamos un código» en ese caso.
+     */
+    public function test_en_produccion_con_el_correo_en_log_no_dice_que_lo_mando(): void
+    {
+        $this->app['env'] = 'production';
+        // En producción Laravel exige el token CSRF, que en pruebas no se manda.
+        $this->withoutMiddleware(PreventRequestForgery::class);
+        config(['mail.default' => 'log', 'services.whatsapp.channel' => 'log']);
+
+        $this->post(route('registro.store'), $this->envio())->assertRedirect(route('registro.confirmar'));
+
+        $this->get(route('registro.confirmar'))
+            ->assertSee('no pudimos mandarte el código')
+            ->assertDontSee('Te mandamos un código de 6 dígitos');
+    }
+
+    public function test_en_produccion_con_el_correo_real_y_whatsapp_en_log_solo_dice_el_correo(): void
+    {
+        $this->app['env'] = 'production';
+        // En producción Laravel exige el token CSRF, que en pruebas no se manda.
+        $this->withoutMiddleware(PreventRequestForgery::class);
+        config(['mail.default' => 'smtp', 'services.whatsapp.channel' => 'log']);
+
+        $this->post(route('registro.store'), $this->envio());
+
+        $this->get(route('registro.confirmar'))
+            ->assertSee('a tu correo (ma***@correo.com)')
+            ->assertDontSee('WhatsApp');
     }
 
     public function test_sin_telefono_el_codigo_sale_solo_por_correo(): void

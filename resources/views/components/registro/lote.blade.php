@@ -52,31 +52,32 @@
         @endif
     </fieldset>
 
+    <x-palette-receipt.nota variante="neutra">
+        Escribe el número oficial, o bien la manzana y el lote. Con una de las dos formas basta.
+    </x-palette-receipt.nota>
+
     <div class="grid grid-cols-3 gap-3">
         <x-palette-receipt.campo nombre="lotes[{{ $i }}][numero_oficial]"
-                                 etiqueta="Núm. oficial *"
+                                 etiqueta="Núm. oficial"
                                  :error="$error('numero_oficial')"
                                  :value="$valores['numero_oficial'] ?? ''"
                                  placeholder="Ej. 128"
                                  inputmode="text"
-                                 maxlength="20"
-                                 required />
+                                 maxlength="20" />
 
         <x-palette-receipt.campo nombre="lotes[{{ $i }}][manzana]"
-                                 etiqueta="Manzana *"
+                                 etiqueta="Manzana"
                                  :error="$error('manzana')"
                                  :value="$valores['manzana'] ?? ''"
                                  placeholder="Ej. 4"
-                                 maxlength="20"
-                                 required />
+                                 maxlength="20" />
 
         <x-palette-receipt.campo nombre="lotes[{{ $i }}][lote]"
-                                 etiqueta="Lote *"
+                                 etiqueta="Lote"
                                  :error="$error('lote')"
                                  :value="$valores['lote'] ?? ''"
                                  placeholder="Ej. 12"
-                                 maxlength="20"
-                                 required />
+                                 maxlength="20" />
     </div>
 
     <fieldset class="space-y-2">

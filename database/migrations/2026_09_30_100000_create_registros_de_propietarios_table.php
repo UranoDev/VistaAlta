@@ -22,7 +22,11 @@ return new class extends Migration
             $table->string('emergencia_nombre')->nullable();
             $table->string('emergencia_telefono', 10)->nullable();
             // Cuándo aceptó y qué versión del Aviso de Privacidad tenía enfrente.
-            $table->timestamp('aceptado_en');
+            //
+            // `useCurrent()` no es un adorno: en MariaDB 10.5 la primera columna TIMESTAMP
+            // sin valor por omisión se declara sola con ON UPDATE CURRENT_TIMESTAMP, y esta
+            // fecha se sobrescribiría con cada verificación o validación del registro.
+            $table->timestamp('aceptado_en')->useCurrent();
             $table->string('aviso_version');
 
             // Verificación del correo. Solo se guardan los hashes del código y del

@@ -4,12 +4,15 @@ Runbook del primer despliegue y de los subsecuentes. El dominio y el porqué de
 servirlo pelón están en `docs/adr/0002`.
 
 La aplicación es más simple de operar de lo que suele ser un Laravel: **no tiene
-tareas programadas ni jobs en cola** (`routes/console.php` está en su estado por
-omisión y no hay una sola clase `ShouldQueue`), así que **no hace falta cron ni
-un worker corriendo**. Tampoco manda correo — los `Notification::make()` del
-panel son avisos de interfaz, no mensajes salientes. Lo único que sale del
-servidor hacia afuera es la llamada HTTP a Twilio cuando alguien pide su código
-para comentar.
+jobs en cola** (no hay una sola clase `ShouldQueue`), así que **no hace falta un
+worker corriendo**. Lo que sí necesita es **una entrada de cron** (sección 8b), que
+cada día borra los datos personales que llevan dos años sin usarse, como promete el
+Aviso de Privacidad.
+
+Lo que sale del servidor hacia afuera: el **SMS** del código de verificación (Twilio)
+y el **correo** con el código y el enlace del registro de propietarios (SMTP, por
+ejemplo Amazon SES). Los `Notification::make()` del panel son avisos de interfaz, no
+mensajes salientes.
 
 ---
 
@@ -304,6 +307,17 @@ TWILIO_AUTH_TOKEN=...
 TWILIO_FROM=+1...
 
 ASOCIACION_CIVIL_VIDEO_URL=https://www.youtube.com/embed/...
+
+# Correo del registro de propietarios (código y enlace de verificación). Sin esto
+# el correo se queda en el log y nadie lo recibe. Con Amazon SES, el servidor y las
+# credenciales SMTP salen de la consola de SES (SMTP settings).
+MAIL_MAILER=smtp
+MAIL_HOST=email-smtp.us-east-1.amazonaws.com
+MAIL_PORT=587
+MAIL_USERNAME=...
+MAIL_PASSWORD=...
+MAIL_FROM_ADDRESS="admon@vistaaltatx.com"
+MAIL_FROM_NAME="Vista Alta"
 ```
 
 Los tres que más caro cuestan si se olvidan:
@@ -443,6 +457,32 @@ cambio posterior a `.env` exige volver a correr `config:cache` o no surte efecto
 
 ---
 
+## 8b. Tarea programada: borrar los datos que ya no se usan
+
+El Aviso de Privacidad promete que los datos personales se eliminan solos a los dos
+años de su última actualización. Lo cumple el comando `datos:depurar`, que Laravel
+programa a diario a las 03:30 (`routes/console.php`). Para que corra, el servidor
+tiene que ejecutar el programador cada minuto.
+
+En Plesk: **Tools & Settings › Scheduled Tasks** (o la del dominio, en **Websites &
+Domains › Scheduled Tasks**) › **Add Task**:
+
+- **Task type:** Run a command
+- **Command:** `cd ~/httpdocs && php artisan schedule:run >> /dev/null 2>&1`
+- **Run:** Cron style, `* * * * *`
+
+Para ver qué borraría sin borrar nada (conviene antes de cambiar el plazo en
+`contenido.legal.conservacion_anos`):
+
+```bash
+php artisan datos:depurar --simular
+```
+
+Si la tarea no está dada de alta, **nada se borra** y el Aviso estaría diciendo algo
+que no ocurre.
+
+---
+
 ## 9. TLS
 
 Plesk → **SSL/TLS Certificates → Install a free basic certificate** (Let's
@@ -540,3 +580,34 @@ mysql -u vistaalta -p vistaalta < ~/respaldos/vistaalta-2026-07-29-1430.sql
 ```
 
 Los Comentarios y sus teléfonos solo existen en esa base. No hay segunda copia.
+
+---
+
+## 13. Atender una solicitud de acceso a los datos (derechos ARCO)
+
+Cuando alguien escribe al buzón pidiendo «todo lo que tienen de mí», se le entrega con
+un comando. **Antes, comprueba quién pide:** el comando no puede saber si quien
+escribió es la persona, y los datos que entrega son personales.
+
+```bash
+php artisan datos:entregar marta@correo.com
+```
+
+Reúne lo que el sitio tiene de esa persona (registro de propietario con sus lotes y
+contactos, lista de internet, comentarios, códigos pedidos), lo escribe en un ZIP con un
+`datos.txt` para leerlo y un `datos.json` para llevárselo, y lo manda por correo. No deja
+copia en el servidor.
+
+- El identificador es el **correo** o el **celular** (a 10 dígitos). Si es el celular,
+  se manda al correo que esa persona verificó junto con él; si no hay uno, el comando se
+  detiene y pide `--a=correo@ejemplo.com`.
+- `--a=` manda a otro correo. Es decisión de quien corre el comando: úsala solo con la
+  identidad comprobada.
+- `--clave=...` cifra el ZIP. La clave **no va en el correo**: dásela por otro medio (por
+  ejemplo, por SMS al celular de la persona).
+- `--sin-enviar` deja el ZIP en `storage/app/entregas/` para revisarlo. Es de quien lo
+  generó borrarlo.
+- Si no hay datos de esa persona, no genera ni manda nada.
+
+Los pagos todavía no salen: este sitio no los registra. Cuando existan, se suman en
+`app/Support/Datos/ReunirDatosDeUnaPersona.php`.

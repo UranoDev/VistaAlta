@@ -164,23 +164,12 @@
                                                  autocomplete="off"
                                                  maxlength="255" />
 
-                        <div class="grid gap-4 sm:grid-cols-[2fr_1fr]">
-                            <x-palette-receipt.campo nombre="emergencia_telefono"
-                                                     etiqueta="Teléfono"
-                                                     tipo="tel"
-                                                     inputmode="tel"
-                                                     :value="old('emergencia_telefono')"
-                                                     placeholder="10 dígitos" />
-
-                            <x-palette-receipt.campo nombre="residentes"
-                                                     etiqueta="Residentes"
-                                                     tipo="number"
-                                                     inputmode="numeric"
-                                                     min="0"
-                                                     max="99"
-                                                     :value="old('residentes')"
-                                                     placeholder="Ej. 4" />
-                        </div>
+                        <x-palette-receipt.campo nombre="emergencia_telefono"
+                                                 etiqueta="Teléfono"
+                                                 tipo="tel"
+                                                 inputmode="tel"
+                                                 :value="old('emergencia_telefono')"
+                                                 placeholder="10 dígitos" />
                     </div>
                 </x-palette-receipt.tarjeta>
 

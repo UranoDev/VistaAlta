@@ -86,7 +86,14 @@ return [
      * afirmación, no un dato de bitácora.
      */
     'legal' => [
-        'actualizado_en' => '6 de octubre de 2026',
+        'actualizado_en' => '9 de octubre de 2026',
+
+        /*
+         * Cuántos años se conservan los datos personales después de la última vez
+         * que se actualizaron o usaron. El Aviso de Privacidad lo dice (sección 6)
+         * y `datos:depurar` lo cumple: los dos leen esta llave.
+         */
+        'conservacion_anos' => 2,
     ],
 
     /*

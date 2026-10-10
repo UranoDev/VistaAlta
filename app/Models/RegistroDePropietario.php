@@ -50,7 +50,7 @@ use LogicException;
  */
 #[Fillable([
     'nombre', 'telefono', 'correo',
-    'emergencia_nombre', 'emergencia_telefono', 'residentes',
+    'emergencia_nombre', 'emergencia_telefono',
     'aceptado_en', 'aviso_version',
 ])]
 #[Hidden(['correo_codigo_hash', 'correo_enlace_hash', 'telefono_codigo_hash'])]
@@ -68,7 +68,6 @@ class RegistroDePropietario extends Model
     {
         return [
             'aceptado_en' => 'datetime',
-            'residentes' => 'integer',
             'correo_expira_en' => 'datetime',
             'correo_enviado_en' => 'datetime',
             'correo_verificado_en' => 'datetime',

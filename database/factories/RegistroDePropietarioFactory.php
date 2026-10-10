@@ -27,7 +27,6 @@ class RegistroDePropietarioFactory extends Factory
             'correo' => fake()->unique()->safeEmail(),
             'emergencia_nombre' => null,
             'emergencia_telefono' => null,
-            'residentes' => null,
             'aceptado_en' => now(),
             'aviso_version' => '13 de septiembre de 2026',
         ];

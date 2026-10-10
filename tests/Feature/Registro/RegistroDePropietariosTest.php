@@ -67,7 +67,6 @@ class RegistroDePropietariosTest extends TestCase
             ],
             'emergencia_nombre' => 'Ana Ejemplo',
             'emergencia_telefono' => '5511112222',
-            'residentes' => '4',
         ]))->assertRedirect(route('registro.confirmar'));
 
         $registro = RegistroDePropietario::query()->sole();
@@ -75,7 +74,6 @@ class RegistroDePropietariosTest extends TestCase
         $this->assertSame('Marta Ejemplo Pérez', $registro->nombre);
         $this->assertSame('5512345678', $registro->telefono);
         $this->assertSame('marta@correo.com', $registro->correo);
-        $this->assertSame(4, $registro->residentes);
         $this->assertSame('Ana Ejemplo', $registro->emergencia_nombre);
         $this->assertNotNull($registro->aceptado_en);
         $this->assertSame(config('contenido.legal.actualizado_en'), $registro->aviso_version);

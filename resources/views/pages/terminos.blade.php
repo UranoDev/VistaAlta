@@ -56,10 +56,15 @@
                         Llevar la lista de espera para la instalación de internet: cada propiedad que la pide se anota
                         con su domicilio y su celular, y recibe un folio.
                     </li>
+                    <li>
+                        Recibir el registro de los propietarios: cada persona declara sus lotes y su correo o su
+                        celular, los verifica y la Administración revisa el registro.
+                    </li>
                 </ul>
                 <p>
                     El sitio no administra el fraccionamiento: no cobra ni procesa pagos, no lleva estados de cuenta,
-                    no tiene padrón de colonos, no recibe archivos y no crea cuentas de usuario. La información
+                    no recibe archivos y no crea cuentas de usuario. El registro de propietarios recoge lo que cada
+                    persona declara y no es un padrón verificado. La información
                     publicada es de carácter informativo y se basa en los registros de la Mesa Directiva.
                 </p>
             </x-legal.seccion>
@@ -76,6 +81,12 @@
                     {{ \App\Support\VentanaDeValidacion::MINUTOS }} minutos sin volver a validarse. Transcurrido ese
                     lapso no se pierde nada de lo ya publicado: simplemente se le pedirá un código nuevo para volver a
                     escribir. Su número no se publica en ninguna parte del sitio.
+                </p>
+                <p>
+                    El registro de propietarios verifica de la misma manera el correo y el celular, cada uno con su
+                    propio código. Verificarlos acredita únicamente que quien se registra controla ese correo o ese
+                    celular: no acredita que sea propietario de los lotes que declaró. Eso lo revisa la Administración,
+                    y hasta que lo valide, el registro es solo lo que la persona declaró.
                 </p>
                 <p>
                     El Visitante es responsable de utilizar un número de teléfono del que pueda disponer legítimamente.

@@ -25,7 +25,7 @@ final class ListaCsv
     public const ENCABEZADO = [
         'Registrado', 'Propietario', 'Teléfono', 'Correo',
         'Calle', 'Núm. oficial', 'Manzana', 'Lote', 'Situación',
-        'Otros contactos', 'Contacto de emergencia', 'Teléfono de emergencia', 'Residentes',
+        'Otros contactos', 'Contacto de emergencia', 'Teléfono de emergencia',
         'Correo verificado', 'Celular verificado', 'Validado por la Administración',
     ];
 
@@ -62,7 +62,6 @@ final class ListaCsv
                     $otros,
                     $registro->emergencia_nombre,
                     $registro->emergencia_telefono,
-                    $registro->residentes,
                     self::fecha($registro->correo_verificado_en, $registro->tieneCorreo()),
                     self::fecha($registro->telefono_verificado_en, $registro->tieneTelefono()),
                     self::fecha($registro->validado_en),

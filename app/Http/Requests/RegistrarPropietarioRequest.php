@@ -84,7 +84,6 @@ class RegistrarPropietarioRequest extends FormRequest
 
             'emergencia_nombre' => ['nullable', 'string', 'max:255', 'required_with:emergencia_telefono'],
             'emergencia_telefono' => [...$telefono, 'required_with:emergencia_nombre'],
-            'residentes' => ['nullable', 'integer', 'min:0', 'max:99'],
 
             'acepto_aviso' => ['accepted'],
         ];
@@ -104,9 +103,6 @@ class RegistrarPropietarioRequest extends FormRequest
             'telefono.regex' => 'Escribe el teléfono a 10 dígitos.',
             'contactos.*.telefono.regex' => 'Escribe el teléfono a 10 dígitos.',
             'emergencia_telefono.regex' => 'Escribe el teléfono a 10 dígitos.',
-            'residentes.integer' => 'Escribe un número.',
-            'residentes.min' => 'Escribe un número de 0 a 99.',
-            'residentes.max' => 'Escribe un número de 0 a 99.',
             'lotes.required' => 'Registra al menos un lote.',
             'lotes.min' => 'Registra al menos un lote.',
             'lotes.max' => 'Son demasiados lotes para un solo registro. Escríbenos y lo vemos.',
@@ -149,7 +145,6 @@ class RegistrarPropietarioRequest extends FormRequest
             'correo' => filled($datos['correo'] ?? null) ? mb_strtolower(trim($datos['correo'])) : null,
             'emergencia_nombre' => filled($datos['emergencia_nombre'] ?? null) ? trim($datos['emergencia_nombre']) : null,
             'emergencia_telefono' => $datos['emergencia_telefono'] ?? null,
-            'residentes' => isset($datos['residentes']) && $datos['residentes'] !== '' ? (int) $datos['residentes'] : null,
             'aceptado_en' => now(),
             'aviso_version' => (string) config('contenido.legal.actualizado_en'),
         ];

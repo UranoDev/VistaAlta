@@ -116,12 +116,11 @@ class RegistrosDePropietariosResource extends Resource
                         ]),
                 ]),
 
-            Section::make('Emergencia y residentes')
-                ->columns(3)
+            Section::make('Contacto de emergencia')
+                ->columns(2)
                 ->schema([
                     TextEntry::make('emergencia_nombre')->label('Contacto de emergencia')->placeholder('Sin captura'),
                     TextEntry::make('emergencia_telefono')->label('Teléfono')->placeholder('—')->copyable(),
-                    TextEntry::make('residentes')->label('Residentes')->placeholder('—'),
                 ]),
 
             // Dos verificaciones separadas: cada medio tiene su propia marca.
@@ -245,11 +244,6 @@ class RegistrosDePropietariosResource extends Resource
                     ->label('Emergencia')
                     ->placeholder('Sin captura')
                     ->description(fn (RegistroDePropietario $registro): ?string => $registro->emergencia_telefono),
-
-                TextColumn::make('residentes')
-                    ->label('Residentes')
-                    ->placeholder('—')
-                    ->alignEnd(),
             ])
             ->filters([
                 SelectFilter::make('calle')

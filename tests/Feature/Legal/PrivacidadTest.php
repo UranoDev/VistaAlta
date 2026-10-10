@@ -47,12 +47,17 @@ class PrivacidadTest extends TestCase
      * (`ComentarioPrivadoNoSeModera` y `VisibilidadEsDefinitiva`) y la interfaz
      * ya las promete; el Aviso es donde quedan por escrito.
      */
-    public function test_declara_que_el_telefono_no_se_publica_y_que_lo_privado_no_se_vuelve_publico(): void
+    /**
+     * Las dos garantías de la sección 6. El código ya las cumple
+     * (`ComentarioPrivadoNoSeModera` y `VisibilidadEsDefinitiva`) y la interfaz
+     * ya las promete; el Aviso es donde quedan por escrito.
+     */
+    public function test_declara_que_los_datos_de_contacto_no_se_publican_y_que_lo_privado_no_se_vuelve_publico(): void
     {
-        $respuesta = $this->get(route('privacidad'));
+        $texto = $this->textoDelAviso();
 
-        $respuesta->assertSee('no se publica en ninguna parte del sitio', escape: false);
-        $respuesta->assertSee('hacerse público después, por ningún medio', escape: false);
+        $this->assertStringContainsString('no se publican en ninguna parte del sitio: solo los ve la Administración', $texto);
+        $this->assertStringContainsString('hacerse público después, por ningún medio', $texto);
     }
 
     public function test_la_seccion_de_cookies_describe_las_dos_que_existen_y_no_inventa_analitica(): void
@@ -91,19 +96,83 @@ class PrivacidadTest extends TestCase
     }
 
     /**
-     * El Aviso no puede quedarse atrás del sitio: la lista de espera de internet
-     * recaba el celular y el domicilio, y entrega la lista a Alinet. Un aviso que
-     * calla datos que sí se piden es tan falso como uno que inventa los que no.
+     * El Aviso dice qué datos se piden y para qué, de forma genérica: sin nombrar
+     * las pantallas del sitio ni los proveedores. Si volviera a nombrar un lugar
+     * del sitio o un proveedor, tendría que cambiar cada vez que cambie uno.
      */
-    public function test_cubre_la_lista_de_espera_de_internet(): void
+    public function test_describe_datos_y_finalidades_sin_nombrar_pantallas_ni_proveedores(): void
     {
         $texto = $this->textoDelAviso();
 
-        $this->assertStringContainsString('lista de espera para la instalación de internet', $texto);
-        $this->assertStringContainsString('El domicilio de la propiedad', $texto);
-        $this->assertStringContainsString('No se le pide su nombre', $texto);
-        $this->assertStringContainsString('folio consecutivo', $texto);
-        $this->assertStringContainsString('El domicilio que anota en esa lista tampoco se publica', $texto);
+        foreach (['lista de espera', 'internet', 'registro de propietarios', 'Twilio', 'Amazon', 'Alinet', 'Propuesta'] as $nombre) {
+            $this->assertStringNotContainsString($nombre, $texto, "El Aviso no debe nombrar «{$nombre}».");
+        }
+    }
+
+    public function test_enumera_los_datos_que_se_piden(): void
+    {
+        $texto = $this->textoDelAviso();
+
+        foreach ([
+            'Su nombre completo',
+            'Su número de teléfono celular',
+            'Su correo electrónico',
+            'El domicilio de una propiedad: la calle y el número oficial, o bien la manzana y el lote',
+            'El tipo de propiedad: terreno, casa terminada o casa en construcción',
+            'el nombre y el teléfono de un contacto de emergencia',
+            'El texto del comentario que escribe',
+            'una huella que no permite recuperarlo',
+            'quién lo revisó, cuándo y, si la hay, una nota',
+        ] as $dato) {
+            $this->assertStringContainsString($dato, $texto);
+        }
+
+        // Ya no se pide cuántas personas viven en la propiedad.
+        $this->assertStringNotContainsString('residentes', $texto);
+        $this->assertStringNotContainsString('cuántas personas', $texto);
+    }
+
+    public function test_dice_para_que_se_usa_cada_dato(): void
+    {
+        $texto = $this->textoDelAviso();
+
+        foreach ([
+            'Saber quién es usted y cómo localizarlo',
+            'Verificar que usted controla el celular y el correo que dio',
+            'evitar que se registre dos veces',
+            'Que la Administración revise y valide los registros',
+            'para el sistema automatizado de pagos del fraccionamiento',
+            'Avisar a las personas de contacto que usted indicó',
+            'Cumplir con obligaciones legales aplicables',
+        ] as $finalidad) {
+            $this->assertStringContainsString($finalidad, $texto);
+        }
+    }
+
+    public function test_dice_que_no_se_transfieren_datos_y_que_los_proveedores_solo_reciben_lo_necesario(): void
+    {
+        $texto = $this->textoDelAviso();
+
+        $this->assertStringContainsString('No transferimos sus datos personales a terceros, salvo a las autoridades competentes', $texto);
+        $this->assertStringContainsString('proveedores de alojamiento, de mensajería SMS y de correo electrónico', $texto);
+        $this->assertStringContainsString('Reciben únicamente los datos que necesitan para prestar ese servicio', $texto);
+        $this->assertStringContainsString('sin poder usarlos para otros fines', $texto);
+    }
+
+    /**
+     * El plazo de conservación se cumple en código (`datos:depurar`) y sale de la
+     * misma llave de configuración que el texto.
+     */
+    public function test_dice_cuanto_se_conservan_los_datos_y_el_plazo_sale_de_la_configuracion(): void
+    {
+        $this->assertStringContainsString(
+            'hasta 2 años después de la última vez que se actualizaron o usaron. Pasado ese plazo se eliminan automáticamente',
+            $this->textoDelAviso(),
+        );
+
+        config(['contenido.legal.conservacion_anos' => 3]);
+
+        $this->assertStringContainsString('hasta 3 años después', $this->textoDelAviso());
     }
 
     /**
@@ -130,6 +199,24 @@ class PrivacidadTest extends TestCase
         $texto = html_entity_decode(strip_tags($this->get(route('privacidad'))->getContent()), ENT_QUOTES | ENT_HTML5);
 
         return trim((string) preg_replace('/\s+/u', ' ', $texto));
+    }
+
+    public function test_pide_que_quien_da_datos_de_otras_personas_tenga_su_autorizacion(): void
+    {
+        $this->assertStringContainsString(
+            'cuenta con su autorización para hacerlo y que les dio a conocer este Aviso',
+            $this->textoDelAviso(),
+        );
+    }
+
+    public function test_los_terminos_dicen_que_verificar_no_acredita_ser_propietario(): void
+    {
+        $texto = trim((string) preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($this->get(route('terminos'))->getContent()), ENT_QUOTES | ENT_HTML5)));
+
+        $this->assertStringContainsString('Recibir el registro de los propietarios', $texto);
+        $this->assertStringContainsString('no acredita que sea propietario de los lotes que declaró', $texto);
+        $this->assertStringContainsString('Eso lo revisa la Administración', $texto);
+        $this->assertStringNotContainsString('no tiene padrón de colonos', $texto);
     }
 
     public function test_el_formulario_de_internet_enlaza_el_aviso(): void

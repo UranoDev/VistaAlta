@@ -1,7 +1,7 @@
 {{--
     Aviso de Privacidad. Portado de nvavista (docs/adr/0003) y recortado a lo
-    que este sitio de verdad hace: aquí no hay cuentas de usuario, ni correo
-    electrónico, ni pagos, ni carga de archivos.
+    que este sitio de verdad hace: aquí no hay cuentas de usuario, ni pagos, ni
+    carga de archivos.
 
     Tres cuidados que lo gobiernan:
 
@@ -13,12 +13,16 @@
     2. Tampoco lleva Rojo Sello. Ese color está reservado a alertas y lo usa
        /demanda; dos franjas rojas más lo volverían decoración.
 
-    3. Solo describe datos que el sitio sí recaba —teléfono, nombre y el texto
-       del comentario; el celular y el domicilio de la lista de espera de
-       internet; y la IP y la cookie de la Ventana de validación—. Un aviso que
-       enumera datos que nadie pide es tan falso como uno que calla los que sí.
-       Cuando el registro de propietarios (`/registro`) salga a producción, este
-       documento y los Términos tienen que cambiar en el mismo despliegue.
+    3. Dice qué datos se piden y para qué, **sin nombrar las pantallas** ni los
+       proveedores: una lista de datos y una lista de finalidades, genéricas. Solo
+       describe lo que el sitio sí recaba —y un aviso que enumera datos que nadie
+       pide es tan falso como uno que calla los que sí—, así que si algún
+       formulario pide o guarda algo nuevo, este documento cambia en el mismo
+       despliegue.
+
+    4. Lo que promete se cumple en código. El plazo de conservación de la
+       sección 6 sale de `contenido.legal.conservacion_anos` y lo hace valer el
+       comando `datos:depurar` (`app/Console/Commands`), que corre a diario.
 
     La fecha y el correo salen de `config/contenido.php`, que los comparte con
     los Términos de Servicio y con la página de Comprobantes.
@@ -26,6 +30,7 @@
 @php
     $correo = config('contenido.correo_contacto');
     $actualizado = config('contenido.legal.actualizado_en');
+    $conservacion = config('contenido.legal.conservacion_anos');
 @endphp
 
 <x-layout.app title="Aviso de Privacidad">
@@ -46,23 +51,33 @@
 
             <x-legal.seccion numero="2" titulo="Datos personales que recabamos">
                 <p>
-                    Este sitio recaba datos personales en dos lugares: cuando usted deja un comentario sobre la
-                    Propuesta y cuando anota una propiedad en la lista de espera para la instalación de internet.
+                    Según lo que usted haga en este sitio, le pedimos algunos de los siguientes datos personales. Cada
+                    formulario pide solo los que necesita:
                 </p>
-                <p>Al dejar un comentario, los datos que se recaban son:</p>
                 <ul class="list-disc space-y-1 pl-5">
+                    <li>Su nombre completo, o el nombre con el que decide firmar un comentario.</li>
                     <li>Su número de teléfono celular.</li>
-                    <li>El nombre con el que decide firmar su comentario.</li>
-                    <li>El texto del comentario que escribe.</li>
-                </ul>
-                <p>Al anotar una propiedad en la lista de espera de internet, los datos que se recaban son:</p>
-                <ul class="list-disc space-y-1 pl-5">
-                    <li>Su número de teléfono celular.</li>
+                    <li>Su correo electrónico.</li>
+                    <li>El domicilio de una propiedad: la calle y el número oficial, o bien la manzana y el lote.</li>
+                    <li>El tipo de propiedad: terreno, casa terminada o casa en construcción.</li>
                     <li>
-                        El domicilio de la propiedad: la calle y el número oficial, o bien la manzana y el lote. No se
-                        le pide su nombre.
+                        Si usted decide darlos: el nombre y el teléfono o el correo de otras personas a las que se puede
+                        avisar por la propiedad, y el nombre y el teléfono de un contacto de emergencia.
+                    </li>
+                    <li>El texto del comentario que escribe.</li>
+                    <li>
+                        La fecha en que aceptó este Aviso y la fecha en que verificó su correo y su celular. De los
+                        códigos de verificación no se guarda el código, sino una huella que no permite recuperarlo.
+                    </li>
+                    <li>
+                        Cuando la Administración revisa un registro: quién lo revisó, cuándo y, si la hay, una nota de
+                        cómo se revisó.
                     </li>
                 </ul>
+                <p>
+                    Si usted nos da datos de otras personas, como contactos adicionales o de emergencia, manifiesta que
+                    cuenta con su autorización para hacerlo y que les dio a conocer este Aviso.
+                </p>
                 <p>
                     No recabamos datos personales sensibles (por ejemplo, origen étnico o racial, estado de salud,
                     información genética, creencias religiosas, filosóficas o morales, afiliación sindical, opiniones
@@ -75,63 +90,53 @@
 
             <x-legal.seccion numero="3" titulo="Finalidades del tratamiento">
                 <p>
-                    Sus datos personales serán utilizados única y exclusivamente para las siguientes finalidades,
-                    necesarias para el servicio que usted pidió.
+                    Sus datos personales se usan única y exclusivamente para las siguientes finalidades, necesarias para
+                    el servicio que usted pidió:
                 </p>
-                <p>Si deja un comentario sobre la Propuesta:</p>
                 <ul class="list-disc space-y-1 pl-5">
+                    <li>Saber quién es usted y cómo localizarlo, con su nombre, su celular y su correo.</li>
                     <li>
-                        Validar, mediante un código enviado por SMS, que del otro lado hay una persona a la que se le
-                        puede responder.
+                        Verificar que usted controla el celular y el correo que dio, con un código enviado por SMS o por
+                        correo.
+                    </li>
+                    <li>Identificar la propiedad de que se trata, con su domicilio y su tipo, y evitar que se registre dos veces.</li>
+                    <li>
+                        Que la Administración revise y valide los registros, es decir, que dé por cierta la información
+                        que usted declaró.
                     </li>
                     <li>
-                        Publicar su comentario en este sitio junto con el nombre que usted escribió, únicamente si
-                        usted eligió que fuera público y después de que la Mesa Directiva lo publique.
+                        Integrar la información de los propietarios y de sus propiedades para el sistema automatizado de
+                        pagos del fraccionamiento.
                     </li>
                     <li>
-                        Permitir que la Mesa Directiva lea su comentario y le conteste por el mismo número que validó.
+                        Dar seguimiento a los servicios que usted solicitó y responder a sus comentarios. Un comentario
+                        se publica con el nombre que usted escribió únicamente si usted eligió que fuera público y
+                        después de que la Administración lo publique.
                     </li>
-                </ul>
-                <p>Si anota una propiedad en la lista de espera de internet:</p>
-                <ul class="list-disc space-y-1 pl-5">
                     <li>
-                        Registrar la propiedad en la lista y asignarle un folio consecutivo, con el que se identifica
-                        su lugar.
+                        Avisar a las personas de contacto que usted indicó, y localizar a su contacto de emergencia
+                        cuando haga falta.
                     </li>
-                    <li>Evitar que una misma propiedad se anote dos veces.</li>
-                    <li>Darle seguimiento a la instalación, por su celular.</li>
-                </ul>
-                <p>En ambos casos:</p>
-                <ul class="list-disc space-y-1 pl-5">
                     <li>Cumplir con obligaciones legales aplicables.</li>
                 </ul>
                 <p>
                     No utilizaremos sus datos personales para finalidades distintas a las aquí descritas, como
-                    mercadotecnia, publicidad o prospección comercial. Este sitio no crea cuentas de usuario, no recaba
-                    correo electrónico, no procesa pagos y no recibe archivos.
+                    mercadotecnia, publicidad o prospección comercial. Este sitio no crea cuentas de usuario, no procesa
+                    pagos y no recibe archivos.
                 </p>
             </x-legal.seccion>
 
             <x-legal.seccion numero="4" titulo="Transferencia de datos personales">
                 <p>
-                    Sus datos personales podrán ser compartidos con las siguientes personas, en el entendido de que
-                    dicha transferencia no requiere de su consentimiento por encontrarse en alguno de los supuestos de
-                    excepción previstos en el artículo 37 de la LFPDPPP, o bien contando con su consentimiento cuando
-                    así lo requiera la ley:
+                    No transferimos sus datos personales a terceros, salvo a las autoridades competentes cuando exista un
+                    requerimiento legal fundado y motivado.
                 </p>
-                <ul class="list-disc space-y-1 pl-5">
-                    <li>
-                        Twilio, el proveedor a través del cual se envía el mensaje SMS con el código de validación de
-                        los comentarios, que para ese fin recibe su número de teléfono y lo trata únicamente por cuenta
-                        y siguiendo las instrucciones del Responsable.
-                    </li>
-                    <li>
-                        Proveedores de servicios tecnológicos que nos apoyan en el alojamiento (hosting) o
-                        mantenimiento del sitio, quienes tratan los datos únicamente por cuenta y siguiendo las
-                        instrucciones del Responsable.
-                    </li>
-                    <li>Autoridades competentes, cuando exista un requerimiento legal fundado y motivado.</li>
-                </ul>
+                <p>
+                    Para operar el sitio nos apoyamos en proveedores de alojamiento, de mensajería SMS y de correo
+                    electrónico. Reciben únicamente los datos que necesitan para prestar ese servicio —por ejemplo, el
+                    número o la dirección de destino y el contenido del mensaje con el código— y los tratan por cuenta
+                    nuestra y siguiendo nuestras instrucciones, sin poder usarlos para otros fines.
+                </p>
                 <p>
                     No vendemos, rentamos ni compartimos sus datos personales con terceros para fines de mercadotecnia
                     ajenos a este Aviso.
@@ -166,16 +171,20 @@
                 </p>
             </x-legal.seccion>
 
-            <x-legal.seccion numero="6" titulo="Limitación de uso y divulgación">
+            <x-legal.seccion numero="6" titulo="Limitación de uso, divulgación y conservación">
                 <p>
-                    Su número de teléfono no se publica en ninguna parte del sitio. En los comentarios se utiliza
-                    únicamente para validar que del otro lado hay una persona a la que se puede responder; en la lista
-                    de espera de internet, para el seguimiento de la instalación. El domicilio que anota en esa lista
-                    tampoco se publica.
+                    Su número de teléfono, su correo, su domicilio y los datos de sus contactos no se publican en
+                    ninguna parte del sitio: solo los ve la Administración, en su panel. Lo único que se publica es el
+                    nombre que usted escribe al firmar un comentario público, junto con el comentario, y solo después
+                    de que la Administración lo publique.
                 </p>
                 <p>
-                    Si usted elige que su comentario sea privado, lo lee únicamente la Mesa Directiva y no puede
+                    Si usted elige que su comentario sea privado, lo lee únicamente la Administración y no puede
                     hacerse público después, por ningún medio.
+                </p>
+                <p>
+                    Conservamos sus datos personales mientras se usan y hasta {{ $conservacion }} años después de la
+                    última vez que se actualizaron o usaron. Pasado ese plazo se eliminan automáticamente.
                 </p>
                 <p>
                     Si desea dejar de recibir comunicaciones de nuestra parte o solicitar que sus datos no sean
@@ -189,8 +198,8 @@
                 <ul class="list-disc space-y-1 pl-5">
                     <li>
                         La cookie de sesión que la plataforma necesita para el funcionamiento básico del sitio y para
-                        proteger los formularios. En la sesión se recuerda el celular que acaba de anotar en la lista de
-                        espera de internet, para no pedirle que lo escriba otra vez si anota otra propiedad.
+                        proteger los formularios. En la sesión se recuerda lo que usted está haciendo, como el celular
+                        que acaba de escribir o el registro que está verificando, para no pedírselo otra vez.
                     </li>
                     <li>
                         Una cookie cifrada y firmada que guarda su número de teléfono durante
@@ -201,8 +210,8 @@
                 <p>
                     El sitio no utiliza herramientas de analítica, publicidad, perfilamiento ni rastreo de terceros, ni
                     web beacons. Si usted borra las cookies de su navegador, lo único que ocurre es que se le pedirá un
-                    código nuevo para volver a comentar y que el formulario de internet ya no traerá su celular
-                    escrito.
+                    código nuevo para volver a comentar, que los formularios ya no traigan escritos sus datos y
+                    que, si estaba verificando un registro, lo retome con el enlace del correo que se le mandó.
                 </p>
             </x-legal.seccion>
 
@@ -219,9 +228,9 @@
 
             <x-legal.seccion numero="9" titulo="Consentimiento">
                 <p>
-                    Al validar su teléfono y dejar un comentario en este sitio, o al anotar una propiedad en la lista de
-                    espera de internet, usted manifiesta su consentimiento para el tratamiento de sus datos personales
-                    conforme a los términos establecidos en el presente Aviso de Privacidad.
+                    Al validar su teléfono, enviar un formulario o aceptar este Aviso en este sitio, usted manifiesta
+                    su consentimiento para el tratamiento de sus datos personales conforme a los términos establecidos
+                    en el presente Aviso de Privacidad.
                 </p>
             </x-legal.seccion>
 

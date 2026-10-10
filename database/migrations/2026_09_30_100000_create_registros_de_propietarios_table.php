@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('correo')->nullable();
             $table->string('emergencia_nombre')->nullable();
             $table->string('emergencia_telefono', 10)->nullable();
-            $table->unsignedSmallInteger('residentes')->nullable();
             // Cuándo aceptó y qué versión del Aviso de Privacidad tenía enfrente.
             $table->timestamp('aceptado_en');
             $table->string('aviso_version');

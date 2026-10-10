@@ -6,6 +6,7 @@ use App\Enums\Calle;
 use App\Enums\MedioDeConfirmacion;
 use App\Enums\SituacionDelLote;
 use App\Models\RegistroDePropietario;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -74,13 +75,57 @@ class RegistroDePropietarioFactory extends Factory
     }
 
     /**
-     * Ya confirmado, como si hubiera escrito el código.
+     * Quien dio solo el celular.
      */
-    public function confirmado(): static
+    public function sinCorreo(): static
+    {
+        return $this->state(fn (array $atributos) => ['correo' => null]);
+    }
+
+    /**
+     * Quien dio solo el correo.
+     */
+    public function sinTelefono(): static
+    {
+        return $this->state(fn (array $atributos) => ['telefono' => null]);
+    }
+
+    /**
+     * Con el correo verificado, como si hubiera escrito el código.
+     */
+    public function conCorreoVerificado(): static
     {
         return $this->state(fn (array $atributos) => [
-            'confirmado_en' => now(),
-            'confirmado_por' => MedioDeConfirmacion::Codigo,
+            'correo_verificado_en' => now(),
+            'correo_verificado_por' => MedioDeConfirmacion::Codigo,
+        ]);
+    }
+
+    /**
+     * Con el celular verificado, como si hubiera escrito el código del SMS.
+     */
+    public function conTelefonoVerificado(): static
+    {
+        return $this->state(fn (array $atributos) => ['telefono_verificado_en' => now()]);
+    }
+
+    /**
+     * Con los dos medios verificados.
+     */
+    public function verificado(): static
+    {
+        return $this->conCorreoVerificado()->conTelefonoVerificado();
+    }
+
+    /**
+     * Verificado y además validado por la Administración.
+     */
+    public function validado(?User $quien = null, ?string $nota = null): static
+    {
+        return $this->verificado()->state(fn (array $atributos) => [
+            'validado_en' => now(),
+            'validado_por' => ($quien ?? User::factory()->create())->id,
+            'validacion_nota' => $nota,
         ]);
     }
 

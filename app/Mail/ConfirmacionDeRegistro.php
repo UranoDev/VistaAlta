@@ -9,8 +9,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
 /**
- * El correo con el que el propietario confirma su registro: el código de seis
- * dígitos y el enlace que hace lo mismo con un toque.
+ * El correo con el que el propietario verifica su correo: el código de seis
+ * dígitos y el enlace que hace lo mismo con un toque. El celular se verifica
+ * aparte, con otro código por SMS.
  */
 class ConfirmacionDeRegistro extends Mailable
 {
@@ -19,11 +20,13 @@ class ConfirmacionDeRegistro extends Mailable
         public readonly string $codigo,
         public readonly string $enlace,
         public readonly int $horas,
+        // Si además dio celular, el correo avisa que ese se verifica aparte.
+        public readonly bool $conCelular = false,
     ) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'Confirma tu registro en Vista Alta');
+        return new Envelope(subject: 'Verifica tu correo en Vista Alta');
     }
 
     public function content(): Content

@@ -6,6 +6,7 @@ namespace App\Support\Registro;
 
 use App\Models\LoteRegistrado;
 use App\Models\RegistroDePropietario;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
 /**
@@ -24,7 +25,8 @@ final class ListaCsv
     public const ENCABEZADO = [
         'Registrado', 'Propietario', 'Teléfono', 'Correo',
         'Calle', 'Núm. oficial', 'Manzana', 'Lote', 'Situación',
-        'Otros contactos', 'Contacto de emergencia', 'Teléfono de emergencia', 'Residentes', 'Confirmado',
+        'Otros contactos', 'Contacto de emergencia', 'Teléfono de emergencia', 'Residentes',
+        'Correo verificado', 'Celular verificado', 'Validado por la Administración',
     ];
 
     /**
@@ -61,7 +63,9 @@ final class ListaCsv
                     $registro->emergencia_nombre,
                     $registro->emergencia_telefono,
                     $registro->residentes,
-                    $registro->confirmado_en?->timezone(config('app.timezone'))->format('d/m/Y H:i') ?? 'Pendiente',
+                    self::fecha($registro->correo_verificado_en, $registro->tieneCorreo()),
+                    self::fecha($registro->telefono_verificado_en, $registro->tieneTelefono()),
+                    self::fecha($registro->validado_en),
                 ]));
             }
         }
@@ -69,6 +73,19 @@ final class ListaCsv
         rewind($flujo);
 
         return $flujo;
+    }
+
+    /**
+     * La fecha y hora de una marca, «Pendiente» si todavía no ocurre, o «No lo dio»
+     * si la persona no dio ese medio.
+     */
+    private static function fecha(?CarbonInterface $marca, bool $loDio = true): string
+    {
+        if (! $loDio) {
+            return 'No lo dio';
+        }
+
+        return $marca?->timezone(config('app.timezone'))->format('d/m/Y H:i') ?? 'Pendiente';
     }
 
     /**

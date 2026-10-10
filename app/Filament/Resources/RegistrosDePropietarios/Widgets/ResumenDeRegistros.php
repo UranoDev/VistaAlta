@@ -30,7 +30,9 @@ class ResumenDeRegistros extends StatsOverviewWidget
 
         return [
             Stat::make('Propietarios registrados', RegistroDePropietario::query()->count())
-                ->description(RegistroDePropietario::query()->confirmados()->count().' confirmados'),
+                ->description(RegistroDePropietario::query()->verificados()->count().' con todo verificado'),
+            Stat::make('Por validar', RegistroDePropietario::query()->porValidar()->count())
+                ->description(RegistroDePropietario::query()->validados()->count().' ya validados por la Administración'),
             Stat::make('Lotes registrados', LoteRegistrado::query()->count()),
             Stat::make('Con casa terminada', (int) ($porSituacion[SituacionDelLote::CasaTerminada->value] ?? 0))
                 ->description($enConstruccion === 1 ? '1 más en construcción' : "{$enConstruccion} más en construcción"),

@@ -62,10 +62,11 @@ class RegistrarPropietarioRequest extends FormRequest
 
         return [
             'nombre' => ['required', 'string', 'max:255'],
-            // El correo es obligatorio: ahí llega el código y el enlace que
-            // confirman el registro. El teléfono es opcional.
-            'telefono' => $telefono,
-            'correo' => ['required', 'email:rfc', 'max:255'],
+            // Con uno de los dos basta. Si se dan los dos, los dos se verifican, cada
+            // uno por separado: el correo con un código y un enlace, el celular con
+            // un código por SMS.
+            'telefono' => [...$telefono, 'required_without:correo'],
+            'correo' => ['nullable', 'email:rfc', 'max:255', 'required_without:telefono'],
 
             'lotes' => ['required', 'array', 'min:1', 'max:20'],
             'lotes.*.calle' => ['required', Rule::enum(Calle::class)],
@@ -96,7 +97,7 @@ class RegistrarPropietarioRequest extends FormRequest
     {
         return [
             'required' => 'Falta este dato.',
-            'required_without' => 'Indica un teléfono o un correo. Con uno basta.',
+            'required_without' => 'Indica un celular o un correo. Con uno basta.',
             'required_with' => 'Falta este dato.',
             'max' => 'Es demasiado largo.',
             'email' => 'Escribe un correo válido, como nombre@correo.com.',
@@ -110,7 +111,6 @@ class RegistrarPropietarioRequest extends FormRequest
             'lotes.min' => 'Registra al menos un lote.',
             'lotes.max' => 'Son demasiados lotes para un solo registro. Escríbenos y lo vemos.',
             'contactos.max' => 'Son demasiados contactos. Deja los más importantes.',
-            'correo.required' => 'Escribe tu correo. Ahí te mandamos el código para confirmar tu registro.',
             'lotes.*.calle.enum' => 'Elige una de las calles.',
             'lotes.*.numero_oficial.required_without_all' => 'Escribe el número oficial, o bien la manzana y el lote.',
             'lotes.*.manzana.required_without' => 'Falta la manzana. Si no la tienes, escribe el número oficial.',
@@ -146,7 +146,7 @@ class RegistrarPropietarioRequest extends FormRequest
         return [
             'nombre' => trim($datos['nombre']),
             'telefono' => $datos['telefono'] ?? null,
-            'correo' => mb_strtolower(trim($datos['correo'])),
+            'correo' => filled($datos['correo'] ?? null) ? mb_strtolower(trim($datos['correo'])) : null,
             'emergencia_nombre' => filled($datos['emergencia_nombre'] ?? null) ? trim($datos['emergencia_nombre']) : null,
             'emergencia_telefono' => $datos['emergencia_telefono'] ?? null,
             'residentes' => isset($datos['residentes']) && $datos['residentes'] !== '' ? (int) $datos['residentes'] : null,

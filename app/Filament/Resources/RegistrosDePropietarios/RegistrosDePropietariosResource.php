@@ -10,11 +10,14 @@ use App\Filament\Resources\RegistrosDePropietarios\Pages\ListRegistrosDePropieta
 use App\Models\LoteRegistrado;
 use App\Models\RegistroDePropietario;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -56,6 +59,17 @@ class RegistrosDePropietariosResource extends Resource
 
     protected static ?int $navigationSort = 60;
 
+    /**
+     * Cuántos registros hay por validar, junto al nombre en el menú: es lo que le
+     * toca hacer a la Administración.
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        $porValidar = RegistroDePropietario::query()->porValidar()->count();
+
+        return $porValidar > 0 ? (string) $porValidar : null;
+    }
+
     public static function canCreate(): bool
     {
         return false;
@@ -69,8 +83,8 @@ class RegistrosDePropietariosResource extends Resource
                 ->schema([
                     TextEntry::make('nombre')->label('Nombre')->weight('bold'),
                     TextEntry::make('created_at')->label('Registrado')->dateTime('d/m/Y H:i'),
-                    TextEntry::make('telefono')->label('Teléfono')->placeholder('Sin teléfono')->copyable(),
-                    TextEntry::make('correo')->label('Correo')->placeholder('Sin correo')->copyable(),
+                    TextEntry::make('telefono')->label('Celular')->placeholder('No lo dio')->copyable(),
+                    TextEntry::make('correo')->label('Correo')->placeholder('No lo dio')->copyable(),
                 ]),
 
             Section::make('Lotes')
@@ -110,15 +124,39 @@ class RegistrosDePropietariosResource extends Resource
                     TextEntry::make('residentes')->label('Residentes')->placeholder('—'),
                 ]),
 
-            Section::make('Consentimiento')
+            // Dos verificaciones separadas: cada medio tiene su propia marca.
+            Section::make('Verificación')
+                ->description('Con el correo o el celular basta para registrarse. Cada uno que se dio se verifica por separado, con su propio código.')
                 ->columns(2)
                 ->schema([
-                    TextEntry::make('confirmado_en')->label('Confirmó su registro')->dateTime('d/m/Y H:i')->placeholder('Todavía no')
-                        ->helperText(fn (?RegistroDePropietario $record): ?string => match ($record?->confirmado_por) {
+                    TextEntry::make('correo_verificado_en')->label('Correo verificado')
+                        ->state(fn (RegistroDePropietario $record): string => ! $record->tieneCorreo()
+                            ? 'No lo dio'
+                            : ($record->correoVerificado() ? $record->correo_verificado_en->timezone(config('app.timezone'))->format('d/m/Y H:i') : 'Pendiente'))
+                        ->helperText(fn (?RegistroDePropietario $record): ?string => match ($record?->correo_verificado_por) {
                             MedioDeConfirmacion::Enlace => 'Con el enlace del correo.',
                             MedioDeConfirmacion::Codigo => 'Con el código.',
                             default => null,
                         }),
+                    TextEntry::make('telefono_verificado_en')->label('Celular verificado')
+                        ->state(fn (RegistroDePropietario $record): string => ! $record->tieneTelefono()
+                            ? 'No lo dio'
+                            : ($record->telefonoVerificado() ? $record->telefono_verificado_en->timezone(config('app.timezone'))->format('d/m/Y H:i') : 'Pendiente'))
+                        ->helperText(fn (?RegistroDePropietario $record): ?string => $record?->telefonoVerificado() ? 'Con el código del SMS.' : null),
+                ]),
+
+            Section::make('Validación de la Administración')
+                ->description('Verificar prueba que la persona controla su correo y su celular. Validar es que la Administración revisó que el registro es cierto.')
+                ->columns(2)
+                ->schema([
+                    TextEntry::make('validado_en')->label('Validado')->dateTime('d/m/Y H:i')->placeholder('Por validar'),
+                    TextEntry::make('validador.name')->label('Lo validó')->placeholder('—'),
+                    TextEntry::make('validacion_nota')->label('Cómo se revisó')->placeholder('—')->columnSpanFull(),
+                ]),
+
+            Section::make('Consentimiento')
+                ->columns(2)
+                ->schema([
                     TextEntry::make('aceptado_en')->label('Aceptó el aviso de privacidad')->dateTime('d/m/Y H:i'),
                     TextEntry::make('aviso_version')->label('Versión del aviso'),
                 ]),
@@ -164,17 +202,39 @@ class RegistrosDePropietariosResource extends Resource
 
                 TextColumn::make('telefono')
                     ->label('Contacto')
-                    ->placeholder('Sin teléfono')
+                    ->placeholder('Sin celular')
                     ->description(fn (RegistroDePropietario $registro): string => $registro->correo ?? 'Sin correo')
                     ->searchable(['telefono', 'correo']),
 
-                IconColumn::make('confirmado_en')
-                    ->label('Confirmado')
+                IconColumn::make('correo_verificado_en')
+                    ->label('Correo')
                     ->boolean()
-                    ->state(fn (RegistroDePropietario $registro): bool => $registro->estaConfirmado())
-                    ->tooltip(fn (RegistroDePropietario $registro): string => $registro->estaConfirmado()
-                        ? 'Confirmó el '.$registro->confirmado_en->timezone(config('app.timezone'))->format('d/m/Y H:i')
-                        : 'Todavía no confirma'),
+                    // Nulo cuando no dio correo: ahí no hay nada que verificar y no se
+                    // pinta ni la palomita ni la tacha.
+                    ->state(fn (RegistroDePropietario $registro): ?bool => $registro->tieneCorreo() ? $registro->correoVerificado() : null)
+                    ->tooltip(fn (RegistroDePropietario $registro): string => ! $registro->tieneCorreo()
+                        ? 'No dio correo'
+                        : ($registro->correoVerificado()
+                            ? 'Correo verificado el '.$registro->correo_verificado_en->timezone(config('app.timezone'))->format('d/m/Y H:i')
+                            : 'Correo sin verificar')),
+
+                IconColumn::make('telefono_verificado_en')
+                    ->label('Celular')
+                    ->boolean()
+                    ->state(fn (RegistroDePropietario $registro): ?bool => $registro->tieneTelefono() ? $registro->telefonoVerificado() : null)
+                    ->tooltip(fn (RegistroDePropietario $registro): string => ! $registro->tieneTelefono()
+                        ? 'No dio celular'
+                        : ($registro->telefonoVerificado()
+                            ? 'Celular verificado el '.$registro->telefono_verificado_en->timezone(config('app.timezone'))->format('d/m/Y H:i')
+                            : 'Celular sin verificar')),
+
+                IconColumn::make('validado_en')
+                    ->label('Validado')
+                    ->boolean()
+                    ->state(fn (RegistroDePropietario $registro): bool => $registro->estaValidado())
+                    ->tooltip(fn (RegistroDePropietario $registro): string => $registro->estaValidado()
+                        ? 'Validado el '.$registro->validado_en->timezone(config('app.timezone'))->format('d/m/Y H:i')
+                        : 'Sin validar'),
 
                 TextColumn::make('contactos_count')
                     ->label('Otros contactos')
@@ -199,16 +259,70 @@ class RegistrosDePropietariosResource extends Resource
                         ? $query->whereHas('lotes', fn (Builder $q): Builder => $q->where('calle', $data['value']))
                         : $query),
 
-                TernaryFilter::make('confirmado_en')
-                    ->label('Confirmación')
+                SelectFilter::make('verificacion')
+                    ->label('Verificación')
+                    ->options([
+                        'completa' => 'Todo lo que dieron, verificado',
+                        'falta' => 'Falta verificar algo',
+                        'correo_pendiente' => 'Correo por verificar',
+                        'celular_pendiente' => 'Celular por verificar',
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => match ($data['value'] ?? null) {
+                        'completa' => $query->verificados(),
+                        'falta' => $query->whereNotIn('id', RegistroDePropietario::query()->verificados()->select('id')),
+                        'correo_pendiente' => $query->whereNotNull('correo')->whereNull('correo_verificado_en'),
+                        'celular_pendiente' => $query->whereNotNull('telefono')->whereNull('telefono_verificado_en'),
+                        default => $query,
+                    }),
+
+                TernaryFilter::make('validado_en')
+                    ->label('Validación')
                     ->nullable()
                     ->placeholder('Todos')
-                    ->trueLabel('Confirmados')
-                    ->falseLabel('Sin confirmar'),
+                    ->trueLabel('Validados')
+                    ->falseLabel('Sin validar'),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([
                 ViewAction::make()->label('Ver')->slideOver(),
+
+                // Solo con el correo y el celular ya verificados: validar un registro
+                // cuyo contacto no se pudo comprobar no tendría a quién avisarle.
+                Action::make('validar')
+                    ->label('Validar')
+                    ->icon(Heroicon::OutlinedCheckBadge)
+                    ->color('success')
+                    ->visible(fn (RegistroDePropietario $record): bool => $record->estaVerificado() && ! $record->estaValidado())
+                    ->modalHeading('Validar este registro')
+                    ->modalDescription('Queda marcado que la Administración revisó que el registro es cierto, con tu nombre y la fecha de hoy.')
+                    ->modalSubmitActionLabel('Validar')
+                    ->schema([
+                        Textarea::make('nota')
+                            ->label('Cómo se revisó (opcional)')
+                            ->helperText('Por ejemplo: «Escritura mostrada el 12 de octubre». No se publica.')
+                            ->rows(3)
+                            ->maxLength(1000),
+                    ])
+                    ->action(function (RegistroDePropietario $record, array $data): void {
+                        $record->validar(auth()->user(), $data['nota'] ?? null);
+
+                        Notification::make()->title('Registro validado')->success()->send();
+                    }),
+
+                Action::make('quitarValidacion')
+                    ->label('Quitar validación')
+                    ->icon(Heroicon::OutlinedArrowUturnLeft)
+                    ->color('gray')
+                    ->visible(fn (RegistroDePropietario $record): bool => $record->estaValidado())
+                    ->requiresConfirmation()
+                    ->modalHeading('Quitar la validación')
+                    ->modalDescription('El registro vuelve a quedar por validar. Se borra la nota de cómo se revisó.')
+                    ->modalSubmitActionLabel('Quitar')
+                    ->action(function (RegistroDePropietario $record): void {
+                        $record->quitarValidacion();
+
+                        Notification::make()->title('Listo')->body('El registro quedó por validar.')->success()->send();
+                    }),
 
                 DeleteAction::make()
                     ->modalHeading('Borrar este registro')
@@ -227,7 +341,7 @@ class RegistrosDePropietariosResource extends Resource
      */
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('lotes')->withCount('contactos');
+        return parent::getEloquentQuery()->with(['lotes', 'validador'])->withCount('contactos');
     }
 
     public static function getPages(): array

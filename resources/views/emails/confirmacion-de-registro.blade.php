@@ -5,19 +5,24 @@
         <p style="margin:0 0 16px;font-size:16px;">Hola, {{ $nombre }}.</p>
 
         <p style="margin:0 0 16px;font-size:16px;line-height:1.5;">
-            Para confirmar tu registro de propietario, toca el botón o escribe este código en la página.
+            Para verificar tu correo, toca el botón o escribe este código en la página del registro.
         </p>
 
         <p style="margin:24px 0;text-align:center;">
             <a href="{{ $enlace }}"
                style="display:inline-block;background:#1e4d3b;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;padding:14px 24px;">
-                Confirmar mi registro
+                Verificar mi correo
             </a>
         </p>
 
         <p style="margin:0 0 8px;font-size:14px;color:#55605a;text-align:center;">Tu código</p>
         <p style="margin:0 0 24px;font-size:32px;font-weight:bold;letter-spacing:6px;text-align:center;font-family:Menlo,Consolas,monospace;">{{ $codigo }}</p>
 
+        @if ($conCelular)
+            <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#55605a;">
+                Tu celular se verifica aparte: te llega un SMS con otro código. Este correo solo verifica tu correo.
+            </p>
+        @endif
         <p style="margin:0 0 8px;font-size:13px;line-height:1.5;color:#55605a;">
             El código y el enlace sirven por {{ $horas }} horas. Si tú no te registraste, ignora este correo.
         </p>

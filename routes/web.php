@@ -120,21 +120,25 @@ Route::post('/registro', [RegistroDePropietariosController::class, 'store'])
     ->name('registro.store');
 
 /*
- * La confirmación del registro: el código que llega por correo y por WhatsApp, y
- * el enlace del correo. El código se escribe en `/registro/confirmar`, que
- * recuerda el registro por la sesión; el enlace lleva el registro y su token en
+ * Las dos verificaciones del registro, cada una por su lado: el código del correo
+ * (que trae además un enlace) y el código del SMS. `{canal}` es `correo` o
+ * `telefono`; los dos códigos se escriben en `/registro/confirmar`, que recuerda
+ * el registro por la sesión. El enlace del correo lleva el registro y su token en
  * la dirección y funciona desde cualquier aparato.
  *
  * El enlace tiene dos rutas a propósito: el GET solo muestra un botón y el POST
- * confirma. Un GET que confirmara lo activarían los antivirus que abren los
+ * verifica. Un GET que verificara lo activarían los antivirus que abren los
  * enlaces del correo. Los topes cubren a quien adivina códigos (solo hay un
- * millón) y a quien usa el reenvío para mandar correos y WhatsApp a otros.
+ * millón) y a quien usa el reenvío para mandar correos y SMS a otros; el SMS
+ * además tiene su propio tope por teléfono y por IP (`LimiteDeEnvioDeOtp`).
  */
 Route::get('/registro/confirmar', [RegistroDePropietariosController::class, 'confirmar'])->name('registro.confirmar');
-Route::post('/registro/confirmar', [RegistroDePropietariosController::class, 'validarCodigo'])
+Route::post('/registro/confirmar/{canal}/codigo', [RegistroDePropietariosController::class, 'validarCodigo'])
+    ->where('canal', 'correo|telefono')
     ->middleware('throttle:20,10')
     ->name('registro.codigo');
-Route::post('/registro/confirmar/reenviar', [RegistroDePropietariosController::class, 'reenviar'])
+Route::post('/registro/confirmar/{canal}/reenviar', [RegistroDePropietariosController::class, 'reenviar'])
+    ->where('canal', 'correo|telefono')
     ->middleware('throttle:5,10')
     ->name('registro.reenviar');
 Route::get('/registro/confirmar/{registro}/{token}', [RegistroDePropietariosController::class, 'enlace'])

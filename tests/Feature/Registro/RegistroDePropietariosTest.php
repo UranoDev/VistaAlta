@@ -88,12 +88,13 @@ class RegistroDePropietariosTest extends TestCase
         $this->assertNull($contacto->correo);
     }
 
-    public function test_despues_de_enviar_pide_el_codigo_y_no_el_formulario(): void
+    public function test_despues_de_enviar_pide_los_dos_codigos_y_no_el_formulario(): void
     {
         $this->followingRedirects()
             ->post(route('registro.store'), $this->envio())
-            ->assertSee('Falta confirmarlo')
-            ->assertSee('Código de 6 dígitos')
+            ->assertSee('Falta verificar tu correo y tu celular')
+            ->assertSee('Código del correo')
+            ->assertSee('Código del SMS')
             ->assertDontSee('Enviar registro');
     }
 
@@ -104,26 +105,48 @@ class RegistroDePropietariosTest extends TestCase
         $this->assertSame('5512345678', RegistroDePropietario::query()->sole()->telefono);
     }
 
-    public function test_con_solo_correo_basta(): void
+    public function test_el_correo_y_el_celular_se_guardan_normalizados(): void
     {
-        $this->post(route('registro.store'), $this->envio(['telefono' => '']))->assertSessionHasNoErrors();
+        $this->post(route('registro.store'), $this->envio(['telefono' => '+52 1 55 1234 5678', 'correo' => 'Marta@Correo.com']))
+            ->assertSessionHasNoErrors();
 
-        $this->assertNull(RegistroDePropietario::query()->sole()->telefono);
+        $registro = RegistroDePropietario::query()->sole();
+
+        $this->assertSame('5512345678', $registro->telefono);
+        $this->assertSame('marta@correo.com', $registro->correo);
     }
 
-    public function test_sin_correo_no_se_guarda_aunque_haya_telefono(): void
+    public function test_sin_correo_ni_celular_no_se_guarda(): void
     {
-        $this->post(route('registro.store'), $this->envio(['correo' => '']))
-            ->assertSessionHasErrors(['correo' => 'Escribe tu correo. Ahí te mandamos el código para confirmar tu registro.']);
+        $this->post(route('registro.store'), $this->envio(['telefono' => '', 'correo' => '']))
+            ->assertSessionHasErrors([
+                'telefono' => 'Indica un celular o un correo. Con uno basta.',
+                'correo' => 'Indica un celular o un correo. Con uno basta.',
+            ]);
 
         $this->assertDatabaseCount('registros_de_propietarios', 0);
     }
 
-    public function test_el_telefono_es_opcional(): void
+    public function test_con_solo_el_correo_basta(): void
     {
         $this->post(route('registro.store'), $this->envio(['telefono' => '']))->assertSessionHasNoErrors();
 
-        $this->assertDatabaseCount('registros_de_propietarios', 1);
+        $registro = RegistroDePropietario::query()->sole();
+
+        $this->assertTrue($registro->tieneCorreo());
+        $this->assertFalse($registro->tieneTelefono());
+        $this->assertNull($registro->telefono);
+    }
+
+    public function test_con_solo_el_celular_basta(): void
+    {
+        $this->post(route('registro.store'), $this->envio(['correo' => '']))->assertSessionHasNoErrors();
+
+        $registro = RegistroDePropietario::query()->sole();
+
+        $this->assertTrue($registro->tieneTelefono());
+        $this->assertFalse($registro->tieneCorreo());
+        $this->assertNull($registro->correo);
     }
 
     public function test_un_contacto_adicional_tambien_necesita_telefono_o_correo(): void

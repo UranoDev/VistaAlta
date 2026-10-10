@@ -521,23 +521,40 @@ git push
 git push origin <version>
 ```
 
-En el servidor:
+En el servidor, por SSH:
 
 ```bash
 cd ~/httpdocs
 git pull
-composer install --no-dev --optimize-autoloader
-npm ci && npm run build          # solo si cambió el front
-php artisan migrate --force
-php artisan storage:link         # solo si el árbol es nuevo: el enlace no está en git
-php artisan optimize             # limpia y rehace config/route/view cache
-php artisan queue:restart        # el worker viejo sigue en memoria con el código viejo
+bash deploy.sh
 ```
+
+`deploy.sh` (en la raíz del repo) hace todo lo demás, y se detiene con un mensaje claro si
+algo falta en vez de publicar a medias:
+
+1. Resuelve PHP y composer (que en Plesk cambian de ruta) y revisa que el PHP sea 8.3 o más
+   y tenga `pdo_mysql`, `mbstring`, `openssl`, `curl`, `fileinfo` y `zip`.
+2. Revisa que exista el `.env` y **avisa** si `APP_ENV` no es `production`, si `APP_DEBUG` es
+   `true`, o si el correo (`MAIL_MAILER`) o el SMS (`OTP_CHANNEL`) están en `log`: el sitio corre,
+   pero esos mensajes no le llegarían a nadie.
+3. `composer install --no-dev`, `npm ci` y `npm run build`. **Si no hay `npm`, falla**: saltarse
+   el build deja el sitio sirviendo el CSS anterior sin que nada lo avise. Si `npm` no aparece en
+   el PATH del despliegue de Plesk, agrega los shims de nodenv (`.node-version` del repo).
+4. `php artisan migrate --force` y `php artisan optimize`.
+
+Para probar un servidor **sin desplegar** (solo las revisiones, sin instalar ni migrar nada):
+
+```bash
+bash deploy.sh --revisar
+```
+
+También sirve como **acción de despliegue de Plesk** (Git › Acciones de despliegue
+adicionales): `bash deploy.sh`.
 
 La siembra de contenido no va aquí: ver «Contenido inicial» en la sección 6.
 
 **Nunca** corras `git clean -fdx` en el servidor: se lleva `.env`, `public/build`
-y el `.node-version`, que son justamente lo que no está en git.
+y el `storage/`, que son justamente lo que no está en git.
 
 Con MariaDB esto pica menos que con SQLite: la base ya no vive dentro del árbol de
 trabajo, así que un `git clean` descuidado te tira la configuración y los assets

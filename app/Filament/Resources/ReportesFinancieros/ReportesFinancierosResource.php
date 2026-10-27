@@ -135,11 +135,11 @@ class ReportesFinancierosResource extends Resource
                 ]),
 
             Section::make('PDF del reporte')
-                ->description('Opcional. Lo mismo que trae la hoja, en un formato que se ve y se revisa mejor desde el celular.')
+                ->description('Opcionales. Dos archivos distintos: el desglose completo y el resumen del mes.')
                 ->schema([
                     TextInput::make('pdf_url')
-                        ->label('Enlace al PDF')
-                        ->helperText('Pega aquí la URL de «Compartir» del PDF, con «Cualquier persona con el enlace: puede ver». Es una copia de la hoja: si la hoja cambia, hay que generar el PDF otra vez y actualizar este enlace, porque la que vale es la hoja. En la página pública abre en una pestaña nueva y sale primero.')
+                        ->label('Enlace al PDF del desglose')
+                        ->helperText('Un PDF con todo lo que trae la hoja, pago por pago. Si el PDF solo trae el resumen, va en el campo de abajo. Pega aquí la URL de «Compartir», con «Cualquier persona con el enlace: puede ver». Si la hoja cambia, hay que generar el PDF otra vez y actualizar este enlace, porque la que vale es la hoja. En la página pública sale como «Ver el desglose en PDF».')
                         ->url()
                         ->maxLength(2048)
                         ->columnSpanFull(),

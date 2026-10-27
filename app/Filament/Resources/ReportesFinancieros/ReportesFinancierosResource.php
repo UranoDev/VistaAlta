@@ -143,6 +143,13 @@ class ReportesFinancierosResource extends Resource
                         ->url()
                         ->maxLength(2048)
                         ->columnSpanFull(),
+
+                    TextInput::make('resumen_pdf_url')
+                        ->label('Enlace al PDF del resumen')
+                        ->helperText('Opcional. Un PDF con solo el resumen del mes: ingresos, egresos y remanente. Compártelo igual que el otro PDF. En la página pública sale después del desglose, como «Ver el resumen en PDF».')
+                        ->url()
+                        ->maxLength(2048)
+                        ->columnSpanFull(),
                 ]),
 
             Callout::make('Esto queda público, sin contraseña')

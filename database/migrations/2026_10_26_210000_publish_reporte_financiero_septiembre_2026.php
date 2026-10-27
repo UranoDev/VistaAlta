@@ -33,6 +33,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Las pruebas migran una base vacía y siembran sus propios reportes: con
+        // septiembre adentro, cada una arrancaría con un mes que no pidió.
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         $cifras = [
             ['concepto' => 'Cuotas de septiembre', 'monto' => 65000, 'destacada' => false],
             ['concepto' => 'Recargos', 'monto' => 640, 'destacada' => false],

@@ -16,8 +16,7 @@
     <x-palette-receipt.seccion rotulo="Rendición de cuentas del Periodo" titulo="Reporte financiero">
         <p class="text-grafito/85">
             De dónde salió y en qué se fue el dinero del fraccionamiento durante el mes. Abajo van las cifras de
-            resumen; el detalle, movimiento por movimiento, está completo en la hoja de cálculo y se abre sin pedir
-            nada a nadie.
+            resumen, y más abajo el desglose completo, movimiento por movimiento, que se abre sin pedir nada a nadie.
         </p>
 
         @if ($reporte->periodo)
@@ -99,14 +98,16 @@
                 @endif
 
                 <x-palette-receipt.nota class="mt-4">
-                    Estas son cifras de resumen, capturadas a mano por la Administración. Si quieres saber de dónde
-                    sale alguna, el lugar no es esta página: es la hoja de cálculo, donde está cada movimiento con su
-                    fecha y su concepto.
+                    Estas son cifras de resumen, capturadas a mano por la Administración.
+                    @if ($reporte->tieneDesglose())
+                        Si quieres saber de dónde sale alguna, el lugar no es esta página: es el desglose completo, donde
+                        está cada movimiento.
+                    @endif
                 </x-palette-receipt.nota>
             </div>
         @endif
 
-        @if ($reporte->tieneDesglose())
+        @if ($reporte->tieneDesglose() || $reporte->tieneResumenPdf())
             {{--
                 Dos enlaces al mismo contenido: el PDF, que se lee mejor en el
                 celular, y la hoja, que es la fuente de verdad. Son dos formas de
@@ -124,12 +125,15 @@
                 comentarios y se confunde igual.
             --}}
             @php($conPdfYHoja = $reporte->tienePdf() && $reporte->tieneHoja())
-            @php($dominios = collect([$reporte->dominioDelPdf(), $reporte->dominioDeLaHoja()])->filter()->unique()->values())
+            @php($dominios = collect([$reporte->dominioDelPdf(), $reporte->dominioDeLaHoja(), $reporte->dominioDelResumenPdf()])->filter()->unique()->values())
+            @php($enlaces = collect([$reporte->tienePdf(), $reporte->tieneHoja(), $reporte->tieneResumenPdf()])->filter()->count())
 
             <div class="mt-10 border-t border-linea pt-8">
-                <h3 class="text-lg font-bold tracking-tight">Desglose completo</h3>
+                <h3 class="text-lg font-bold tracking-tight">{{ $reporte->tieneDesglose() ? 'Desglose completo' : 'Resumen en PDF' }}</h3>
                 <p class="mt-2 text-sm text-grafito/80">
-                    @if ($conPdfYHoja)
+                    @if (! $reporte->tieneDesglose())
+                        Las cifras de arriba, en un PDF.
+                    @elseif ($conPdfYHoja)
                         Cada ingreso y cada gasto del periodo, en dos formatos con la misma información: un PDF, más
                         cómodo de revisar, y la hoja de cálculo. La hoja es la fuente de verdad de este reporte: si una
                         cifra de arriba y el PDF no coinciden con la hoja, la que vale es la hoja.
@@ -139,6 +143,9 @@
                     @else
                         Cada ingreso y cada gasto del periodo. La hoja de cálculo es la fuente
                         de verdad de este reporte: si una cifra de arriba y la hoja no coinciden, la que vale es la hoja.
+                    @endif
+                    @if ($reporte->tieneDesglose() && $reporte->tieneResumenPdf())
+                        El resumen, con las cifras de arriba, también está en un PDF aparte.
                     @endif
                 </p>
 
@@ -164,10 +171,25 @@
                             <span aria-hidden="true">&nearr;</span>
                         </x-palette-receipt.boton>
                     @endif
+
+                    {{--
+                        Después del desglose y con contorno cuando hay desglose:
+                        trae lo mismo que la tarjeta de arriba, así que es la
+                        opción secundaria.
+                    --}}
+                    @if ($reporte->tieneResumenPdf())
+                        <x-palette-receipt.boton :href="$reporte->resumen_pdf_url"
+                                        :variante="$reporte->tieneDesglose() ? 'contorno' : 'tinta'"
+                                        target="_blank"
+                                        rel="noopener noreferrer">
+                            Ver el resumen en PDF
+                            <span aria-hidden="true">&nearr;</span>
+                        </x-palette-receipt.boton>
+                    @endif
                 </div>
 
                 <p class="mt-3 text-xs text-grafito/70">
-                    {{ $conPdfYHoja ? 'Se abren' : 'Se abre' }} en una pestaña nueva, fuera de este sitio{{ $dominios->isNotEmpty() ? ' ('.$dominios->join(', ', ' y ').')' : '' }}.
+                    {{ $enlaces > 1 ? 'Se abren' : 'Se abre' }} en una pestaña nueva, fuera de este sitio{{ $dominios->isNotEmpty() ? ' ('.$dominios->join(', ', ' y ').')' : '' }}.
                 </p>
             </div>
         @endif

@@ -38,7 +38,7 @@ use Illuminate\Support\Collection;
  *
  * @property-read string|null $periodo
  */
-#[Fillable(['mes', 'cifras', 'aclaracion', 'hoja_url', 'pdf_url'])]
+#[Fillable(['mes', 'cifras', 'aclaracion', 'hoja_url', 'pdf_url', 'resumen_pdf_url'])]
 class ReporteFinanciero extends Model
 {
     protected $table = 'reporte_financiero';
@@ -268,6 +268,15 @@ class ReporteFinanciero extends Model
     }
 
     /**
+     * Si el reporte trae, aparte del desglose, un PDF con solo el resumen del
+     * mes.
+     */
+    public function tieneResumenPdf(): bool
+    {
+        return filled($this->resumen_pdf_url);
+    }
+
+    /**
      * La aclaración del Periodo: lo que las cifras no dicen solas. Un mes con un
      * ingreso extraordinario infla el remanente, y quien lea el resumen sin ese
      * contexto concluye que ese excedente es lo normal.
@@ -282,7 +291,7 @@ class ReporteFinanciero extends Model
 
     public function estaVacio(): bool
     {
-        return ! $this->tieneResumen() && ! $this->tieneDesglose();
+        return ! $this->tieneResumen() && ! $this->tieneDesglose() && ! $this->tieneResumenPdf();
     }
 
     /**
@@ -310,5 +319,17 @@ class ReporteFinanciero extends Model
         }
 
         return parse_url((string) $this->pdf_url, PHP_URL_HOST) ?: null;
+    }
+
+    /**
+     * Lo mismo, para el PDF del resumen.
+     */
+    public function dominioDelResumenPdf(): ?string
+    {
+        if (! $this->tieneResumenPdf()) {
+            return null;
+        }
+
+        return parse_url((string) $this->resumen_pdf_url, PHP_URL_HOST) ?: null;
     }
 }

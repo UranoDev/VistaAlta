@@ -237,6 +237,57 @@ class PaginaReporteFinancieroTest extends TestCase
             ->assertDontSee('El reporte financiero de este periodo se publica aquí.');
     }
 
+    public function test_el_pdf_del_resumen_sale_despues_del_desglose_y_con_contorno(): void
+    {
+        $this->sembrar([
+            'cifras' => [['concepto' => 'Remanente', 'monto' => 1]],
+            'pdf_url' => 'https://drive.google.com/file/d/desglose123/view',
+            'resumen_pdf_url' => 'https://drive.google.com/file/d/resumen123/view',
+        ]);
+
+        $respuesta = $this->get(route('reporte-financiero'));
+
+        $respuesta->assertSee('https://drive.google.com/file/d/resumen123/view', escape: false);
+        $respuesta->assertSeeInOrder(['Ver el desglose en PDF', 'Ver el resumen en PDF']);
+        $respuesta->assertSee('Desglose completo');
+        $respuesta->assertSee('Se abren en una pestaña nueva, fuera de este sitio (drive.google.com)');
+        $this->assertMatchesRegularExpression('/border-tinta[^"]*"[^>]*>\s*Ver el resumen en PDF/s', $respuesta->getContent());
+    }
+
+    public function test_la_nota_del_resumen_manda_al_desglose_sin_nombrar_el_formato(): void
+    {
+        $this->sembrar([
+            'cifras' => [['concepto' => 'Remanente', 'monto' => 1]],
+            'pdf_url' => 'https://drive.google.com/file/d/desglose123/view',
+        ]);
+
+        $this->get(route('reporte-financiero'))
+            ->assertSee('es el desglose completo')
+            ->assertDontSee('hoja de cálculo');
+    }
+
+    public function test_sin_desglose_la_nota_del_resumen_no_manda_a_ningun_lado(): void
+    {
+        $this->sembrar(['cifras' => [['concepto' => 'Remanente', 'monto' => 1]]]);
+
+        $this->get(route('reporte-financiero'))
+            ->assertSee('capturadas a mano por la Administración')
+            ->assertDontSee('es el desglose completo');
+    }
+
+    public function test_un_reporte_solo_con_el_pdf_del_resumen_lo_publica(): void
+    {
+        $reporte = $this->sembrar(['resumen_pdf_url' => 'https://drive.google.com/file/d/resumen123/view']);
+
+        $this->assertFalse($reporte->estaVacio());
+
+        $this->get(route('reporte-financiero'))
+            ->assertSee('Resumen en PDF')
+            ->assertSee('Ver el resumen en PDF')
+            ->assertDontSee('Desglose completo')
+            ->assertSee('Se abre en una pestaña nueva');
+    }
+
     public function test_sin_hoja_capturada_no_hay_enlace_roto(): void
     {
         $this->sembrar(['cifras' => [['concepto' => 'Saldo final', 'monto' => 1]]]);
